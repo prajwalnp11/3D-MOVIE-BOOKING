@@ -1,0 +1,190 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CineVerse | Movie Booking</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+
+    <header class="navbar">
+
+        <a href="/" class="logo">
+            CINE<span>VERSE</span>
+        </a>
+
+        <nav>
+            <a href="/">Home</a>
+            <a href="#movies">Movies</a>
+            <a href="#theatres">Theatres</a>
+            <a href="{% url 'booking_home' %}">Booking</a>
+            <a href="#bookings">My Bookings</a>
+        </nav>
+
+        <a href="/admin/" class="login-btn">Login</a>
+
+    </header>
+
+
+    <!-- Featured Movie -->
+
+    {% if featured_movie %}
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <p class="tagline">
+                NOW SHOWING ON CINEVERSE
+            </p>
+
+            <h1>{{ featured_movie.title }}</h1>
+
+            <p class="rating">
+                ★ {{ featured_movie.rating|floatformat:1 }} / 10
+            </p>
+
+            <p class="description">
+                {{ featured_movie.description|truncatewords:30 }}
+            </p>
+
+            <a href="#movies" class="book-btn">
+                Explore Movies
+            </a>
+
+        </div>
+
+
+        {% if featured_movie.poster_url %}
+
+        <div class="hero-poster">
+
+            <img
+                src="{{ featured_movie.poster_url }}"
+                alt="{{ featured_movie.title }}"
+            >
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+    {% endif %}
+
+
+    <!-- Popular Movies -->
+
+    <section class="movie-section" id="movies">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="tagline">
+                    EXPLORE THE COLLECTION
+                </p>
+
+                <h2>Popular Movies</h2>
+
+            </div>
+
+            <span>
+                {{ movies|length }} Movies
+            </span>
+
+        </div>
+
+
+        <!-- Movie Cards -->
+
+        <div class="movie-grid">
+
+            {% for movie in movies %}
+
+            <a
+                class="movie-card-link"
+                href="{% url 'movie_detail' movie.tmdb_id %}"
+            >
+
+                <article class="movie-card">
+
+                    <div class="poster-container">
+
+                        {% if movie.poster_url %}
+
+                        <img
+                            src="{{ movie.poster_url }}"
+                            alt="{{ movie.title }}"
+                            loading="lazy"
+                        >
+
+                        {% else %}
+
+                        <div class="no-poster">
+                            No Poster
+                        </div>
+
+                        {% endif %}
+
+
+                        <span class="movie-rating">
+                            ★ {{ movie.rating|floatformat:1 }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="movie-info">
+
+                        <h3>{{ movie.title }}</h3>
+
+                        <p>
+                            {{ movie.release_date|date:"Y" }}
+                        </p>
+
+                        <span class="select-btn">
+                            View Movie Details
+                        </span>
+
+                    </div>
+
+                </article>
+
+            </a>
+
+            {% empty %}
+
+            <p>No movies available yet.</p>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <!-- Footer -->
+
+    <footer>
+
+        <p>
+            © 2026 CineVerse. Experience Movies Differently.
+        </p>
+
+    </footer>
+
+
+</body>
+
+</html>

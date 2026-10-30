@@ -1,0 +1,199 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>3D Movie Booking | CineVerse</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/booking.css' %}">
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"
+        }
+    }
+    </script>
+</head>
+
+
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">CINE<span>VERSE</span></a>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/#movies">Movies</a>
+        <a href="{% url 'booking_home' %}" class="active-link">Booking</a>
+        <a href="/admin/">Admin</a>
+    </nav>
+</header>
+
+
+<main class="booking-page">
+
+    <section class="booking-heading">
+        <p class="tagline">YOUR PERSONAL CINEMA EXPERIENCE</p>
+        <h1>3D Cinema Booking</h1>
+        <p>Choose your movie, enter the auditorium and select your seats.</p>
+    </section>
+
+
+    <!-- Movie and Showtime Selection -->
+
+    <section class="booking-controls">
+
+        <div class="control-group">
+            <label for="movieSelect">Select Movie</label>
+
+            <select id="movieSelect">
+                <option value="">Choose a movie</option>
+
+                {% for movie in movies %}
+                    <option value="{{ movie.tmdb_id }}">
+                        {{ movie.title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+        <div class="control-group">
+            <label for="showtimeSelect">Select Showtime</label>
+
+            <select id="showtimeSelect">
+                <option value="">Choose a showtime</option>
+
+                {% for showtime in showtimes %}
+                    <option
+                        value="{{ showtime.id }}"
+                        data-movie-id="{{ showtime.movie.tmdb_id }}">
+
+                        {{ showtime.theatre.name }} -
+                        {{ showtime.show_date|date:"M d, Y" }} -
+                        {{ showtime.show_time|time:"g:i A" }}
+
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+    </section>
+
+
+    <!-- 3D Cinema Auditorium -->
+
+    <section class="auditorium-section">
+
+        <div class="auditorium-heading">
+            <div>
+                <p class="tagline">INTERACTIVE EXPERIENCE</p>
+                <h2>Choose Your Seats</h2>
+            </div>
+
+            <span class="live-indicator">3D THEATRE</span>
+        </div>
+
+
+        <div class="theatre-container">
+
+            <div id="theatre3D">
+                <div class="loading-message">
+                    Loading 3D Cinema...
+                </div>
+            </div>
+
+            <div class="theatre-instructions">
+                Drag to rotate the theatre. Scroll to zoom. Click a seat to select it.
+            </div>
+
+        </div>
+
+
+        <!-- Seat Legend -->
+
+        <div class="seat-legend">
+
+            <div>
+                <span class="legend-seat available"></span>
+                Available
+            </div>
+
+            <div>
+                <span class="legend-seat selected"></span>
+                Selected
+            </div>
+
+            <div>
+                <span class="legend-seat unavailable"></span>
+                Unavailable
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Selected Seats and Price -->
+
+    <section class="booking-summary">
+
+        <div class="summary-details">
+
+            <p class="tagline">YOUR SELECTION</p>
+
+            <h2>Booking Summary</h2>
+
+            <p>Selected Seats:</p>
+
+            <div id="selectedSeats">
+                No seats selected
+            </div>
+
+            <p class="total-label">Total Amount</p>
+
+            <h2 id="totalAmount">₹0</h2>
+
+        </div>
+
+
+        <div class="price-details">
+
+            <h3>Ticket Categories</h3>
+
+            <p>Normal (Rows A-D): ₹150</p>
+            <p>Premium (Row E): ₹250</p>
+            <p>Recliner (Row F): ₹400</p>
+
+            <button id="continueBooking" disabled>
+                Continue to Booking
+            </button>
+
+            <p class="prototype-note">
+                Interactive demo: actual reservation and payment are not connected yet.
+            </p>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+    <p>© 2026 CineVerse. Experience Movies Differently.</p>
+</footer>
+
+
+<script type="module" src="{% static 'js/auditorium.js' %}"></script>
+
+</body>
+</html>
+

@@ -1,0 +1,283 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #090909;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+}
+
+.navbar {
+    height: 80px;
+    padding: 0 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #111;
+    border-bottom: 1px solid #292929;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.logo span {
+    color: #d6a84f;
+}
+
+nav {
+    display: flex;
+    gap: 30px;
+}
+
+nav a {
+    color: #cccccc;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+nav a:hover {
+    color: #d6a84f;
+}
+
+.login-btn {
+    color: #111;
+    background: #d6a84f;
+    padding: 11px 24px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.hero {
+    min-height: 470px;
+    padding: 65px 9%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    background: linear-gradient(110deg, #171717, #090909);
+}
+
+.hero-content {
+    max-width: 600px;
+}
+
+.tagline {
+    color: #d6a84f;
+    font-size: 12px;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+}
+
+.hero h1 {
+    font-size: clamp(35px, 5vw, 58px);
+    margin-bottom: 15px;
+}
+
+.rating {
+    color: #e5b957;
+    margin-bottom: 20px;
+}
+
+.description {
+    color: #bbbbbb;
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+.book-btn {
+    display: inline-block;
+    background: #b5262e;
+    color: white;
+    text-decoration: none;
+    padding: 14px 28px;
+    border-radius: 5px;
+}
+
+.hero-poster img {
+    width: 230px;
+    max-height: 330px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 15px 40px #000;
+}
+
+.movie-section {
+    padding: 65px 7%;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 35px;
+}
+
+.section-heading h2 {
+    font-size: 30px;
+}
+
+.section-heading span {
+    color: #aaaaaa;
+}
+
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 28px;
+}
+
+.movie-card {
+    background: #151515;
+    border-radius: 9px;
+    overflow: hidden;
+    transition: transform 0.3s;
+}
+
+.movie-card:hover {
+    transform: translateY(-8px);
+}
+
+.poster-container {
+    position: relative;
+    height: 280px;
+}
+
+.poster-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.movie-rating {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    background: #111;
+    color: #e5b957;
+    padding: 7px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+.movie-info {
+    padding: 15px;
+}
+
+.movie-info h3 {
+    font-size: 16px;
+    margin-bottom: 9px;
+}
+
+.movie-info p {
+    color: #999;
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+.select-btn {
+    width: 100%;
+    padding: 10px;
+    background: #333;
+    color: #ddd;
+    border: none;
+    border-radius: 4px;
+}
+
+.no-poster {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    color: #999;
+}
+
+footer {
+    padding: 30px;
+    text-align: center;
+    color: #777;
+    border-top: 1px solid #292929;
+}
+
+@media (max-width: 700px) {
+    .navbar {
+        padding: 15px 5%;
+        height: auto;
+        flex-wrap: wrap;
+        gap: 18px;
+    }
+
+    nav {
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hero-poster img {
+        width: 170px;
+    }
+}
+/* Clickable Movie Cards */
+
+.movie-card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.movie-card-link .movie-card {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.movie-card-link:hover .movie-card {
+    transform: translateY(-6px);
+}
+
+.movie-card-link:focus-visible {
+    outline: 2px solid #d6a84f;
+    outline-offset: 4px;
+    border-radius: 9px;
+}
+
+/* Movie Details Button */
+
+.movie-card-link .select-btn {
+    display: block;
+    text-align: center;
+}
+/* Movie Trailer Section */
+
+.trailer-section {
+    margin-top: 60px;
+}
+
+.trailer-section h2 {
+    margin-bottom: 25px;
+    color: #d6a84f;
+}
+
+.trailer-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 14px;
+    background: #000;
+}
+
+.trailer-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}

@@ -1,0 +1,119 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ movie.title }} | CineVerse</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">CINE<span>VERSE</span></div>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/#movies">Movies</a>
+        <a href="/#theatres">Theatres</a>
+    </nav>
+
+</header>
+
+
+<section class="movie-section">
+
+    <a href="/" class="book-btn">← Back to Movies</a>
+
+    <div class="detail-layout">
+
+        <div>
+
+            {% if movie.poster_url %}
+
+                <img
+                    src="{{ movie.poster_url }}"
+                    alt="{{ movie.title }}"
+                    style="width:100%; max-width:350px; border-radius:12px;"
+                >
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="hero-content">
+
+            <p class="tagline">CINEVERSE MOVIE EXPERIENCE</p>
+
+            <h1>{{ movie.title }}</h1>
+
+            <p class="rating">
+                ★ {{ movie.rating|floatformat:1 }} / 10
+            </p>
+
+            <p class="description">
+                {{ movie.description|default:"Movie description unavailable." }}
+            </p>
+
+            <p>
+                Release Date:
+                {{ movie.release_date|date:"F d, Y"|default:"Not available" }}
+            </p>
+
+            <br>
+
+            <button class="book-btn" disabled>
+                Booking Coming Soon
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Movie Trailer -->
+
+    <div class="trailer-section">
+
+        <h2>Watch Trailer</h2>
+
+        {% if trailer_url %}
+
+            <div class="trailer-container">
+
+                <iframe
+                    src="{{ trailer_url }}"
+                    title="{{ movie.title }} trailer"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen>
+                </iframe>
+
+            </div>
+
+        {% else %}
+
+            <p>Sorry, trailer is currently unavailable.</p>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+<footer>
+
+    <p>© 2026 CineVerse. Experience Movies Differently.</p>
+
+</footer>
+
+</body>
+</html>
