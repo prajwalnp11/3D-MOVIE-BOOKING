@@ -5,11 +5,13 @@ from .models import Snack, Booking, BookingSeat, BookingSnack
 class BookingSeatInline(admin.TabularInline):
     model = BookingSeat
     extra = 0
+    fields = ('cinema_seat', 'seat', 'price_at_booking')
 
 
 class BookingSnackInline(admin.TabularInline):
     model = BookingSnack
     extra = 0
+    fields = ('snack', 'quantity', 'price_at_booking')
 
 
 @admin.register(Snack)
@@ -24,7 +26,8 @@ class BookingAdmin(admin.ModelAdmin):
     list_display = (
         'booking_id',
         'customer_name',
-        'showtime',
+        'get_movie_title',
+        'get_cinema_name',
         'total_amount',
         'status',
         'payment_method',
@@ -34,10 +37,20 @@ class BookingAdmin(admin.ModelAdmin):
     search_fields = ('booking_id', 'customer_name', 'customer_email', 'customer_phone')
     inlines = [BookingSeatInline, BookingSnackInline]
 
+    def get_movie_title(self, obj):
+        m = obj.movie
+        return m.title if m else '-'
+    get_movie_title.short_description = 'Movie'
+
+    def get_cinema_name(self, obj):
+        c = obj.cinema
+        return c.name if c else '-'
+    get_cinema_name.short_description = 'Cinema'
+
 
 @admin.register(BookingSeat)
 class BookingSeatAdmin(admin.ModelAdmin):
-    list_display = ('booking', 'seat', 'price_at_booking')
+    list_display = ('booking', 'seat_label', 'category_display', 'price_at_booking')
 
 
 @admin.register(BookingSnack)

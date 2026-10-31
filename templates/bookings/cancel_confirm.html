@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirm Cancellation: {{ booking.booking_id }} | CINEVERSE{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center py-12 px-4">
+    <div class="w-full max-w-lg glass-panel rounded-3xl p-8 border border-white/10 shadow-glass space-y-6 text-center">
+        
+        <div class="w-16 h-16 rounded-full bg-red-500/15 border border-red-500/40 text-red-500 flex items-center justify-center text-2xl mx-auto shadow-sm">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+
+        <div class="space-y-2">
+            <span class="text-xs font-mono text-red-400 font-bold uppercase tracking-widest">CANCEL RESERVATION</span>
+            <h1 class="text-2xl font-display font-black text-white">Are You Sure You Want to Cancel?</h1>
+            <p class="text-xs text-gray-400 max-w-sm mx-auto">
+                Cancelling this booking will immediately release your reserved seats for other guests and initiate an automatic refund.
+            </p>
+        </div>
+
+        <!-- Booking Summary Box -->
+        <div class="p-4 rounded-2xl bg-dark-900 border border-white/10 text-left space-y-2 text-xs font-mono">
+            <div class="flex justify-between border-b border-white/5 pb-2">
+                <span class="text-gray-400">Booking ID:</span>
+                <span class="text-neon font-bold">{{ booking.booking_id }}</span>
+            </div>
+            <div class="flex justify-between border-b border-white/5 pb-2">
+                <span class="text-gray-400">Movie:</span>
+                <span class="text-white font-bold">{{ booking.movie.title }}</span>
+            </div>
+            <div class="flex justify-between border-b border-white/5 pb-2">
+                <span class="text-gray-400">Cinema & Screen:</span>
+                <span class="text-white">{{ booking.cinema.name }} ({{ booking.screen_name }})</span>
+            </div>
+            <div class="flex justify-between border-b border-white/5 pb-2">
+                <span class="text-gray-400">Showtime:</span>
+                <span class="text-white">{{ booking.show_date|date:"D, M d" }} @ {{ booking.show_time|time:"g:i A" }}</span>
+            </div>
+            <div class="flex justify-between border-b border-white/5 pb-2">
+                <span class="text-gray-400">Reserved Seats:</span>
+                <span class="text-neon">
+                    {% for bs in booking.booked_seats.all %}
+                        {{ bs.seat_label }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </span>
+            </div>
+            <div class="flex justify-between pt-1 text-sm font-bold">
+                <span class="text-gray-300">Refund Amount:</span>
+                <span class="text-neon">₹{{ booking.total_amount|floatformat:2 }}</span>
+            </div>
+        </div>
+
+        <!-- Confirmation Form -->
+        <form method="POST" action="{% url 'cancel_booking' booking.booking_id %}" class="flex flex-col sm:flex-row gap-3 pt-2">
+            {% csrf_token %}
+            <a 
+                href="{% url 'my_bookings' %}" 
+                class="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs tracking-wider uppercase transition-all"
+            >
+                Keep Booking
+            </a>
+            <button 
+                type="submit" 
+                class="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-lg"
+            >
+                Confirm Cancellation
+            </button>
+        </form>
+
+        <p class="text-[10px] text-gray-500 font-mono">
+            Refunds are credited back to your original payment method within 3-5 business days.
+        </p>
+
+    </div>
+</div>
+{% endblock %}

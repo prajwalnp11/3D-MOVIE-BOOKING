@@ -56,8 +56,8 @@
             
             <div class="md:col-span-4 lg:col-span-3">
                 <img 
-                    src="{{ booking.showtime.movie.poster_url }}" 
-                    alt="{{ booking.showtime.movie.title }}" 
+                    src="{{ booking.movie.poster_url }}" 
+                    alt="{{ booking.movie.title }}" 
                     class="w-full aspect-[2/3] object-cover rounded-2xl border border-white/20 shadow-glass"
                 >
             </div>
@@ -66,32 +66,32 @@
                 
                 <div>
                     <div class="flex flex-wrap items-center gap-2 mb-2">
-                        <span class="px-2.5 py-0.5 rounded bg-cyber-cyan/15 border border-cyber-cyan/30 text-cyber-cyan text-xs font-mono font-bold">
-                            {{ booking.showtime.format_type }}
+                        <span class="px-2.5 py-0.5 rounded bg-cyber-cyan/15 border border-cyber-cyan/30 text-cyber-cyan text-xs font-mono font-bold uppercase">
+                            {{ booking.format_type }}
                         </span>
                         <span class="px-2.5 py-0.5 rounded bg-white/10 text-gray-300 text-xs font-mono">
-                            {{ booking.showtime.movie.age_rating|default:"UA 16+" }}
+                            {{ booking.movie.certification|default:"UA 16+" }}
                         </span>
                     </div>
 
-                    <h3 class="text-3xl font-display font-black text-white">{{ booking.showtime.movie.title }}</h3>
-                    <p class="text-sm text-gray-300 mt-1">{{ booking.showtime.theatre.name }}</p>
-                    <p class="text-xs text-gray-400 font-mono">{{ booking.showtime.theatre.address|default:booking.showtime.theatre.location }}</p>
+                    <h3 class="text-3xl font-display font-black text-white">{{ booking.movie.title }}</h3>
+                    <p class="text-sm text-gray-300 mt-1">{{ booking.cinema.name }}</p>
+                    <p class="text-xs text-gray-400 font-mono">{{ booking.cinema.address|default:booking.cinema.location }}</p>
                 </div>
 
                 <!-- Showtime Highlights Grid -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl bg-dark-900 border border-white/10">
                     <div>
                         <p class="text-[10px] font-mono text-gray-400 uppercase">Date</p>
-                        <p class="text-xs font-bold text-white mt-0.5">{{ booking.showtime.show_date|date:"D, M d, Y" }}</p>
+                        <p class="text-xs font-bold text-white mt-0.5">{{ booking.show_date|date:"D, M d, Y" }}</p>
                     </div>
                     <div>
                         <p class="text-[10px] font-mono text-gray-400 uppercase">Time</p>
-                        <p class="text-xs font-bold text-neon mt-0.5">{{ booking.showtime.show_time|time:"g:i A" }}</p>
+                        <p class="text-xs font-bold text-neon mt-0.5">{{ booking.show_time|time:"g:i A" }}</p>
                     </div>
                     <div>
                         <p class="text-[10px] font-mono text-gray-400 uppercase">Auditorium</p>
-                        <p class="text-xs font-bold text-cyber-cyan mt-0.5">{{ booking.showtime.screen_name }}</p>
+                        <p class="text-xs font-bold text-cyber-cyan mt-0.5">{{ booking.screen_name }}</p>
                     </div>
                     <div>
                         <p class="text-[10px] font-mono text-gray-400 uppercase">Status</p>
@@ -101,13 +101,13 @@
 
                 <!-- Booked Seats Chips -->
                 <div>
-                    <p class="text-[10px] font-mono text-gray-400 uppercase mb-2">Reserved 3D Seats ({{ booking.booked_seats.count }})</p>
+                    <p class="text-[10px] font-mono text-gray-400 uppercase mb-2">Reserved Seats ({{ booking.booked_seats.count }})</p>
                     <div class="flex flex-wrap gap-2">
                         {% for bs in booking.booked_seats.all %}
                         <div class="px-3 py-1.5 rounded-xl bg-neon text-black font-mono font-black text-sm shadow-neon flex items-center gap-1.5">
                             <i class="fa-solid fa-chair text-xs"></i>
-                            <span>{{ bs.seat.row }}{{ bs.seat.number }}</span>
-                            <span class="text-[10px] font-normal uppercase">({{ bs.seat.get_category_display }})</span>
+                            <span>{{ bs.seat_label }}</span>
+                            <span class="text-[10px] font-normal uppercase">({{ bs.category_display }})</span>
                         </div>
                         {% endfor %}
                     </div>

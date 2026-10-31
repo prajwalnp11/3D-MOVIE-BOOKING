@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign In | CINEVERSE VIP{% endblock %}
+
+{% block content %}
+<div class="min-h-[75vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8 glass-panel rounded-3xl p-8 sm:p-10 border border-white/10 shadow-glass">
+        
+        <!-- Header -->
+        <div class="text-center space-y-2">
+            <div class="w-12 h-12 rounded-2xl bg-neon/15 border border-neon/50 text-neon flex items-center justify-center text-xl mx-auto shadow-neon">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-display font-black text-white tracking-tight">
+                Welcome Back
+            </h2>
+            <p class="text-xs text-gray-400">
+                Sign in to manage your active bookings, tickets & cinema loyalty points.
+            </p>
+        </div>
+
+        <!-- Form Errors -->
+        {% if form.errors %}
+        <div class="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-400 space-y-1">
+            <p><i class="fa-solid fa-circle-exclamation mr-1"></i> Invalid username or password. Please try again.</p>
+        </div>
+        {% endif %}
+
+        <!-- Login Form -->
+        <form method="POST" action="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-xs font-mono text-gray-300 mb-1.5">Username or ID *</label>
+                <div class="relative">
+                    <i class="fa-regular fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
+                    <input 
+                        type="text" 
+                        name="username" 
+                        required 
+                        autocomplete="username"
+                        placeholder="Enter your username"
+                        class="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon transition-all"
+                    >
+                </div>
+            </div>
+
+            <div>
+                <div class="flex items-center justify-between mb-1.5">
+                    <label class="text-xs font-mono text-gray-300">Password *</label>
+                </div>
+                <div class="relative">
+                    <i class="fa-solid fa-key absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        required 
+                        autocomplete="current-password"
+                        placeholder="••••••••"
+                        class="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon transition-all"
+                    >
+                </div>
+            </div>
+
+            <button 
+                type="submit" 
+                class="w-full py-3.5 rounded-xl bg-neon text-black font-display font-bold text-xs uppercase tracking-wider text-center hover:bg-neon-hover shadow-neon transition-all mt-4"
+            >
+                Sign In to CINEVERSE
+            </button>
+        </form>
+
+        <!-- Footer -->
+        <p class="text-xs text-center text-gray-400 font-mono">
+            Don't have an account yet? 
+            <a href="{% url 'register' %}" class="text-neon hover:underline font-bold ml-1">Create VIP Account</a>
+        </p>
+
+    </div>
+</div>
+{% endblock %}

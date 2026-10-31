@@ -24,7 +24,7 @@ class Movie(models.Model):
 
     tmdb_id = models.IntegerField(unique=True, null=True, blank=True)
     title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=220, unique=True, blank=True)
+    slug = models.SlugField(max_length=220, blank=True, null=True)
     description = models.TextField(blank=True)
     poster = models.ImageField(upload_to='posters/', blank=True, null=True)
     poster_url = models.URLField(blank=True)

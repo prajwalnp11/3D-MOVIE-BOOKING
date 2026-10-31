@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile & Account | CINEVERSE VIP{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 lg:px-8 py-10">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-white/10 mb-8">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-neon to-amber-500 text-black flex items-center justify-center text-2xl font-black shadow-neon">
+                {{ user.username|slice:":1"|upper }}
+            </div>
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="px-2.5 py-0.5 rounded-full bg-neon/15 border border-neon/40 text-neon text-[10px] font-mono font-bold uppercase">
+                        VIP MEMBER
+                    </span>
+                    <span class="text-xs text-gray-400 font-mono">Joined {{ user.date_joined|date:"M Y" }}</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-display font-black text-white">
+                    {{ user.get_full_name|default:user.username }}
+                </h1>
+                <p class="text-xs text-gray-400 font-mono">{{ user.email }}</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <a 
+                href="{% url 'my_bookings' %}" 
+                class="px-4 py-2.5 rounded-xl bg-neon text-black font-display font-bold text-xs uppercase tracking-wider hover:bg-neon-hover shadow-neon transition-all flex items-center gap-2"
+            >
+                <i class="fa-solid fa-ticket"></i>
+                <span>My Bookings Vault</span>
+            </a>
+            <a 
+                href="{% url 'logout' %}" 
+                class="px-4 py-2.5 rounded-xl bg-dark-900 border border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs font-semibold transition-all flex items-center gap-1.5"
+            >
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Sign Out</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Profile Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Edit Profile Form -->
+        <div class="lg:col-span-5 glass-panel rounded-3xl p-6 sm:p-8 border border-white/10 shadow-glass space-y-6">
+            <h2 class="text-lg font-display font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-user-pen text-neon text-sm"></i>
+                <span>Account Information</span>
+            </h2>
+
+            <form method="POST" action="{% url 'profile' %}" enctype="multipart/form-data" class="space-y-4">
+                {% csrf_token %}
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-mono text-gray-300 mb-1">First Name</label>
+                        <input 
+                            type="text" 
+                            name="first_name" 
+                            value="{{ user.first_name }}"
+                            class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-gray-300 mb-1">Last Name</label>
+                        <input 
+                            type="text" 
+                            name="last_name" 
+                            value="{{ user.last_name }}"
+                            class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+                        >
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-gray-300 mb-1">Email Address *</label>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        required
+                        value="{{ user.email }}"
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-gray-300 mb-1">Mobile Phone</label>
+                    <input 
+                        type="tel" 
+                        name="phone" 
+                        value="{{ user.profile.phone|default:'' }}"
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-gray-300 mb-1">Preferred City</label>
+                    <select 
+                        name="city" 
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+                    >
+                        <option value="Kochi" {% if user.profile.city == 'Kochi' %}selected{% endif %}>Kochi</option>
+                        <option value="Bengaluru" {% if user.profile.city == 'Bengaluru' %}selected{% endif %}>Bengaluru</option>
+                        <option value="Mumbai" {% if user.profile.city == 'Mumbai' %}selected{% endif %}>Mumbai</option>
+                        <option value="Delhi-NCR" {% if user.profile.city == 'Delhi-NCR' %}selected{% endif %}>Delhi-NCR</option>
+                    </select>
+                </div>
+
+                <button 
+                    type="submit" 
+                    class="w-full py-3 rounded-xl bg-neon text-black font-display font-bold text-xs uppercase tracking-wider text-center hover:bg-neon-hover shadow-neon transition-all mt-2"
+                >
+                    Save Changes
+                </button>
+            </form>
+        </div>
+
+        <!-- Right Column: Recent Booking History -->
+        <div class="lg:col-span-7 glass-panel rounded-3xl p-6 sm:p-8 border border-white/10 shadow-glass space-y-6">
+            <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                <h2 class="text-lg font-display font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-cyber-cyan text-sm"></i>
+                    <span>Booking History ({{ user_bookings|length }})</span>
+                </h2>
+                <a href="{% url 'my_bookings' %}" class="text-xs font-mono text-neon hover:underline">View All</a>
+            </div>
+
+            <div class="space-y-4">
+                {% for b in user_bookings|slice:":5" %}
+                <div class="p-4 rounded-2xl bg-dark-900/80 border border-white/10 hover:border-white/20 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-mono font-bold text-neon">{{ b.booking_id }}</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold {% if b.status == 'CONFIRMED' %}bg-cyber-emerald/15 text-cyber-emerald{% else %}bg-red-500/15 text-red-400{% endif %}">
+                                {{ b.status }}
+                            </span>
+                        </div>
+                        <h4 class="text-sm font-bold text-white">{{ b.movie.title }}</h4>
+                        <p class="text-xs text-gray-400 font-mono">
+                            {{ b.cinema.name }} • {{ b.show_date|date:"M d" }} @ {{ b.show_time|time:"g:i A" }}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-3 self-end sm:self-center">
+                        <span class="text-xs font-mono font-bold text-white">₹{{ b.total_amount|floatformat:2 }}</span>
+                        <a 
+                            href="{% url 'booking_confirmation' b.booking_id %}" 
+                            class="px-3 py-1.5 rounded-lg bg-neon/15 hover:bg-neon hover:text-black border border-neon/40 text-neon text-xs font-bold transition-all"
+                        >
+                            Pass
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="py-12 text-center text-gray-500 space-y-2">
+                    <i class="fa-solid fa-receipt text-3xl"></i>
+                    <p class="text-xs">No bookings recorded on your profile yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

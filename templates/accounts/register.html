@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Your Account | CINEVERSE VIP{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8 glass-panel rounded-3xl p-8 sm:p-10 border border-white/10 shadow-glass">
+        
+        <!-- Header -->
+        <div class="text-center space-y-2">
+            <div class="w-12 h-12 rounded-2xl bg-neon/15 border border-neon/50 text-neon flex items-center justify-center text-xl mx-auto shadow-neon">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-display font-black text-white tracking-tight">
+                Join CINEVERSE VIP
+            </h2>
+            <p class="text-xs text-gray-400">
+                Unlock instant digital tickets, recliner pre-reservations & F&B lounge perks.
+            </p>
+        </div>
+
+        <!-- Form Errors -->
+        {% if form.errors %}
+        <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-400 space-y-1">
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <p><i class="fa-solid fa-triangle-exclamation mr-1"></i> {{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <p><i class="fa-solid fa-triangle-exclamation mr-1"></i> {{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Registration Form -->
+        <form method="POST" action="{% url 'register' %}" class="space-y-4">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-mono text-gray-300 mb-1">First Name</label>
+                    <input 
+                        type="text" 
+                        name="first_name" 
+                        value="{{ form.first_name.value|default:'' }}"
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+                    >
+                </div>
+                <div>
+                    <label class="block text-xs font-mono text-gray-300 mb-1">Last Name</label>
+                    <input 
+                        type="text" 
+                        name="last_name" 
+                        value="{{ form.last_name.value|default:'' }}"
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+                    >
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-mono text-gray-300 mb-1">Username *</label>
+                <input 
+                    type="text" 
+                    name="username" 
+                    required
+                    value="{{ form.username.value|default:'' }}"
+                    class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+                >
+            </div>
+
+            <div>
+                <label class="block text-xs font-mono text-gray-300 mb-1">Email Address *</label>
+                <input 
+                    type="email" 
+                    name="email" 
+                    required
+                    value="{{ form.email.value|default:'' }}"
+                    class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+                >
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-mono text-gray-300 mb-1">Phone Number</label>
+                    <input 
+                        type="tel" 
+                        name="phone" 
+                        placeholder="+91 98765 43210"
+                        value="{{ form.phone.value|default:'' }}"
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+                    >
+                </div>
+                <div>
+                    <label class="block text-xs font-mono text-gray-300 mb-1">Default City</label>
+                    <select 
+                        name="city" 
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+                    >
+                        <option value="Kochi" {% if form.city.value == 'Kochi' %}selected{% endif %}>Kochi</option>
+                        <option value="Bengaluru" {% if form.city.value == 'Bengaluru' %}selected{% endif %}>Bengaluru</option>
+                        <option value="Mumbai" {% if form.city.value == 'Mumbai' %}selected{% endif %}>Mumbai</option>
+                        <option value="Delhi-NCR" {% if form.city.value == 'Delhi-NCR' %}selected{% endif %}>Delhi-NCR</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-mono text-gray-300 mb-1">Password *</label>
+                <input 
+                    type="password" 
+                    name="password1" 
+                    required
+                    class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+                >
+                <span class="text-[10px] text-gray-500 font-mono">Minimum 8 characters with letters and numbers.</span>
+            </div>
+
+            <div>
+                <label class="block text-xs font-mono text-gray-300 mb-1">Confirm Password *</label>
+                <input 
+                    type="password" 
+                    name="password2" 
+                    required
+                    class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+                >
+            </div>
+
+            <button 
+                type="submit" 
+                class="w-full py-3.5 rounded-xl bg-neon text-black font-display font-bold text-xs uppercase tracking-wider text-center hover:bg-neon-hover shadow-neon transition-all mt-4"
+            >
+                Create Account & Join
+            </button>
+        </form>
+
+        <!-- Footer Switch to Login -->
+        <p class="text-xs text-center text-gray-400 font-mono">
+            Already registered? 
+            <a href="{% url 'login' %}" class="text-neon hover:underline font-bold ml-1">Sign In</a>
+        </p>
+
+    </div>
+</div>
+{% endblock %}

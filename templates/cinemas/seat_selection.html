@@ -1,0 +1,383 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Select Seats | {{ show.movie.title }} | CINEVERSE{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Seat styling states */
+    .seat-btn {
+        width: 34px;
+        height: 32px;
+        border-radius: 8px 8px 4px 4px;
+        font-family: monospace;
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        user-select: none;
+        position: relative;
+    }
+    .seat-btn:not(.seat-booked):hover {
+        transform: translateY(-2px);
+    }
+    /* Green: Available */
+    .seat-available {
+        background-color: rgba(16, 185, 129, 0.15);
+        border: 1px solid rgba(16, 185, 129, 0.4);
+        color: #34d399;
+        cursor: pointer;
+    }
+    .seat-available:hover {
+        background-color: rgba(16, 185, 129, 0.35);
+        border-color: #10b981;
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+    /* Yellow: Selected */
+    .seat-selected {
+        background-color: #eab308 !important;
+        border: 1px solid #ca8a04 !important;
+        color: #000000 !important;
+        font-weight: 800 !important;
+        box-shadow: 0 0 14px rgba(234, 179, 8, 0.6) !important;
+        transform: scale(1.08) !important;
+    }
+    /* Red / Grey: Booked */
+    .seat-booked {
+        background-color: rgba(239, 68, 68, 0.12) !important;
+        border: 1px solid rgba(239, 68, 68, 0.25) !important;
+        color: #ef4444 !important;
+        cursor: not-allowed !important;
+        opacity: 0.45;
+    }
+
+    /* Screen Curved Projection Effect */
+    .cinema-screen-curve {
+        height: 14px;
+        border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+        background: linear-gradient(180deg, #eab308 0%, rgba(234, 179, 8, 0.3) 60%, transparent 100%);
+        box-shadow: 0 -4px 25px rgba(234, 179, 8, 0.65);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 lg:px-8 py-8">
+
+    <!-- Top Breadcrumb & Showtime Info Header -->
+    <div class="glass-panel rounded-2xl p-5 border border-white/10 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <img 
+                src="{{ show.movie.poster_url }}" 
+                alt="{{ show.movie.title }}" 
+                class="w-14 h-20 rounded-xl object-cover border border-white/10 shadow"
+            >
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="px-2 py-0.5 rounded bg-neon/15 border border-neon/40 text-neon text-[10px] font-mono font-bold uppercase">
+                        {{ show.format_type }}
+                    </span>
+                    <span class="text-xs text-gray-400 font-mono">{{ show.movie.certification|default:"UA" }}</span>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-display font-black text-white leading-tight">
+                    {{ show.movie.title }}
+                </h1>
+                <p class="text-xs text-gray-400 font-mono mt-0.5">
+                    {{ show.cinema.name }} • <span class="text-cyber-cyan">{{ show.screen.name }}</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4 text-xs font-mono">
+            <div class="px-3.5 py-2 rounded-xl bg-dark-900 border border-white/10">
+                <span class="text-gray-400 block text-[10px] uppercase">DATE</span>
+                <span class="font-bold text-white">{{ show.show_date|date:"l, M d, Y" }}</span>
+            </div>
+            <div class="px-3.5 py-2 rounded-xl bg-dark-900 border border-neon/40">
+                <span class="text-neon block text-[10px] uppercase font-bold">SHOWTIME</span>
+                <span class="font-bold text-neon">{{ show.show_time|time:"g:i A" }}</span>
+            </div>
+            <a 
+                href="{% url 'booking_home' %}?movie={{ show.movie.tmdb_id }}" 
+                class="px-3.5 py-2 rounded-xl bg-dark-900 border border-cyber-cyan/40 text-cyber-cyan hover:bg-cyber-cyan hover:text-black font-semibold transition-all flex items-center gap-1.5"
+                title="Switch to 3D Auditorium View"
+            >
+                <i class="fa-solid fa-vr-cardboard"></i>
+                <span class="hidden sm:inline">3D Auditorium</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Grid: Auditorium Seat Map (Left) + Order Summary (Right) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Seat Map Auditorium Column -->
+        <div class="lg:col-span-8 flex flex-col items-center glass-panel rounded-3xl p-6 sm:p-8 border border-white/10 shadow-glass">
+            
+            <!-- 1. Cinema Screen Display -->
+            <div class="w-full max-w-xl mx-auto mb-10 text-center">
+                <div class="cinema-screen-curve w-full"></div>
+                <div class="h-6 bg-gradient-to-b from-yellow-500/10 to-transparent"></div>
+                <p class="text-[10px] font-mono tracking-widest text-gray-400 uppercase mt-1">
+                    <i class="fa-solid fa-film text-neon mr-1"></i> CINEMA SCREEN • ALL EYES THIS WAY
+                </p>
+            </div>
+
+            <!-- 2. Seat Selection Legend -->
+            <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 pb-8 border-b border-white/10 w-full mb-8 text-xs font-mono">
+                <div class="flex items-center gap-2">
+                    <span class="seat-btn seat-available text-[9px] pointer-events-none">A1</span>
+                    <span class="text-gray-300">Available (Green)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="seat-btn seat-selected text-[9px] pointer-events-none">A2</span>
+                    <span class="text-neon font-bold">Selected (Yellow)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="seat-btn seat-booked text-[9px] pointer-events-none">A3</span>
+                    <span class="text-red-400">Booked (Red)</span>
+                </div>
+            </div>
+
+            <!-- 3. Seating Rows Organized by Tiers -->
+            <div class="w-full max-w-2xl space-y-7 overflow-x-auto pb-4 scrollbar-none">
+                
+                {% for row_item in rows_data %}
+                <!-- Tier Header when tier changes -->
+                {% if forloop.first or row_item.category != rows_data.0.category and forloop.counter == 3 or forloop.counter == 5 %}
+                <div class="flex items-center gap-3 pt-2">
+                    <div class="h-px bg-white/10 flex-grow"></div>
+                    <span class="text-[11px] font-mono uppercase tracking-widest px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-300">
+                        {{ row_item.category_display }} — ₹{{ row_item.price|floatformat:0 }}
+                    </span>
+                    <div class="h-px bg-white/10 flex-grow"></div>
+                </div>
+                {% endif %}
+
+                <!-- Row of Seats -->
+                <div class="flex items-center justify-center gap-2 sm:gap-3">
+                    <!-- Left Row Identifier -->
+                    <span class="w-6 text-center font-mono font-bold text-xs text-gray-400">
+                        {{ row_item.row }}
+                    </span>
+
+                    <!-- Seat Buttons -->
+                    <div class="flex items-center gap-1.5 sm:gap-2">
+                        {% for s in row_item.seats %}
+                        <!-- Walkway gap in middle of row -->
+                        {% if forloop.counter == 6 %}
+                        <div class="w-4 sm:w-8"></div>
+                        {% endif %}
+
+                        <button 
+                            type="button" 
+                            class="seat-btn {% if s.is_booked %}seat-booked{% else %}seat-available{% endif %}"
+                            data-seat-id="{{ s.id }}"
+                            data-seat-label="{{ s.label }}"
+                            data-category="{{ s.category }}"
+                            data-price="{{ s.price }}"
+                            {% if s.is_booked %}disabled title="Seat {{ s.label }} is already booked"{% else %}title="Seat {{ s.label }} (₹{{ s.price|floatformat:0 }})"{% endif %}
+                            onclick="toggleSeat(this)"
+                        >
+                            {{ s.number }}
+                        </button>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Right Row Identifier -->
+                    <span class="w-6 text-center font-mono font-bold text-xs text-gray-400">
+                        {{ row_item.row }}
+                    </span>
+                </div>
+                {% endfor %}
+
+            </div>
+
+            <!-- Tier Price Badges Footer -->
+            <div class="mt-8 pt-6 border-t border-white/10 w-full flex flex-wrap items-center justify-around gap-4 text-xs font-mono text-gray-400">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-gray-400"></span>
+                    <span>Silver: ₹{{ silver_price }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
+                    <span>Gold: ₹{{ gold_price }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span>
+                    <span>Premium Recliner: ₹{{ premium_price }}</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Booking Summary & Checkout Action -->
+        <div class="lg:col-span-4 space-y-6">
+            
+            <div class="glass-panel rounded-3xl p-6 border border-white/10 shadow-glass space-y-5">
+                <h3 class="text-base font-display font-bold text-white flex items-center justify-between">
+                    <span>Ticket Summary</span>
+                    <span id="selectedCountBadge" class="px-2 py-0.5 rounded-md bg-neon/15 text-neon text-xs font-mono font-bold">
+                        0 Seats
+                    </span>
+                </h3>
+
+                <!-- Selected Seats Tags -->
+                <div>
+                    <label class="text-[10px] font-mono text-gray-400 uppercase tracking-wider block mb-2">Selected Seats:</label>
+                    <div id="selectedSeatsTags" class="flex flex-wrap gap-1.5 min-h-[38px] p-2 rounded-xl bg-dark-900 border border-white/5 items-center">
+                        <span class="text-xs text-gray-500 italic">No seats selected yet. Click any green seat.</span>
+                    </div>
+                </div>
+
+                <!-- Price Breakdown Table -->
+                <div class="space-y-2.5 pt-3 border-t border-white/10 text-xs font-mono">
+                    <div class="flex justify-between text-gray-300">
+                        <span>Ticket Price:</span>
+                        <span id="summarySubtotal" class="font-bold text-white">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-gray-400">
+                        <span>Convenience Fee:</span>
+                        <span>₹45.00</span>
+                    </div>
+                    <div class="flex justify-between text-gray-400">
+                        <span>GST & Taxes (18%):</span>
+                        <span>₹8.10</span>
+                    </div>
+                    <div class="flex justify-between text-sm font-bold text-neon pt-3 border-t border-white/10">
+                        <span>Total Amount:</span>
+                        <span id="summaryGrandTotal">₹0.00</span>
+                    </div>
+                </div>
+
+                <!-- Checkout Form -->
+                <form id="seatCheckoutForm" action="{% url 'checkout' %}" method="POST" class="pt-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="show_id" value="{{ show.id }}">
+                    <input type="hidden" name="seat_ids" id="formSeatIds" value="">
+
+                    <button 
+                        type="submit" 
+                        id="proceedCheckoutBtn"
+                        disabled
+                        class="w-full py-3.5 rounded-xl bg-neon text-black font-display font-bold text-sm uppercase tracking-wider text-center hover:bg-neon-hover shadow-neon transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-neon"
+                    >
+                        <span>Proceed to Checkout</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </form>
+
+                <p class="text-[11px] text-gray-400 text-center font-mono">
+                    <i class="fa-solid fa-shield-halved text-neon mr-1"></i> Live availability guaranteed via server lock.
+                </p>
+            </div>
+
+            <!-- Cinema Rules Notice -->
+            <div class="glass-panel rounded-2xl p-4 border border-white/5 text-xs text-gray-400 space-y-2">
+                <p class="font-bold text-white flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-info text-cyber-cyan"></i>
+                    <span>Booking Policy</span>
+                </p>
+                <ul class="list-disc list-inside space-y-1 text-[11px]">
+                    <li>Free cancellation up to 2 hours before showtime.</li>
+                    <li>3D glasses provided at the screen entry.</li>
+                    <li>Outside food & beverages are not permitted.</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Selected seats state
+    const selectedSeats = new Map(); // seatId -> { id, label, category, price }
+    const CONVENIENCE_FEE = 45.00;
+    const TAX_RATE = 0.18;
+
+    function toggleSeat(btn) {
+        if (btn.classList.contains('seat-booked')) return;
+
+        const seatId = btn.dataset.seatId;
+        const seatLabel = btn.dataset.seatLabel;
+        const category = btn.dataset.category;
+        const price = parseFloat(btn.dataset.price);
+
+        if (selectedSeats.has(seatId)) {
+            // Deselect
+            selectedSeats.delete(seatId);
+            btn.classList.remove('seat-selected');
+            btn.classList.add('seat-available');
+        } else {
+            // Limit to max 10 seats per booking
+            if (selectedSeats.size >= 10) {
+                alert("You can select up to 10 seats per transaction.");
+                return;
+            }
+            // Select
+            selectedSeats.set(seatId, { id: seatId, label: seatLabel, category, price });
+            btn.classList.remove('seat-available');
+            btn.classList.add('seat-selected');
+        }
+
+        updateSummary();
+    }
+
+    function updateSummary() {
+        const count = selectedSeats.size;
+        const countBadge = document.getElementById('selectedCountBadge');
+        const tagsContainer = document.getElementById('selectedSeatsTags');
+        const subtotalEl = document.getElementById('summarySubtotal');
+        const grandTotalEl = document.getElementById('summaryGrandTotal');
+        const checkoutBtn = document.getElementById('proceedCheckoutBtn');
+        const formSeatIds = document.getElementById('formSeatIds');
+
+        countBadge.textContent = `${count} Seat${count === 1 ? '' : 's'}`;
+
+        if (count === 0) {
+            tagsContainer.innerHTML = '<span class="text-xs text-gray-500 italic">No seats selected yet. Click any green seat.</span>';
+            subtotalEl.textContent = '₹0.00';
+            grandTotalEl.textContent = '₹0.00';
+            checkoutBtn.disabled = true;
+            formSeatIds.value = '';
+            return;
+        }
+
+        // Render seat label pills
+        tagsContainer.innerHTML = '';
+        let subtotal = 0;
+        const ids = [];
+
+        selectedSeats.forEach(seat => {
+            subtotal += seat.price;
+            ids.push(seat.id);
+
+            const pill = document.createElement('span');
+            pill.className = "px-2.5 py-1 rounded-lg bg-neon text-black text-xs font-mono font-bold flex items-center gap-1.5 shadow-sm";
+            pill.innerHTML = `<span>${seat.label}</span> <i class="fa-solid fa-xmark text-[9px] cursor-pointer hover:opacity-75" onclick="removeSeat('${seat.id}')"></i>`;
+            tagsContainer.appendChild(pill);
+        });
+
+        const tax = Math.round(CONVENIENCE_FEE * TAX_RATE * 100) / 100;
+        const grandTotal = subtotal + CONVENIENCE_FEE + tax;
+
+        subtotalEl.textContent = `₹${subtotal.toFixed(2)}`;
+        grandTotalEl.textContent = `₹${grandTotal.toFixed(2)}`;
+        formSeatIds.value = ids.join(',');
+        checkoutBtn.disabled = false;
+    }
+
+    function removeSeat(seatId) {
+        const btn = document.querySelector(`.seat-btn[data-seat-id="${seatId}"]`);
+        if (btn) {
+            toggleSeat(btn);
+        }
+    }
+</script>
+{% endblock %}

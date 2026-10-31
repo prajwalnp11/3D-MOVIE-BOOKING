@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}All Movies | CINEVERSE Cinema Experience{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 lg:px-8 py-10">
+
+    <!-- Page Title & Search Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-white/10">
+        <div>
+            <div class="flex items-center gap-2 mb-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-neon animate-pulse"></span>
+                <p class="text-xs font-mono font-bold tracking-widest text-neon uppercase">CATALOGUE</p>
+            </div>
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-display font-black text-white tracking-tight">
+                Explore All Movies
+            </h1>
+            <p class="text-xs sm:text-sm text-gray-400 mt-1">Discover what's playing now in {{ city|default:"Kochi" }} and book immersive cinema seats.</p>
+        </div>
+
+        <!-- Search Form -->
+        <form method="GET" action="{% url 'movie_list' %}" class="relative w-full md:w-80">
+            {% if selected_genre %}<input type="hidden" name="genre" value="{{ selected_genre }}">{% endif %}
+            {% if selected_language %}<input type="hidden" name="language" value="{{ selected_language }}">{% endif %}
+            {% if selected_status %}<input type="hidden" name="status" value="{{ selected_status }}">{% endif %}
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <input 
+                    type="text" 
+                    name="q" 
+                    value="{{ search_query|default:'' }}"
+                    placeholder="Search movies, genres, cast..." 
+                    class="w-full pl-11 pr-4 py-3 rounded-xl bg-dark-900 border border-white/15 text-white text-xs placeholder-gray-500 focus:outline-none focus:border-neon focus:ring-1 focus:ring-neon transition-all"
+                >
+            </div>
+        </form>
+    </div>
+
+    <!-- Filter Bar: Status, Genre & Language -->
+    <div class="py-6 space-y-4">
+        
+        <!-- Status Tabs -->
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-mono text-gray-400 mr-2 uppercase tracking-wider">Status:</span>
+            <a 
+                href="{% url 'movie_list' %}?{% if search_query %}q={{ search_query }}&{% endif %}{% if selected_genre %}genre={{ selected_genre }}&{% endif %}{% if selected_language %}language={{ selected_language }}&{% endif %}"
+                class="px-4 py-1.5 rounded-lg text-xs font-semibold border transition-all {% if not selected_status %}bg-neon text-black border-neon shadow-neon{% else %}bg-dark-900 text-gray-300 border-white/10 hover:border-white/30{% endif %}"
+            >
+                All
+            </a>
+            <a 
+                href="{% url 'movie_list' %}?status=NOW_SHOWING{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if selected_language %}&language={{ selected_language }}{% endif %}"
+                class="px-4 py-1.5 rounded-lg text-xs font-semibold border transition-all {% if selected_status == 'NOW_SHOWING' %}bg-neon text-black border-neon shadow-neon{% else %}bg-dark-900 text-gray-300 border-white/10 hover:border-white/30{% endif %}"
+            >
+                Now Showing
+            </a>
+            <a 
+                href="{% url 'movie_list' %}?status=UPCOMING{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if selected_language %}&language={{ selected_language }}{% endif %}"
+                class="px-4 py-1.5 rounded-lg text-xs font-semibold border transition-all {% if selected_status == 'UPCOMING' %}bg-neon text-black border-neon shadow-neon{% else %}bg-dark-900 text-gray-300 border-white/10 hover:border-white/30{% endif %}"
+            >
+                Upcoming
+            </a>
+        </div>
+
+        <!-- Genre Pills -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <span class="text-xs font-mono text-gray-400 mr-2 uppercase tracking-wider whitespace-nowrap">Genre:</span>
+            <a 
+                href="{% url 'movie_list' %}?{% if search_query %}q={{ search_query }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}{% if selected_language %}language={{ selected_language }}&{% endif %}"
+                class="px-3 py-1 rounded-lg text-xs whitespace-nowrap border transition-all {% if not selected_genre %}bg-white/20 text-white font-bold border-white/40{% else %}bg-dark-900/80 text-gray-400 border-white/10 hover:border-white/30 hover:text-white{% endif %}"
+            >
+                All Genres
+            </a>
+            {% for g in genres %}
+            <a 
+                href="{% url 'movie_list' %}?genre={{ g.slug }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_language %}&language={{ selected_language }}{% endif %}"
+                class="px-3 py-1 rounded-lg text-xs whitespace-nowrap border transition-all {% if selected_genre == g.slug %}bg-white/20 text-white font-bold border-white/40{% else %}bg-dark-900/80 text-gray-400 border-white/10 hover:border-white/30 hover:text-white{% endif %}"
+            >
+                {{ g.name }}
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Language Pills -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <span class="text-xs font-mono text-gray-400 mr-2 uppercase tracking-wider whitespace-nowrap">Language:</span>
+            <a 
+                href="{% url 'movie_list' %}?{% if search_query %}q={{ search_query }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}{% if selected_genre %}genre={{ selected_genre }}&{% endif %}"
+                class="px-3 py-1 rounded-lg text-xs whitespace-nowrap border transition-all {% if not selected_language %}bg-cyber-cyan/20 text-cyber-cyan font-bold border-cyber-cyan/50{% else %}bg-dark-900/80 text-gray-400 border-white/10 hover:border-white/30 hover:text-white{% endif %}"
+            >
+                All Languages
+            </a>
+            {% for lang in languages %}
+            <a 
+                href="{% url 'movie_list' %}?language={{ lang }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_genre %}genre={{ selected_genre }}{% endif %}"
+                class="px-3 py-1 rounded-lg text-xs whitespace-nowrap border transition-all {% if selected_language == lang %}bg-cyber-cyan/20 text-cyber-cyan font-bold border-cyber-cyan/50{% else %}bg-dark-900/80 text-gray-400 border-white/10 hover:border-white/30 hover:text-white{% endif %}"
+            >
+                {{ lang }}
+            </a>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <!-- Active Filters Display -->
+    {% if selected_genre or selected_language or selected_status or search_query %}
+    <div class="flex items-center gap-2 mb-6 text-xs text-gray-400 font-mono">
+        <span>Active Filters:</span>
+        {% if search_query %}<span class="px-2 py-0.5 rounded bg-white/10 text-white">Search: "{{ search_query }}"</span>{% endif %}
+        {% if selected_status %}<span class="px-2 py-0.5 rounded bg-white/10 text-white">{{ selected_status }}</span>{% endif %}
+        {% if selected_genre %}<span class="px-2 py-0.5 rounded bg-white/10 text-white">{{ selected_genre }}</span>{% endif %}
+        {% if selected_language %}<span class="px-2 py-0.5 rounded bg-white/10 text-white">{{ selected_language }}</span>{% endif %}
+        <a href="{% url 'movie_list' %}" class="text-neon hover:underline ml-2">Clear all</a>
+    </div>
+    {% endif %}
+
+    <!-- Movies Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
+        {% for movie in movies %}
+        <div class="group relative flex flex-col rounded-2xl overflow-hidden glass-panel border border-white/10 hover:border-neon transition-all duration-300 hover:shadow-neon hover:-translate-y-2">
+            
+            <!-- Poster -->
+            <div class="relative w-full aspect-[2/3] overflow-hidden bg-dark-900">
+                <img 
+                    src="{{ movie.poster_url }}" 
+                    alt="{{ movie.title }}" 
+                    loading="lazy"
+                    class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+                >
+                <div class="absolute top-2.5 right-2.5 px-2 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/20 text-neon text-[11px] font-mono font-bold flex items-center gap-1 shadow">
+                    <i class="fa-solid fa-star text-[10px]"></i>
+                    <span>{{ movie.rating|floatformat:1 }}</span>
+                </div>
+                <div class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-cyber-cyan/20 backdrop-blur-md border border-cyber-cyan/40 text-cyber-cyan text-[10px] font-mono font-bold uppercase shadow">
+                    {{ movie.language|default:"English" }}
+                </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-4 flex flex-col flex-grow justify-between bg-dark-900/90 border-t border-white/5 space-y-3">
+                <div>
+                    <h3 class="font-display font-bold text-base text-white truncate group-hover:text-neon transition-colors">
+                        {{ movie.title }}
+                    </h3>
+                    <p class="text-xs text-gray-400 truncate mt-0.5">
+                        {{ movie.genre|default:"Action / Sci-Fi" }}
+                    </p>
+                </div>
+
+                <div class="flex items-center justify-between text-xs text-gray-500 font-mono pt-2 border-t border-white/5">
+                    <span>{{ movie.duration_mins|default:"145" }} Mins</span>
+                    <span class="text-gray-400">{{ movie.certification|default:"UA 16+" }}</span>
+                </div>
+
+                <!-- Book Tickets Button -->
+                <a 
+                    href="{% url 'movie_detail' movie.tmdb_id %}?city={{ city }}" 
+                    class="w-full py-2.5 rounded-xl bg-neon text-black font-display font-bold text-xs uppercase tracking-wider text-center hover:bg-neon-hover shadow-neon transition-all flex items-center justify-center gap-1.5"
+                >
+                    <i class="fa-solid fa-ticket"></i>
+                    <span>Book Tickets</span>
+                </a>
+            </div>
+
+        </div>
+        {% empty %}
+        <div class="col-span-full py-20 text-center glass-panel rounded-2xl border border-white/10 p-8">
+            <i class="fa-solid fa-film text-5xl text-gray-600 mb-4"></i>
+            <h3 class="text-lg font-bold text-white">No Movies Match Your Criteria</h3>
+            <p class="text-xs text-gray-400 mt-1 max-w-md mx-auto">Try selecting a different genre, language, or search query to browse other releases.</p>
+            <a href="{% url 'movie_list' %}" class="inline-block mt-4 px-5 py-2.5 rounded-xl bg-neon text-black font-bold text-xs uppercase tracking-wider hover:bg-neon-hover shadow-neon transition-all">
+                Reset All Filters
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

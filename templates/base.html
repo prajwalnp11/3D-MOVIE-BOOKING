@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}CINEVERSE | Futuristic 3D Cinema Experience{% endblock %}</title>
+    <title>{% block title %}CINEVERSE | Premium Cinematic Movie Ticket Booking{% endblock %}</title>
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS with Gold/Yellow Cinematic Theme -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -14,25 +14,26 @@
             theme: {
                 extend: {
                     colors: {
-                        neon: '#CCFF00',
-                        'neon-glow': 'rgba(204, 255, 0, 0.4)',
+                        primary: '#EAB308', // Gold / Cinematic Yellow
+                        'primary-hover': '#CA8A04',
+                        neon: '#CCFF00', // Electric Accent
                         'cyber-cyan': '#00F0FF',
                         'cyber-purple': '#A855F7',
                         'cyber-emerald': '#10B981',
-                        'dark-950': '#07080B',
-                        'dark-900': '#0D0F17',
-                        'dark-800': '#131722',
-                        'dark-700': '#1C2233',
+                        'dark-950': '#08090C', // Almost-Black Background
+                        'dark-900': '#10121A', // Dark Grey Panels
+                        'dark-800': '#181B26',
+                        'dark-700': '#232738',
                     },
                     fontFamily: {
                         sans: ['Space Grotesk', 'Inter', 'sans-serif'],
                         display: ['Outfit', 'sans-serif'],
                     },
                     boxShadow: {
+                        'gold': '0 0 25px rgba(234, 179, 8, 0.35)',
+                        'gold-lg': '0 0 45px rgba(234, 179, 8, 0.55)',
                         'neon': '0 0 25px rgba(204, 255, 0, 0.35)',
-                        'neon-lg': '0 0 45px rgba(204, 255, 0, 0.55)',
-                        'cyan': '0 0 25px rgba(0, 240, 255, 0.35)',
-                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.65)',
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.75)',
                     }
                 }
             }
@@ -44,60 +45,35 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome 6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Custom Futuristic Utilities -->
+    <!-- Cinematic Custom Styling -->
     <style>
         body {
-            background-color: #07080B;
+            background-color: #08090C;
             color: #F3F4F6;
             font-family: 'Space Grotesk', sans-serif;
             overflow-x: hidden;
         }
 
-        /* Glassmorphism */
         .glass-panel {
-            background: rgba(13, 15, 23, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(16, 18, 26, 0.78);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .glass-panel-neon {
-            background: rgba(13, 15, 23, 0.85);
+        .glass-panel-gold {
+            background: rgba(16, 18, 26, 0.88);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(204, 255, 0, 0.3);
-            box-shadow: 0 0 25px rgba(204, 255, 0, 0.15);
+            border: 1px solid rgba(234, 179, 8, 0.35);
+            box-shadow: 0 0 25px rgba(234, 179, 8, 0.15);
         }
 
-        /* Cyber scrollbar */
-        ::-webkit-scrollbar {
-            width: 7px;
-            height: 7px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #07080B;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1C2233;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #CCFF00;
-        }
-
-        /* Neon Text Glow */
-        .neon-glow-text {
-            text-shadow: 0 0 15px rgba(204, 255, 0, 0.6);
-        }
-        .cyan-glow-text {
-            text-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
-        }
-
-        /* Ambient background glow */
-        .cyber-bg-glow {
+        /* Ambient Cinema Glow */
+        .cinema-bg-glow {
             position: fixed;
             top: 0;
             left: 0;
@@ -106,195 +82,257 @@
             pointer-events: none;
             z-index: 0;
             background: 
-                radial-gradient(circle at 15% 10%, rgba(204, 255, 0, 0.04) 0%, transparent 40%),
-                radial-gradient(circle at 85% 80%, rgba(0, 240, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 12% 10%, rgba(234, 179, 8, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 88% 85%, rgba(0, 240, 255, 0.04) 0%, transparent 40%),
                 radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.02) 0%, transparent 60%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #08090C;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #232738;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #EAB308;
+        }
+
+        .gold-glow-text {
+            text-shadow: 0 0 15px rgba(234, 179, 8, 0.6);
         }
     </style>
 
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-dark-950 text-gray-100 min-h-screen flex flex-col relative selection:bg-neon selection:text-black">
+<body class="bg-dark-950 text-gray-100 min-h-screen flex flex-col relative selection:bg-primary selection:text-black">
 
-    <div class="cyber-bg-glow"></div>
+    <div class="cinema-bg-glow"></div>
 
-    <!-- Top Futuristic Glass Navbar -->
-    <header class="sticky top-0 z-50 w-full glass-panel border-b border-white/10 px-4 lg:px-8 transition-all duration-300">
+    <!-- Toast Notifications Container -->
+    {% if messages %}
+    <div id="toastContainer" class="fixed top-24 right-5 z-50 space-y-3 max-w-md w-full pointer-events-none">
+        {% for message in messages %}
+        <div class="pointer-events-auto p-4 rounded-2xl glass-panel-gold border flex items-start gap-3 shadow-glass transition-all transform duration-300 {% if message.tags == 'error' %}border-red-500/50 bg-red-950/70 text-red-200{% elif message.tags == 'success' %}border-primary/50 bg-yellow-950/70 text-yellow-100{% else %}border-cyber-cyan/50 bg-blue-950/70 text-cyan-100{% endif %}">
+            <div class="text-base mt-0.5">
+                {% if message.tags == 'error' %}<i class="fa-solid fa-circle-exclamation text-red-400"></i>
+                {% elif message.tags == 'success' %}<i class="fa-solid fa-circle-check text-primary"></i>
+                {% else %}<i class="fa-solid fa-circle-info text-cyber-cyan"></i>{% endif %}
+            </div>
+            <div class="flex-grow text-xs leading-relaxed font-sans font-medium">
+                {{ message }}
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" class="text-gray-400 hover:text-white text-xs">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 1. NAVIGATION BAR -->
+    <header class="sticky top-0 z-40 w-full glass-panel border-b border-white/10 px-4 lg:px-8 transition-all duration-300">
         <div class="max-w-7xl mx-auto flex items-center justify-between h-20">
             
             <!-- Logo -->
-            <a href="/" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-neon via-cyber-cyan to-cyber-purple flex items-center justify-center p-[2px] shadow-neon group-hover:scale-105 transition-transform duration-300">
+            <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary via-yellow-400 to-amber-600 flex items-center justify-center p-[2px] shadow-gold group-hover:scale-105 transition-transform duration-300">
                     <div class="w-full h-full bg-dark-950 rounded-[10px] flex items-center justify-center">
-                        <i class="fa-solid fa-cube text-neon text-lg animate-pulse"></i>
+                        <i class="fa-solid fa-film text-primary text-lg"></i>
                     </div>
                 </div>
                 <div class="flex flex-col">
                     <span class="font-display font-black text-2xl tracking-wider text-white">
-                        CINE<span class="text-neon neon-glow-text">VERSE</span>
+                        CINE<span class="text-primary gold-glow-text">VERSE</span>
                     </span>
                     <span class="text-[9px] text-gray-400 font-mono tracking-widest uppercase -mt-1 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-neon animate-ping inline-block"></span> 3D NEXT-GEN CINEMA
+                        <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping inline-block"></span> PREMIUM CINEMA TICKETING
                     </span>
                 </div>
             </a>
 
             <!-- Navigation Links -->
-            <nav class="hidden md:flex items-center gap-8 text-sm font-medium tracking-wide">
-                <a href="/#movies" class="text-gray-300 hover:text-neon transition-colors duration-200 flex items-center gap-1.5 py-1">
-                    <i class="fa-solid fa-film text-xs text-neon"></i> Movies
+            <nav class="hidden md:flex items-center gap-7 text-sm font-medium tracking-wide">
+                <a href="{% url 'home' %}" class="text-gray-200 hover:text-primary transition-colors duration-200 flex items-center gap-1.5 py-1 font-semibold">
+                    Home
                 </a>
-                <a href="{% url 'theatre_selection' %}" class="text-gray-300 hover:text-neon transition-colors duration-200 flex items-center gap-1.5 py-1">
-                    <i class="fa-solid fa-masks-theater text-xs text-cyber-cyan"></i> Theatres & Shows
+                <a href="{% url 'movie_list' %}" class="text-gray-300 hover:text-primary transition-colors duration-200 flex items-center gap-1.5 py-1">
+                    Movies
                 </a>
-                <a href="{% url 'booking_home' %}" class="relative text-white font-semibold flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-neon/30 text-neon hover:bg-neon hover:text-black transition-all duration-200 shadow-[0_0_15px_rgba(204,255,0,0.15)]">
+                <a href="{% url 'cinema_list' %}" class="text-gray-300 hover:text-primary transition-colors duration-200 flex items-center gap-1.5 py-1">
+                    Cinemas
+                </a>
+                <a href="{% url 'booking_home' %}" class="relative text-white font-semibold flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-primary/40 text-primary hover:bg-primary hover:text-black transition-all duration-200 shadow-[0_0_15px_rgba(234,179,8,0.2)]">
                     <i class="fa-solid fa-vr-cardboard text-xs"></i> 3D Auditorium
-                    <span class="absolute -top-1 -right-1 flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-neon"></span>
-                    </span>
                 </a>
-                <a href="#events" onclick="alert('⚡ CineVerse Live Events & Esports Championships coming next quarter!')" class="text-gray-400 hover:text-gray-200 transition-colors duration-200 text-xs tracking-wider">
+                <a href="{% url 'home' %}#events" class="text-gray-300 hover:text-primary transition-colors duration-200 flex items-center gap-1.5 py-1">
                     Events
                 </a>
-                <a href="#sports" onclick="alert('⚽ CineVerse Stadium Live Screening coming for Football World Cup 2026!')" class="text-gray-400 hover:text-gray-200 transition-colors duration-200 text-xs tracking-wider">
-                    Sports
+                <a href="{% url 'my_bookings' %}" class="text-gray-300 hover:text-primary transition-colors duration-200 flex items-center gap-1.5 py-1">
+                    My Bookings
                 </a>
             </nav>
 
-            <!-- Search & Location & Profile Icons -->
-            <div class="flex items-center gap-4">
+            <!-- Search, Location & Auth Actions -->
+            <div class="flex items-center gap-3">
                 
                 <!-- Live Search Bar -->
-                <div class="relative hidden sm:block w-48 lg:w-64">
+                <form action="{% url 'movie_list' %}" method="GET" class="relative hidden lg:block w-48 xl:w-60">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                         <i class="fa-solid fa-magnifying-glass text-xs"></i>
                     </div>
                     <input 
                         type="text" 
+                        name="q"
                         id="globalSearchInput"
                         placeholder="Search movies, genre..." 
-                        class="w-full pl-9 pr-3 py-2 bg-dark-900/90 border border-white/10 rounded-full text-xs text-white placeholder-gray-500 focus:outline-none focus:border-neon focus:ring-1 focus:ring-neon transition-all"
+                        class="w-full pl-9 pr-3 py-2 bg-dark-900 border border-white/10 rounded-full text-xs text-white placeholder-gray-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                         autocomplete="off"
                     >
-                    <!-- Quick Search Results Dropdown -->
-                    <div id="searchDropdown" class="hidden absolute top-full left-0 right-0 mt-2 glass-panel-neon rounded-xl p-2 z-50 max-h-72 overflow-y-auto">
-                        <!-- Populated dynamically via JS -->
-                    </div>
-                </div>
+                    <div id="searchDropdown" class="hidden absolute top-full left-0 right-0 mt-2 glass-panel-gold rounded-xl p-2 z-50 max-h-72 overflow-y-auto"></div>
+                </form>
 
                 <!-- Location Selector Dropdown -->
                 <div class="relative">
                     <button 
                         id="locationToggleBtn"
                         type="button" 
-                        class="flex items-center gap-2 px-3 py-2 rounded-xl bg-dark-900 border border-white/10 text-xs font-semibold text-gray-200 hover:border-cyber-cyan hover:text-cyber-cyan transition-all"
+                        class="flex items-center gap-2 px-3 py-2 rounded-xl bg-dark-900 border border-white/10 text-xs font-semibold text-gray-200 hover:border-primary hover:text-primary transition-all"
                     >
-                        <i class="fa-solid fa-location-dot text-cyber-cyan text-xs"></i>
-                        <span id="currentCityLabel">{{ city|default:"Kochi" }}</span>
+                        <i class="fa-solid fa-location-dot text-primary text-xs"></i>
+                        <span>{{ CURRENT_CITY|default:"Kochi" }}</span>
                         <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
                     </button>
 
-                    <!-- Location Dropdown Menu -->
-                    <div id="locationDropdown" class="hidden absolute right-0 mt-2 w-48 glass-panel rounded-xl shadow-glass border border-white/10 p-2 z-50">
-                        <p class="text-[10px] uppercase font-mono text-gray-400 px-3 py-1">Select City</p>
-                        {% for c in cities|default:"Kochi,Bengaluru,Mumbai,Delhi-NCR,Hyderabad" %}
+                    <div id="locationDropdown" class="hidden absolute right-0 mt-2 w-44 glass-panel rounded-xl shadow-glass border border-white/10 p-2 z-50">
+                        <p class="text-[10px] uppercase font-mono text-gray-400 px-3 py-1">Choose Location</p>
+                        {% for c in CITIES %}
                         <a 
                             href="?city={{ c }}" 
-                            class="block px-3 py-2 text-xs rounded-lg text-gray-200 hover:bg-neon hover:text-black font-medium transition-colors flex items-center justify-between"
+                            class="block px-3 py-2 text-xs rounded-lg text-gray-200 hover:bg-primary hover:text-black font-medium transition-colors flex items-center justify-between"
                         >
                             <span>{{ c }}</span>
-                            {% if c == city|default:"Kochi" %}
-                            <i class="fa-solid fa-check text-xs"></i>
+                            {% if c == CURRENT_CITY %}
+                            <i class="fa-solid fa-check text-xs text-black"></i>
                             {% endif %}
                         </a>
                         {% endfor %}
                     </div>
                 </div>
 
-                <!-- User Profile / My Bookings Menu -->
+                <!-- Authentication Buttons (Login & Register) OR Profile Dropdown -->
+                {% if request.user.is_authenticated %}
                 <div class="relative">
                     <button 
                         id="profileMenuBtn"
                         type="button" 
-                        class="w-10 h-10 rounded-xl bg-gradient-to-br from-dark-800 to-dark-900 border border-white/15 flex items-center justify-center text-gray-200 hover:border-neon hover:text-neon transition-all shadow-glass"
-                        title="User Account & Bookings"
+                        class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-dark-900 border border-primary/30 text-white hover:border-primary transition-all shadow-gold"
                     >
-                        <i class="fa-solid fa-user-astronaut text-sm"></i>
+                        <div class="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold font-mono">
+                            {{ request.user.username|slice:":1"|upper }}
+                        </div>
+                        <span class="text-xs font-bold hidden sm:inline">{{ request.user.username }}</span>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
                     </button>
 
-                    <!-- Profile Dropdown -->
-                    <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-56 glass-panel-neon rounded-2xl p-3 z-50 border border-neon/30 shadow-glass">
-                        <div class="px-2 py-1.5 border-b border-white/10 mb-2">
-                            <p class="text-xs font-bold text-white flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-neon"></span>
-                                {% if request.user.is_authenticated %}{{ request.user.username }}{% else %}CineVerse Guest{% endif %}
-                            </p>
-                            <p class="text-[10px] text-gray-400 font-mono mt-0.5">VIP Member #CV-2026</p>
+                    <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-52 glass-panel-gold rounded-2xl p-2.5 z-50 shadow-glass border border-primary/30">
+                        <div class="px-3 py-2 border-b border-white/10 mb-1.5">
+                            <p class="text-xs font-bold text-white">{{ request.user.get_full_name|default:request.user.username }}</p>
+                            <p class="text-[10px] text-gray-400 truncate">{{ request.user.email }}</p>
                         </div>
-                        <a href="{% url 'my_bookings' %}" class="flex items-center gap-2.5 px-3 py-2 text-xs rounded-xl text-gray-200 hover:bg-neon/15 hover:text-neon transition-colors">
-                            <i class="fa-solid fa-ticket text-neon"></i>
-                            <span>My E-Tickets Vault</span>
+                        <a href="{% url 'profile' %}" class="flex items-center gap-2.5 px-3 py-2 text-xs rounded-xl text-gray-200 hover:bg-white/10 transition-colors">
+                            <i class="fa-solid fa-user-gear text-primary text-xs"></i>
+                            <span>Profile & Account</span>
                         </a>
-                        <a href="{% url 'theatre_selection' %}" class="flex items-center gap-2.5 px-3 py-2 text-xs rounded-xl text-gray-200 hover:bg-white/5 transition-colors">
-                            <i class="fa-solid fa-calendar-days text-cyber-cyan"></i>
-                            <span>Showtimes & Multiplexes</span>
+                        <a href="{% url 'my_bookings' %}" class="flex items-center gap-2.5 px-3 py-2 text-xs rounded-xl text-gray-200 hover:bg-white/10 transition-colors">
+                            <i class="fa-solid fa-ticket text-cyber-cyan text-xs"></i>
+                            <span>My Bookings</span>
                         </a>
-                        <a href="/admin/" class="flex items-center gap-2.5 px-3 py-2 text-xs rounded-xl text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors">
-                            <i class="fa-solid fa-shield-halved text-xs"></i>
+                        {% if request.user.is_staff %}
+                        <a href="/admin/" class="flex items-center gap-2.5 px-3 py-2 text-xs rounded-xl text-gray-200 hover:bg-white/10 transition-colors">
+                            <i class="fa-solid fa-shield-halved text-xs text-cyber-purple"></i>
                             <span>Django Admin</span>
                         </a>
+                        {% endif %}
+                        <div class="pt-1 border-t border-white/10 mt-1">
+                            <a href="{% url 'logout' %}" class="flex items-center gap-2.5 px-3 py-2 text-xs rounded-xl text-red-400 hover:bg-red-500/15 transition-colors font-medium">
+                                <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+                                <span>Sign Out</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
+
+                {% else %}
+                <div class="flex items-center gap-2">
+                    <a 
+                        href="{% url 'login' %}" 
+                        class="px-4 py-2 rounded-xl text-xs font-semibold text-gray-200 hover:text-white hover:bg-white/5 transition-all"
+                    >
+                        Login
+                    </a>
+                    <a 
+                        href="{% url 'register' %}" 
+                        class="px-4 py-2 rounded-xl bg-primary text-black text-xs font-bold font-display uppercase tracking-wider hover:bg-primary-hover shadow-gold transition-all"
+                    >
+                        Register
+                    </a>
+                </div>
+                {% endif %}
 
             </div>
 
         </div>
     </header>
 
-    <!-- Main Content Area -->
+    <!-- Main Content Injection -->
     <main class="flex-grow z-10">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Global Futuristic Cyber Footer -->
+    <!-- 2. FOOTER WITH SOCIAL LINKS -->
     <footer class="glass-panel border-t border-white/10 mt-20 z-10 relative">
         <div class="max-w-7xl mx-auto px-6 py-12">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-neon/10 border border-neon/30 flex items-center justify-center text-neon">
-                            <i class="fa-solid fa-cube text-sm"></i>
+                        <div class="w-8 h-8 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center text-primary">
+                            <i class="fa-solid fa-film text-sm"></i>
                         </div>
                         <span class="font-display font-black text-xl text-white">
-                            CINE<span class="text-neon">VERSE</span>
+                            CINE<span class="text-primary">VERSE</span>
                         </span>
                     </div>
                     <p class="text-xs text-gray-400 leading-relaxed">
-                        The next frontier of cinematic immersion. Featuring real-time 3D WebGL auditorium visualization, direct screen video trailers, and seamless digital ticketing.
+                        Experience cinema like never before. From real-time interactive seat layouts to 3D WebGL screen auditorium previews and seamless digital QR ticket delivery.
                     </p>
                     <div class="flex items-center gap-3 text-sm text-gray-400">
-                        <a href="#" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-neon hover:text-black flex items-center justify-center transition-colors"><i class="fa-brands fa-x-twitter"></i></a>
-                        <a href="#" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-neon hover:text-black flex items-center justify-center transition-colors"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-neon hover:text-black flex items-center justify-center transition-colors"><i class="fa-brands fa-youtube"></i></a>
-                        <a href="#" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-neon hover:text-black flex items-center justify-center transition-colors"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://twitter.com" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-primary hover:text-black flex items-center justify-center transition-colors"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="https://instagram.com" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-primary hover:text-black flex items-center justify-center transition-colors"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://youtube.com" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-primary hover:text-black flex items-center justify-center transition-colors"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://facebook.com" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-primary hover:text-black flex items-center justify-center transition-colors"><i class="fa-brands fa-facebook"></i></a>
                     </div>
                 </div>
 
                 <div>
-                    <h4 class="text-xs font-mono uppercase tracking-widest text-neon mb-4">Experiences</h4>
+                    <h4 class="text-xs font-mono uppercase tracking-widest text-primary mb-4">Explore</h4>
                     <ul class="space-y-2 text-xs text-gray-400">
-                        <li><a href="{% url 'booking_home' %}" class="hover:text-white transition-colors">3D Virtual Auditorium</a></li>
-                        <li><a href="{% url 'theatre_selection' %}" class="hover:text-white transition-colors">IMAX 3D Laser Theaters</a></li>
-                        <li><a href="{% url 'theatre_selection' %}" class="hover:text-white transition-colors">Dolby Atmos 7.1 Multi-Dimensional</a></li>
-                        <li><a href="{% url 'booking_home' %}" class="hover:text-white transition-colors">Royal Recliner Lounges</a></li>
-                        <li><a href="{% url 'theatre_selection' %}" class="hover:text-white transition-colors">4DX Sensory Projection</a></li>
+                        <li><a href="{% url 'movie_list' %}?status=NOW_SHOWING" class="hover:text-white transition-colors">Now Showing Movies</a></li>
+                        <li><a href="{% url 'movie_list' %}?status=UPCOMING" class="hover:text-white transition-colors">Upcoming Releases</a></li>
+                        <li><a href="{% url 'cinema_list' %}" class="hover:text-white transition-colors">Cinemas & Multiplexes</a></li>
+                        <li><a href="{% url 'booking_home' %}" class="hover:text-white transition-colors">3D Cinema Auditorium</a></li>
+                        <li><a href="{% url 'home' %}#events" class="hover:text-white transition-colors">Film Festivals & Events</a></li>
                     </ul>
                 </div>
 
                 <div>
-                    <h4 class="text-xs font-mono uppercase tracking-widest text-cyber-cyan mb-4">Cities & Venues</h4>
+                    <h4 class="text-xs font-mono uppercase tracking-widest text-cyber-cyan mb-4">Cities & Multiplexes</h4>
                     <ul class="space-y-2 text-xs text-gray-400">
                         <li><a href="?city=Kochi" class="hover:text-cyber-cyan transition-colors">Kochi (Lulu Mall, Centre Square, Shenoys)</a></li>
                         <li><a href="?city=Bengaluru" class="hover:text-cyber-cyan transition-colors">Bengaluru (Vega City, Mantri Square)</a></li>
@@ -305,42 +343,30 @@
                 </div>
 
                 <div>
-                    <h4 class="text-xs font-mono uppercase tracking-widest text-cyber-purple mb-4">CineVerse Technology</h4>
-                    <p class="text-xs text-gray-400 mb-3">
-                        Built with Django 6, Django REST Framework, Three.js WebGL, and Tailwind CSS.
-                    </p>
-                    <div class="p-3 rounded-xl bg-dark-900 border border-white/5 space-y-2">
-                        <div class="flex items-center justify-between text-[11px]">
-                            <span class="text-gray-400">Auditorium Engine:</span>
-                            <span class="text-neon font-mono">Three.js WebGL</span>
-                        </div>
-                        <div class="flex items-center justify-between text-[11px]">
-                            <span class="text-gray-400">Backend API:</span>
-                            <span class="text-cyber-cyan font-mono">Django REST</span>
-                        </div>
-                        <div class="flex items-center justify-between text-[11px]">
-                            <span class="text-gray-400">Screen Texture:</span>
-                            <span class="text-cyber-purple font-mono">HTML5 Video</span>
-                        </div>
-                    </div>
+                    <h4 class="text-xs font-mono uppercase tracking-widest text-cyber-purple mb-4">Help & Security</h4>
+                    <ul class="space-y-2 text-xs text-gray-400">
+                        <li><a href="{% url 'my_bookings' %}" class="hover:text-white transition-colors">View Booking Confirmation</a></li>
+                        <li><a href="{% url 'profile' %}" class="hover:text-white transition-colors">Cancel Booking Rules</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Terms of Ticketing</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Payment Protection</a></li>
+                        <li><a href="/admin/" class="hover:text-primary transition-colors">Admin Dashboard</a></li>
+                    </ul>
                 </div>
 
             </div>
 
             <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500 font-mono">
-                <p>© 2026 CINEVERSE TECHNOLOGIES INC. ALL RIGHTS RESERVED.</p>
+                <p>© 2026 CINEVERSE CINEMAS INC. ALL RIGHTS RESERVED.</p>
                 <div class="flex items-center gap-6">
-                    <a href="#" class="hover:text-gray-300 transition-colors">Privacy Protocol</a>
-                    <a href="#" class="hover:text-gray-300 transition-colors">Terms of Experience</a>
-                    <a href="/admin/" class="hover:text-neon transition-colors">Staff Terminal</a>
+                    <span>Engineered with Django & WebGL</span>
+                    <span>Razorpay Ready</span>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Global Scripts: Search, Dropdowns, City state -->
+    <!-- Global Javascript for Dropdowns & Search -->
     <script>
-        // Toggle location dropdown
         const locBtn = document.getElementById('locationToggleBtn');
         const locDropdown = document.getElementById('locationDropdown');
         if (locBtn && locDropdown) {
@@ -351,7 +377,6 @@
             });
         }
 
-        // Toggle profile dropdown
         const profBtn = document.getElementById('profileMenuBtn');
         const profileDropdown = document.getElementById('profileDropdown');
         if (profBtn && profileDropdown) {
@@ -362,7 +387,6 @@
             });
         }
 
-        // Close dropdowns on outside click
         document.addEventListener('click', () => {
             if (locDropdown) locDropdown.classList.add('hidden');
             if (profileDropdown) profileDropdown.classList.add('hidden');
@@ -370,7 +394,7 @@
             if (searchDd) searchDd.classList.add('hidden');
         });
 
-        // Global Movie Search Bar with live autocomplete
+        // Autocomplete
         const searchInput = document.getElementById('globalSearchInput');
         const searchDropdown = document.getElementById('searchDropdown');
         let searchTimeout = null;
@@ -392,7 +416,7 @@
                         const movies = await res.json();
 
                         if (!movies || movies.length === 0) {
-                            searchDropdown.innerHTML = `<div class="p-3 text-xs text-gray-400 text-center">No movies found matching "${query}"</div>`;
+                            searchDropdown.innerHTML = `<div class="p-3 text-xs text-gray-400 text-center">No movies matching "${query}"</div>`;
                             searchDropdown.classList.remove('hidden');
                             return;
                         }

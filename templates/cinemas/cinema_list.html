@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cinemas & Showtimes in {{ city }} | CINEVERSE{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 lg:px-8 py-10">
+
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-white/10">
+        <div>
+            <div class="flex items-center gap-2 mb-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-neon animate-pulse"></span>
+                <p class="text-xs font-mono font-bold tracking-widest text-neon uppercase">CINEMA DIRECTORY & SCHEDULE</p>
+            </div>
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-display font-black text-white tracking-tight">
+                Cinemas in {{ city }}
+            </h1>
+            <p class="text-xs sm:text-sm text-gray-400 mt-1">Select your preferred multiplex, date, and showtime to choose your seats.</p>
+        </div>
+
+        <!-- Location City Selector Dropdown / Pills -->
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-mono text-gray-400 mr-1 uppercase">City:</span>
+            {% for c in cities %}
+            <a 
+                href="{% url 'cinema_list' %}?city={{ c }}{% if selected_movie %}&movie={{ selected_movie.id }}{% endif %}&date={{ active_date }}"
+                class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all {% if c|lower == city|lower %}bg-neon text-black font-bold border-neon shadow-neon{% else %}bg-dark-900 text-gray-300 border-white/10 hover:border-white/30{% endif %}"
+            >
+                {{ c }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Filter Strip: Date Selector & Movie Filter -->
+    <div class="py-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        
+        <!-- Horizontal Scrollable Date Selector -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {% for d in date_options %}
+            <a 
+                href="{% url 'cinema_list' %}?city={{ city }}&date={{ d.date_str }}{% if selected_movie %}&movie={{ selected_movie.id }}{% endif %}"
+                class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border {% if d.is_selected %}bg-neon text-black font-bold border-neon shadow-neon{% else %}bg-dark-900 text-gray-300 border-white/10 hover:border-neon/40 hover:text-white{% endif %}"
+            >
+                <div class="text-[9px] uppercase font-mono tracking-wider">{{ d.day_name }}</div>
+                <div class="text-sm font-bold">{{ d.day_num }} {{ d.month }}</div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Filter by Movie Selector -->
+        <div class="flex items-center gap-3">
+            <label for="movieFilter" class="text-xs font-mono text-gray-400 whitespace-nowrap uppercase">Filter by Movie:</label>
+            <select 
+                id="movieFilter" 
+                onchange="window.location.href=this.value"
+                class="px-4 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white text-xs focus:outline-none focus:border-neon"
+            >
+                <option value="{% url 'cinema_list' %}?city={{ city }}&date={{ active_date }}">All Movies Showing</option>
+                {% for m in movies %}
+                <option 
+                    value="{% url 'cinema_list' %}?city={{ city }}&date={{ active_date }}&movie={{ m.id }}"
+                    {% if selected_movie.id == m.id %}selected{% endif %}
+                >
+                    {{ m.title }} ({{ m.rating|floatformat:1 }}★)
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+    </div>
+
+    <!-- Active Movie Filter Badge -->
+    {% if selected_movie %}
+    <div class="flex items-center gap-3 mb-6 p-3 rounded-xl bg-neon/10 border border-neon/30 text-xs">
+        <span class="text-neon font-bold">Filtered for Movie:</span>
+        <span class="text-white font-semibold">{{ selected_movie.title }}</span>
+        <a href="{% url 'cinema_list' %}?city={{ city }}&date={{ active_date }}" class="text-gray-400 hover:text-white underline ml-auto">
+            Clear filter
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Cinema Cards List -->
+    <div class="space-y-6">
+        {% for item in cinema_data %}
+        <div class="glass-panel rounded-2xl border border-white/10 p-6 shadow-glass hover:border-white/20 transition-all">
+            
+            <!-- Cinema Details Header -->
+            <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-5 border-b border-white/10">
+                <div class="space-y-1.5">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-xl font-display font-bold text-white">
+                            <a href="{% url 'cinema_detail' item.cinema.slug %}" class="hover:text-neon transition-colors">
+                                {{ item.cinema.name }}
+                            </a>
+                        </h2>
+                        <span class="px-2.5 py-0.5 rounded-lg bg-black/80 border border-neon/40 text-neon text-xs font-mono font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-star text-[10px]"></i> {{ item.cinema.rating }}
+                        </span>
+                    </div>
+
+                    <p class="text-xs text-gray-400 flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-neon text-xs"></i>
+                        <span>{{ item.cinema.address|default:item.cinema.location }}</span>
+                    </p>
+
+                    <!-- Available Facilities Badges -->
+                    <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                        {% for fac in item.cinema.facilities.split %}
+                        <span class="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-gray-300 text-[10px] font-mono">
+                            {{ fac|cut:"," }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Available Seats Indicator -->
+                <div class="flex flex-col md:items-end gap-1">
+                    <div class="px-3 py-1.5 rounded-xl bg-cyber-emerald/15 border border-cyber-emerald/40 text-cyber-emerald text-xs font-mono font-bold flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-cyber-emerald animate-pulse"></span>
+                        <span>{{ item.available_seat_count }} Seats Available</span>
+                    </div>
+                    <a href="{% url 'cinema_detail' item.cinema.slug %}" class="text-[11px] text-gray-400 hover:text-neon transition-colors">
+                        View Cinema Profile & Screens &rarr;
+                    </a>
+                </div>
+            </div>
+
+            <!-- Showtimes by Screen / Movie -->
+            <div class="pt-5 space-y-4">
+                {% if item.shows %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for show in item.shows %}
+                    <div class="p-3.5 rounded-xl bg-dark-900/80 border border-white/10 hover:border-neon transition-all flex flex-col justify-between space-y-3 group">
+                        
+                        <div>
+                            <!-- Movie Title & Screen Info -->
+                            <div class="flex items-start justify-between gap-2">
+                                <h4 class="text-sm font-bold text-white group-hover:text-neon transition-colors line-clamp-1">
+                                    {{ show.movie.title }}
+                                </h4>
+                                <span class="px-2 py-0.5 rounded bg-cyber-cyan/15 text-cyber-cyan text-[10px] font-mono font-bold uppercase whitespace-nowrap">
+                                    {{ show.format_type }}
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between text-[11px] text-gray-400 font-mono mt-1">
+                                <span>{{ show.screen.name }}</span>
+                                <span class="text-gray-300 font-semibold">₹{{ show.base_price|floatformat:0 }} onwards</span>
+                            </div>
+                        </div>
+
+                        <!-- Showtime Action Button -->
+                        <div class="flex items-center justify-between pt-2 border-t border-white/5">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full {% if show.status == 'AVAILABLE' %}bg-cyber-emerald{% else %}bg-amber-400{% endif %}"></span>
+                                <span class="text-xs font-mono font-bold text-white">{{ show.show_time|time:"g:i A" }}</span>
+                            </div>
+
+                            <a 
+                                href="{% url 'seat_selection' show.id %}"
+                                class="px-3.5 py-1.5 rounded-lg bg-neon text-black font-display font-bold text-xs uppercase tracking-wider hover:bg-neon-hover shadow-neon transition-all flex items-center gap-1.5"
+                            >
+                                <span>Select Seats</span>
+                                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </a>
+                        </div>
+
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-xs text-gray-500 italic py-2">No showtimes scheduled for this multiplex on {{ active_date }}.</p>
+                {% endif %}
+            </div>
+
+        </div>
+        {% empty %}
+        <div class="py-16 text-center glass-panel rounded-2xl border border-white/10 p-8">
+            <i class="fa-solid fa-masks-theater text-5xl text-gray-600 mb-3"></i>
+            <h3 class="text-base font-bold text-white">No Cinemas Found in {{ city }}</h3>
+            <p class="text-xs text-gray-400 mt-1">Try switching to Kochi, Bengaluru, or Mumbai.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
