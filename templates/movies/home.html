@@ -1,190 +1,686 @@
-
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
+{% block title %}CINEVERSE | Next-Gen 3D Cinema Experience{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block content %}
 
-    <title>CineVerse | Movie Booking</title>
+<!-- 1. HERO SECTION: Full-Width Dynamic Carousel with Autoplaying Background Trailer -->
+<section class="relative w-full h-[620px] lg:h-[720px] overflow-hidden bg-black select-none">
+    
+    <!-- Slides Container -->
+    <div id="heroCarousel" class="relative w-full h-full">
+        {% for movie in trending_movies %}
+        <div 
+            class="hero-slide absolute inset-0 transition-opacity duration-1000 ease-in-out {% if forloop.first %}opacity-100 pointer-events-auto z-10{% else %}opacity-0 pointer-events-none z-0{% endif %}"
+            data-index="{{ forloop.counter0 }}"
+            data-tmdb-id="{{ movie.tmdb_id }}"
+            data-title="{{ movie.title }}"
+            data-trailer-url="{{ movie.trailer_url|default:'' }}"
+            data-video-mp4="{{ movie.video_trailer_mp4|default:'' }}"
+        >
+            <!-- Background Backdrop / Video Container -->
+            <div class="absolute inset-0 overflow-hidden">
+                <!-- Static Backdrop Image (Fades out when video plays or serves as base) -->
+                <img 
+                    src="{{ movie.backdrop_url|default:movie.poster_url }}" 
+                    alt="{{ movie.title }}" 
+                    class="w-full h-full object-cover object-center filter brightness-50 scale-105 transition-transform duration-[12000ms] ease-out hero-backdrop"
+                >
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
+                <!-- Dynamic Autoplaying Background Video Trailer -->
+                {% if movie.video_trailer_mp4 %}
+                <video 
+                    class="hero-video absolute inset-0 w-full h-full object-cover object-center opacity-0 transition-opacity duration-1000 pointer-events-none"
+                    src="{{ movie.video_trailer_mp4 }}"
+                    muted 
+                    loop 
+                    playsinline
+                    preload="metadata"
+                ></video>
+                {% endif %}
 
-<body>
+                <!-- Cinematic Dark Gradient Overlays -->
+                <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/60 to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-dark-950 via-dark-950/80 to-transparent w-full lg:w-3/4"></div>
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_40%,rgba(204,255,0,0.06),transparent_50%)]"></div>
+            </div>
 
-    <!-- Navigation Bar -->
+            <!-- Hero Slide Content Overlay -->
+            <div class="relative max-w-7xl mx-auto h-full px-6 lg:px-8 flex flex-col justify-center z-20 pb-20 lg:pb-16">
+                
+                <div class="max-w-2xl space-y-5">
+                    
+                    <!-- Format & Certification Badges -->
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <span class="px-3 py-1 rounded-full bg-neon/15 border border-neon/50 text-neon text-xs font-mono font-bold tracking-wider uppercase shadow-[0_0_15px_rgba(204,255,0,0.3)] flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-neon animate-pulse"></span>
+                            NOW SHOWING
+                        </span>
+                        <span class="px-2.5 py-1 rounded-md bg-white/10 backdrop-blur-md border border-white/15 text-white text-xs font-semibold">
+                            {{ movie.age_rating|default:"UA 16+" }}
+                        </span>
+                        <span class="px-2.5 py-1 rounded-md bg-cyber-cyan/15 border border-cyber-cyan/40 text-cyber-cyan text-xs font-mono font-semibold">
+                            IMAX 3D Laser
+                        </span>
+                        <span class="px-2.5 py-1 rounded-md bg-cyber-purple/15 border border-cyber-purple/40 text-cyber-purple text-xs font-mono font-semibold">
+                            Dolby Atmos 7.1
+                        </span>
+                    </div>
 
-    <header class="navbar">
+                    <!-- Movie Title -->
+                    <h1 class="font-display font-black text-4xl sm:text-6xl lg:text-7xl text-white tracking-tight leading-none drop-shadow-lg">
+                        {{ movie.title }}
+                    </h1>
 
-        <a href="/" class="logo">
-            CINE<span>VERSE</span>
-        </a>
+                    <!-- Rating & Metadata -->
+                    <div class="flex items-center gap-6 text-sm text-gray-300">
+                        <div class="flex items-center gap-1.5 text-neon font-bold text-base">
+                            <i class="fa-solid fa-star"></i>
+                            <span>{{ movie.rating|floatformat:1 }}</span>
+                            <span class="text-xs text-gray-400 font-normal">/ 10 TMDB</span>
+                        </div>
+                        <span class="text-gray-500">•</span>
+                        <span class="text-gray-300">{{ movie.genre|default:"Action / Sci-Fi" }}</span>
+                        <span class="text-gray-500">•</span>
+                        <span class="text-gray-300">{{ movie.duration_mins|default:"148" }} Mins</span>
+                    </div>
 
-        <nav>
-            <a href="/">Home</a>
-            <a href="#movies">Movies</a>
-            <a href="#theatres">Theatres</a>
-            <a href="{% url 'booking_home' %}">Booking</a>
-            <a href="#bookings">My Bookings</a>
-        </nav>
+                    <!-- Description -->
+                    <p class="text-sm sm:text-base text-gray-300 line-clamp-3 leading-relaxed max-w-xl font-normal drop-shadow">
+                        {{ movie.description }}
+                    </p>
 
-        <a href="/admin/" class="login-btn">Login</a>
+                    <!-- CTA Actions -->
+                    <div class="flex flex-wrap items-center gap-4 pt-2">
+                        
+                        <!-- Primary 3D Seat Booking CTA -->
+                        <a 
+                            href="{% url 'booking_home' %}?movie={{ movie.tmdb_id }}" 
+                            class="px-7 py-3.5 rounded-xl bg-neon text-black font-display font-bold text-sm tracking-wide uppercase hover:bg-neon-hover hover:scale-105 active:scale-95 transition-all shadow-neon flex items-center gap-2 group/btn"
+                        >
+                            <i class="fa-solid fa-vr-cardboard text-base group-hover/btn:rotate-12 transition-transform"></i>
+                            <span>Book 3D Seats</span>
+                            <i class="fa-solid fa-arrow-right text-xs ml-1"></i>
+                        </a>
 
-    </header>
+                        <!-- View Theatres & Showtimes -->
+                        <a 
+                            href="{% url 'movie_detail' movie.tmdb_id %}?city={{ city }}" 
+                            class="px-6 py-3.5 rounded-xl glass-panel hover:bg-white/10 text-white font-medium text-sm border border-white/20 transition-all flex items-center gap-2"
+                        >
+                            <i class="fa-solid fa-calendar-day text-cyber-cyan text-xs"></i>
+                            <span>Showtimes & Multiplexes</span>
+                        </a>
 
+                        <!-- Watch Trailer Modal Trigger -->
+                        {% if movie.trailer_url %}
+                        <button 
+                            type="button" 
+                            onclick="openTrailerModal('{{ movie.title|escapejs }}', '{{ movie.trailer_url }}')"
+                            class="w-12 h-12 rounded-xl glass-panel hover:border-cyber-cyan hover:text-cyber-cyan text-gray-300 flex items-center justify-center text-sm transition-all"
+                            title="Watch Official Trailer"
+                        >
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                        {% endif %}
 
-    <!-- Featured Movie -->
+                        <!-- Background Trailer Audio Toggle -->
+                        <button 
+                            type="button"
+                            onclick="toggleHeroAudio()"
+                            id="heroAudioBtn"
+                            class="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-lg bg-black/60 border border-white/10 text-xs text-gray-300 hover:text-neon hover:border-neon transition-all ml-2"
+                            title="Trailer Audio"
+                        >
+                            <i class="fa-solid fa-volume-xmark" id="heroAudioIcon"></i>
+                            <span id="heroAudioLabel">Muted</span>
+                        </button>
 
-    {% if featured_movie %}
+                    </div>
 
-    <section class="hero">
-
-        <div class="hero-content">
-
-            <p class="tagline">
-                NOW SHOWING ON CINEVERSE
-            </p>
-
-            <h1>{{ featured_movie.title }}</h1>
-
-            <p class="rating">
-                ★ {{ featured_movie.rating|floatformat:1 }} / 10
-            </p>
-
-            <p class="description">
-                {{ featured_movie.description|truncatewords:30 }}
-            </p>
-
-            <a href="#movies" class="book-btn">
-                Explore Movies
-            </a>
-
-        </div>
-
-
-        {% if featured_movie.poster_url %}
-
-        <div class="hero-poster">
-
-            <img
-                src="{{ featured_movie.poster_url }}"
-                alt="{{ featured_movie.title }}"
-            >
-
-        </div>
-
-        {% endif %}
-
-    </section>
-
-    {% endif %}
-
-
-    <!-- Popular Movies -->
-
-    <section class="movie-section" id="movies">
-
-        <div class="section-heading">
-
-            <div>
-
-                <p class="tagline">
-                    EXPLORE THE COLLECTION
-                </p>
-
-                <h2>Popular Movies</h2>
+                </div>
 
             </div>
 
-            <span>
-                {{ movies|length }} Movies
-            </span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Carousel Nav Buttons -->
+    <div class="absolute right-6 sm:right-10 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-3">
+        <button 
+            type="button" 
+            onclick="changeHeroSlide(-1)"
+            class="w-11 h-11 rounded-xl glass-panel hover:bg-neon hover:text-black text-white flex items-center justify-center transition-all border border-white/15 shadow-glass active:scale-95"
+            aria-label="Previous Slide"
+        >
+            <i class="fa-solid fa-chevron-up text-sm"></i>
+        </button>
+        <button 
+            type="button" 
+            onclick="changeHeroSlide(1)"
+            class="w-11 h-11 rounded-xl glass-panel hover:bg-neon hover:text-black text-white flex items-center justify-center transition-all border border-white/15 shadow-glass active:scale-95"
+            aria-label="Next Slide"
+        >
+            <i class="fa-solid fa-chevron-down text-sm"></i>
+        </button>
+    </div>
+
+    <!-- Bottom Thumbnail Navigation Strip -->
+    <div class="absolute bottom-5 left-0 right-0 z-30">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
+            
+            <!-- Indicators / Thumbnail Row -->
+            <div class="flex items-center gap-3 overflow-x-auto pb-1 max-w-full">
+                {% for movie in trending_movies %}
+                <button 
+                    type="button"
+                    onclick="goToHeroSlide({{ forloop.counter0 }})"
+                    class="hero-thumb group relative flex items-center gap-2.5 px-3 py-1.5 rounded-lg border transition-all duration-300 {% if forloop.first %}border-neon bg-neon/10 text-neon shadow-[0_0_12px_rgba(204,255,0,0.3)]{% else %}border-white/10 bg-dark-900/60 text-gray-400 hover:border-white/30{% endif %}"
+                    data-thumb-index="{{ forloop.counter0 }}"
+                >
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="w-6 h-8 object-cover rounded shadow">
+                    <span class="text-xs font-semibold whitespace-nowrap hidden sm:inline">{{ movie.title|truncatechars:18 }}</span>
+                    <!-- Progress Bar for active slide -->
+                    <div class="thumb-progress absolute bottom-0 left-0 right-0 h-[2px] bg-neon opacity-0 {% if forloop.first %}opacity-100{% endif %}"></div>
+                </button>
+                {% endfor %}
+            </div>
+
+            <!-- Slide Counter -->
+            <div class="hidden lg:flex items-center gap-2 font-mono text-xs text-gray-400">
+                <span id="currentSlideNum" class="text-neon font-bold">01</span>
+                <span>/</span>
+                <span>0{{ trending_movies|length }}</span>
+            </div>
 
         </div>
+    </div>
+
+</section>
 
 
-        <!-- Movie Cards -->
+<!-- 2. QUICK MULTIPLEX & SHOWTIME SELECTION STRIP -->
+<section class="relative z-20 -mt-6 max-w-7xl mx-auto px-4 lg:px-8">
+    <div class="glass-panel-neon rounded-2xl p-5 lg:p-6 border border-white/15 shadow-glass">
+        
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-white/10">
+            <div>
+                <p class="text-[10px] font-mono tracking-widest text-neon uppercase">REAL-TIME MULTIPLEX SCHEDULE</p>
+                <h3 class="text-lg lg:text-xl font-display font-bold text-white flex items-center gap-2">
+                    <span>Now Showing in {{ city|default:"Kochi" }}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-cyber-emerald/15 text-cyber-emerald text-xs font-mono font-normal">
+                        Live Showtimes
+                    </span>
+                </h3>
+            </div>
 
-        <div class="movie-grid">
+            <!-- Horizontal Scrollable Date Selector -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+                {% for d in date_options %}
+                <button 
+                    type="button" 
+                    onclick="filterDate('{{ d.date_str }}', this)"
+                    class="date-pill px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all border {% if d.is_selected %}bg-neon text-black font-bold border-neon shadow-neon{% else %}bg-dark-900/80 text-gray-300 border-white/10 hover:border-neon/40 hover:text-white{% endif %}"
+                    data-date="{{ d.date_str }}"
+                >
+                    <div class="text-[10px] uppercase font-mono tracking-wider">{{ d.day_name }}</div>
+                    <div class="text-sm font-bold">{{ d.day_num }} {{ d.month }}</div>
+                </button>
+                {% endfor %}
+                <a 
+                    href="{% url 'theatre_selection' %}?city={{ city }}"
+                    class="px-4 py-3 rounded-xl bg-dark-900 border border-cyber-cyan/40 text-cyber-cyan hover:bg-cyber-cyan hover:text-black text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5"
+                >
+                    <span>View All Theatres</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </a>
+            </div>
+        </div>
 
-            {% for movie in movies %}
-
-            <a
-                class="movie-card-link"
-                href="{% url 'movie_detail' movie.tmdb_id %}"
-            >
-
-                <article class="movie-card">
-
-                    <div class="poster-container">
-
-                        {% if movie.poster_url %}
-
-                        <img
-                            src="{{ movie.poster_url }}"
-                            alt="{{ movie.title }}"
-                            loading="lazy"
-                        >
-
-                        {% else %}
-
-                        <div class="no-poster">
-                            No Poster
-                        </div>
-
-                        {% endif %}
-
-
-                        <span class="movie-rating">
-                            ★ {{ movie.rating|floatformat:1 }}
+        <!-- Multiplex Quick Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+            {% for item in theatre_showtimes %}
+            <div class="p-4 rounded-xl bg-dark-900/70 border border-white/10 hover:border-neon/40 transition-all flex flex-col justify-between space-y-3">
+                <div>
+                    <div class="flex items-start justify-between gap-2 mb-1">
+                        <h4 class="text-sm font-bold text-white truncate">{{ item.theatre.name }}</h4>
+                        <span class="text-xs text-neon font-mono flex items-center gap-1">
+                            <i class="fa-solid fa-star text-[10px]"></i> {{ item.theatre.rating }}
                         </span>
-
                     </div>
-
-
-                    <div class="movie-info">
-
-                        <h3>{{ movie.title }}</h3>
-
-                        <p>
-                            {{ movie.release_date|date:"Y" }}
-                        </p>
-
-                        <span class="select-btn">
-                            View Movie Details
+                    <p class="text-[11px] text-gray-400 truncate">{{ item.theatre.location }}</p>
+                    <div class="flex flex-wrap gap-1.5 mt-2">
+                        <span class="px-2 py-0.5 rounded bg-white/5 text-gray-300 text-[10px] font-mono border border-white/5">
+                            {{ item.theatre.specs|truncatechars:26 }}
                         </span>
-
                     </div>
+                </div>
 
-                </article>
-
-            </a>
-
-            {% empty %}
-
-            <p>No movies available yet.</p>
-
+                <!-- Showtimes Pills -->
+                <div class="flex flex-wrap gap-1.5 pt-2 border-t border-white/5">
+                    {% for st in item.showtimes %}
+                    <a 
+                        href="{% url 'booking_auditorium' st.id %}"
+                        class="px-2.5 py-1.5 rounded-lg bg-dark-800 border border-white/15 text-xs text-gray-200 hover:border-neon hover:text-neon hover:scale-105 transition-all font-mono flex flex-col items-center group"
+                        title="{{ st.movie.title }} ({{ st.format_type }})"
+                    >
+                        <span class="font-bold">{{ st.show_time|time:"g:i A" }}</span>
+                        <span class="text-[8px] text-gray-400 group-hover:text-neon uppercase">{{ st.format_type|truncatechars:7 }}</span>
+                    </a>
+                    {% empty %}
+                    <span class="text-[11px] text-gray-500 italic py-1">No more shows scheduled today.</span>
+                    {% endfor %}
+                </div>
+            </div>
             {% endfor %}
-
         </div>
 
-    </section>
+    </div>
+</section>
 
 
-    <!-- Footer -->
+<!-- 3. CATEGORIZED MOVIE GRID -->
+<section class="max-w-7xl mx-auto px-4 lg:px-8 py-16" id="movies">
+    
+    <!-- Section Header & Filter Tabs -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-neon animate-pulse"></span>
+                <p class="text-xs font-mono font-bold tracking-widest text-neon uppercase">EXPLORE EXPERIENCES</p>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-display font-black text-white tracking-tight">
+                Trending & Popular Movies
+            </h2>
+        </div>
 
-    <footer>
+        <!-- Category Filter Pills -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            <button 
+                type="button" 
+                onclick="filterCategory('all', this)"
+                class="category-tab px-4 py-2 rounded-xl text-xs font-bold transition-all border bg-neon text-black border-neon shadow-neon"
+                data-category="all"
+            >
+                All Releases ({{ movies|length }})
+            </button>
+            <button 
+                type="button" 
+                onclick="filterCategory('action', this)"
+                class="category-tab px-4 py-2 rounded-xl text-xs font-medium text-gray-400 border border-white/10 hover:border-neon/40 hover:text-white transition-all bg-dark-900"
+                data-category="action"
+            >
+                Sci-Fi & Action
+            </button>
+            <button 
+                type="button" 
+                onclick="filterCategory('imax', this)"
+                class="category-tab px-4 py-2 rounded-xl text-xs font-medium text-gray-400 border border-white/10 hover:border-neon/40 hover:text-white transition-all bg-dark-900"
+                data-category="imax"
+            >
+                IMAX 3D Experience
+            </button>
+            <button 
+                type="button" 
+                onclick="filterCategory('thriller', this)"
+                class="category-tab px-4 py-2 rounded-xl text-xs font-medium text-gray-400 border border-white/10 hover:border-neon/40 hover:text-white transition-all bg-dark-900"
+                data-category="thriller"
+            >
+                Thriller & Crime
+            </button>
+            <button 
+                type="button" 
+                onclick="filterCategory('animation', this)"
+                class="category-tab px-4 py-2 rounded-xl text-xs font-medium text-gray-400 border border-white/10 hover:border-neon/40 hover:text-white transition-all bg-dark-900"
+                data-category="animation"
+            >
+                Animation
+            </button>
+        </div>
+    </div>
 
-        <p>
-            © 2026 CineVerse. Experience Movies Differently.
-        </p>
+    <!-- Responsive Movie Grid with 3D Hover Scale -->
+    <div id="movieGridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 lg:gap-6">
+        {% for movie in movies %}
+        <div 
+            class="movie-card-item group relative flex flex-col rounded-2xl overflow-hidden glass-panel border border-white/10 hover:border-neon transition-all duration-300 hover:shadow-neon hover:-translate-y-2 cursor-pointer"
+            data-title="{{ movie.title|lower }}"
+            data-genre="{{ movie.genre|lower }}"
+            data-rating="{{ movie.rating }}"
+            data-tmdb-id="{{ movie.tmdb_id }}"
+            onclick="window.location.href='{% url 'movie_detail' movie.tmdb_id %}?city={{ city }}'"
+        >
+            <!-- Poster Image Container -->
+            <div class="relative w-full aspect-[2/3] overflow-hidden bg-dark-900">
+                {% if movie.poster_url %}
+                <img 
+                    src="{{ movie.poster_url }}" 
+                    alt="{{ movie.title }}" 
+                    loading="lazy"
+                    class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+                >
+                {% else %}
+                <div class="w-full h-full flex flex-col items-center justify-center text-gray-500 gap-2">
+                    <i class="fa-solid fa-film text-3xl"></i>
+                    <span class="text-xs">No Poster Available</span>
+                </div>
+                {% endif %}
 
-    </footer>
+                <!-- Floating Rating Badge -->
+                <div class="absolute top-2.5 right-2.5 px-2 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/20 text-neon text-[11px] font-mono font-bold flex items-center gap-1 shadow">
+                    <i class="fa-solid fa-star text-[10px]"></i>
+                    <span>{{ movie.rating|floatformat:1 }}</span>
+                </div>
+
+                <!-- Format Pill -->
+                <div class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-cyber-cyan/20 backdrop-blur-md border border-cyber-cyan/40 text-cyber-cyan text-[10px] font-mono font-bold uppercase shadow">
+                    IMAX 3D
+                </div>
+
+                <!-- Hover Overlay with Quick "Book 3D Seats" Button -->
+                <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-end gap-2">
+                    <p class="text-xs text-gray-200 line-clamp-3 leading-tight font-normal">
+                        {{ movie.description }}
+                    </p>
+                    <a 
+                        href="{% url 'booking_home' %}?movie={{ movie.tmdb_id }}" 
+                        onclick="event.stopPropagation();"
+                        class="w-full py-2.5 rounded-xl bg-neon text-black font-display font-bold text-xs uppercase tracking-wider text-center hover:bg-neon-hover shadow-neon transition-all flex items-center justify-center gap-1.5"
+                    >
+                        <i class="fa-solid fa-vr-cardboard"></i>
+                        <span>Book 3D Seats</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Movie Info -->
+            <div class="p-3.5 flex flex-col flex-grow justify-between bg-dark-900/90 border-t border-white/5">
+                <div>
+                    <h3 class="font-display font-bold text-sm text-white truncate group-hover:text-neon transition-colors">
+                        {{ movie.title }}
+                    </h3>
+                    <p class="text-[11px] text-gray-400 truncate mt-0.5">
+                        {{ movie.genre|default:"Action / Sci-Fi" }}
+                    </p>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-gray-500 font-mono mt-2 pt-2 border-t border-white/5">
+                    <span>{{ movie.release_date|date:"Y" }}</span>
+                    <span class="text-gray-400">{{ movie.duration_mins|default:"145" }}m</span>
+                    <span class="text-cyber-cyan">{{ movie.age_rating|default:"UA 16+" }}</span>
+                </div>
+            </div>
+
+        </div>
+        {% empty %}
+        <div class="col-span-full py-16 text-center text-gray-400">
+            <i class="fa-solid fa-film text-4xl mb-3 text-gray-600"></i>
+            <p class="text-base font-semibold">No movies found in the database.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+</section>
 
 
-</body>
+<!-- 4. GOURMET CINEMA SNACKS PREVIEW -->
+<section class="max-w-7xl mx-auto px-4 lg:px-8 py-12 mb-10">
+    <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-white/10 relative overflow-hidden">
+        
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+            <div>
+                <p class="text-xs font-mono font-bold tracking-widest text-cyber-cyan uppercase">GRAB A BITE • CHEF CURATED</p>
+                <h3 class="text-2xl sm:text-3xl font-display font-black text-white">
+                    Gourmet Cinema Bites & Beverages
+                </h3>
+                <p class="text-xs text-gray-400 mt-1">Pre-order to have freshly prepared snacks served directly to your recliner.</p>
+            </div>
+            <a 
+                href="{% url 'booking_home' %}"
+                class="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-neon hover:text-black border border-white/15 text-xs font-bold text-gray-200 transition-all flex items-center gap-2 self-start"
+            >
+                <span>Select Seats to Order F&B</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+        </div>
 
-</html>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
+            {% for snack in snacks %}
+            <div class="p-3.5 rounded-2xl bg-dark-900/80 border border-white/10 flex items-center gap-3.5 hover:border-cyber-cyan/50 transition-all group">
+                <img 
+                    src="{{ snack.image_url }}" 
+                    alt="{{ snack.name }}" 
+                    class="w-16 h-16 rounded-xl object-cover flex-shrink-0 group-hover:scale-105 transition-transform"
+                >
+                <div class="overflow-hidden flex-grow">
+                    <div class="flex items-center gap-1.5 mb-0.5">
+                        <span class="w-2.5 h-2.5 border {% if snack.is_veg %}border-green-500 text-green-500{% else %}border-red-500 text-red-500{% endif %} flex items-center justify-center p-[1px] rounded-sm">
+                            <span class="w-1 h-1 rounded-full {% if snack.is_veg %}bg-green-500{% else %}bg-red-500{% endif %}"></span>
+                        </span>
+                        <span class="text-[10px] text-gray-400 font-mono uppercase">{{ snack.category }}</span>
+                    </div>
+                    <h5 class="text-xs font-bold text-white truncate">{{ snack.name }}</h5>
+                    <p class="text-xs font-mono font-bold text-neon mt-1">₹{{ snack.price|floatformat:0 }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+
+<!-- Trailer Video Modal -->
+<div id="trailerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
+    <div class="relative w-full max-w-4xl bg-dark-900 rounded-2xl border border-neon/40 shadow-neon-lg overflow-hidden">
+        <div class="flex items-center justify-between p-4 border-b border-white/10">
+            <h4 id="trailerModalTitle" class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-clapperboard text-neon"></i>
+                <span>Movie Trailer</span>
+            </h4>
+            <button 
+                type="button" 
+                onclick="closeTrailerModal()" 
+                class="w-8 h-8 rounded-lg bg-white/10 hover:bg-neon hover:text-black text-gray-400 flex items-center justify-center transition-all"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="relative aspect-video w-full bg-black">
+            <iframe 
+                id="trailerIframe" 
+                class="w-full h-full" 
+                src="" 
+                title="Trailer" 
+                allow="autoplay; encrypted-media; fullscreen" 
+                allowfullscreen
+            ></iframe>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // ==========================================
+    // HERO CAROUSEL CONTROLLER WITH VIDEO FADE-IN
+    // ==========================================
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.hero-slide');
+    const thumbs = document.querySelectorAll('.hero-thumb');
+    const totalSlides = slides.length;
+    let heroTimer = null;
+    let isHeroMuted = true;
+
+    function showSlide(index) {
+        if (totalSlides === 0) return;
+
+        // Wrap around
+        if (index < 0) currentSlide = totalSlides - 1;
+        else if (index >= totalSlides) currentSlide = 0;
+        else currentSlide = index;
+
+        // Update slides visibility and video playback
+        slides.forEach((slide, i) => {
+            const video = slide.querySelector('.hero-video');
+            if (i === currentSlide) {
+                slide.classList.remove('opacity-0', 'pointer-events-none', 'z-0');
+                slide.classList.add('opacity-100', 'pointer-events-auto', 'z-10');
+
+                // Autoplay background trailer video
+                if (video) {
+                    video.currentTime = 0;
+                    video.muted = isHeroMuted;
+                    video.play().then(() => {
+                        video.classList.remove('opacity-0');
+                        video.classList.add('opacity-70');
+                    }).catch(err => {
+                        console.log('Video autoplay prevented:', err);
+                    });
+                }
+            } else {
+                slide.classList.remove('opacity-100', 'pointer-events-auto', 'z-10');
+                slide.classList.add('opacity-0', 'pointer-events-none', 'z-0');
+
+                // Pause other videos
+                if (video) {
+                    video.pause();
+                    video.classList.remove('opacity-70');
+                    video.classList.add('opacity-0');
+                }
+            }
+        });
+
+        // Update thumbnails
+        thumbs.forEach((thumb, i) => {
+            const prog = thumb.querySelector('.thumb-progress');
+            if (i === currentSlide) {
+                thumb.className = "hero-thumb group relative flex items-center gap-2.5 px-3 py-1.5 rounded-lg border transition-all duration-300 border-neon bg-neon/10 text-neon shadow-[0_0_12px_rgba(204,255,0,0.3)]";
+                if (prog) prog.classList.remove('opacity-0');
+            } else {
+                thumb.className = "hero-thumb group relative flex items-center gap-2.5 px-3 py-1.5 rounded-lg border transition-all duration-300 border-white/10 bg-dark-900/60 text-gray-400 hover:border-white/30";
+                if (prog) prog.classList.add('opacity-0');
+            }
+        });
+
+        // Update slide number indicator
+        const numElem = document.getElementById('currentSlideNum');
+        if (numElem) {
+            numElem.textContent = String(currentSlide + 1).padStart(2, '0');
+        }
+
+        resetHeroTimer();
+    }
+
+    function changeHeroSlide(direction) {
+        showSlide(currentSlide + direction);
+    }
+
+    function goToHeroSlide(index) {
+        showSlide(index);
+    }
+
+    function resetHeroTimer() {
+        clearInterval(heroTimer);
+        heroTimer = setInterval(() => {
+            showSlide(currentSlide + 1);
+        }, 9000);
+    }
+
+    function toggleHeroAudio() {
+        isHeroMuted = !isHeroMuted;
+        const activeSlide = slides[currentSlide];
+        const video = activeSlide ? activeSlide.querySelector('.hero-video') : null;
+        const icon = document.getElementById('heroAudioIcon');
+        const label = document.getElementById('heroAudioLabel');
+
+        if (video) video.muted = isHeroMuted;
+
+        if (icon && label) {
+            if (isHeroMuted) {
+                icon.className = 'fa-solid fa-volume-xmark';
+                label.textContent = 'Muted';
+            } else {
+                icon.className = 'fa-solid fa-volume-high text-neon';
+                label.textContent = 'Sound On';
+            }
+        }
+    }
+
+    // Initialize Hero Carousel
+    if (totalSlides > 0) {
+        showSlide(0);
+    }
+
+    // ==========================================
+    // TRAILER POPUP MODAL
+    // ==========================================
+    function openTrailerModal(title, url) {
+        const modal = document.getElementById('trailerModal');
+        const iframe = document.getElementById('trailerIframe');
+        const titleEl = document.getElementById('trailerModalTitle');
+
+        if (!url) return;
+
+        // Convert standard youtube link to embed link
+        let embedUrl = url;
+        if (url.includes('watch?v=')) {
+            const vId = url.split('v=')[1]?.split('&')[0];
+            embedUrl = `https://www.youtube.com/embed/${vId}?autoplay=1`;
+        } else if (url.includes('youtu.be/')) {
+            const vId = url.split('youtu.be/')[1]?.split('?')[0];
+            embedUrl = `https://www.youtube.com/embed/${vId}?autoplay=1`;
+        }
+
+        iframe.src = embedUrl;
+        titleEl.innerHTML = `<i class="fa-solid fa-clapperboard text-neon"></i> <span>${title} - Official Trailer</span>`;
+        modal.classList.remove('hidden');
+    }
+
+    function closeTrailerModal() {
+        const modal = document.getElementById('trailerModal');
+        const iframe = document.getElementById('trailerIframe');
+        iframe.src = '';
+        modal.classList.add('hidden');
+    }
+
+    // ==========================================
+    // CATEGORY FILTER TABS
+    // ==========================================
+    function filterCategory(category, btn) {
+        document.querySelectorAll('.category-tab').forEach(t => {
+            t.className = "category-tab px-4 py-2 rounded-xl text-xs font-medium text-gray-400 border border-white/10 hover:border-neon/40 hover:text-white transition-all bg-dark-900";
+        });
+        btn.className = "category-tab px-4 py-2 rounded-xl text-xs font-bold transition-all border bg-neon text-black border-neon shadow-neon";
+
+        const cards = document.querySelectorAll('.movie-card-item');
+        cards.forEach(card => {
+            const genre = card.dataset.genre || '';
+            let show = false;
+
+            if (category === 'all') show = true;
+            else if (category === 'action') show = genre.includes('action') || genre.includes('sci-fi') || genre.includes('adventure');
+            else if (category === 'imax') show = true; // All curated for IMAX
+            else if (category === 'thriller') show = genre.includes('thriller') || genre.includes('crime') || genre.includes('mystery');
+            else if (category === 'animation') show = genre.includes('animation') || genre.includes('fantasy');
+
+            if (show) {
+                card.style.display = 'flex';
+                card.classList.add('animate-fadeIn');
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // Date pill filter on homepage
+    function filterDate(dateStr, btn) {
+        document.querySelectorAll('.date-pill').forEach(p => {
+            p.className = "date-pill px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all border bg-dark-900/80 text-gray-300 border-white/10 hover:border-neon/40 hover:text-white";
+        });
+        btn.className = "date-pill px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border bg-neon text-black font-bold border-neon shadow-neon";
+    }
+</script>
+{% endblock %}

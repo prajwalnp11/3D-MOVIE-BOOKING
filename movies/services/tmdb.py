@@ -76,3 +76,44 @@ def fetch_movie_trailer(tmdb_id):
             return f"https://www.youtube.com/embed/{video['key']}"
 
     return ""
+
+def fetch_movie_trailer(movie):
+    url = f"{BASE_URL}/movie/{movie.tmdb_id}/videos"
+
+    params = {
+        "api_key": settings.TMDB_API_KEY,
+        "language": "en-US"
+    }
+
+    response = requests.get(url, params=params, timeout=20)
+    response.raise_for_status()
+
+    videos = response.json().get("results", [])
+
+    trailers = [
+        video for video in videos
+        if video.get("site") == "YouTube"
+        and video.get("type") == "Trailer"
+    ]
+
+    if not trailers:
+        trailers = [
+            video for video in videos
+            if video.get("site") == "YouTube"
+            and video.get("type") == "Teaser"
+        ]
+
+    if not trailers:
+        return None
+
+    official = [video for video in trailers if video.get("official")]
+
+    selected = (official or trailers)[0]
+
+    movie.trailer_url = (
+        f"https://www.youtube.com/watch?v={selected['key']}"
+    )
+
+    movie.save(update_fields=["trailer_url"])
+
+    return movie.trailer_url

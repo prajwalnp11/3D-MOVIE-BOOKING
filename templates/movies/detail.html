@@ -1,119 +1,197 @@
-
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}{{ movie.title }} | CINEVERSE 3D{% endblock %}
 
-    <title>{{ movie.title }} | CineVerse</title>
+{% block content %}
+<!-- Movie Hero Backdrop Banner -->
+<div class="relative w-full h-[400px] lg:h-[480px] overflow-hidden bg-black">
+    <img 
+        src="{{ movie.backdrop_url|default:movie.poster_url }}" 
+        alt="{{ movie.title }}" 
+        class="w-full h-full object-cover object-center filter brightness-40 scale-105"
+    >
+    <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/70 to-transparent"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-dark-950 via-dark-950/80 to-transparent"></div>
+</div>
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-
-<body>
-
-<header class="navbar">
-
-    <div class="logo">CINE<span>VERSE</span></div>
-
-    <nav>
-        <a href="/">Home</a>
-        <a href="/#movies">Movies</a>
-        <a href="/#theatres">Theatres</a>
-    </nav>
-
-</header>
-
-
-<section class="movie-section">
-
-    <a href="/" class="book-btn">← Back to Movies</a>
-
-    <div class="detail-layout">
-
-        <div>
-
-            {% if movie.poster_url %}
-
-                <img
-                    src="{{ movie.poster_url }}"
-                    alt="{{ movie.title }}"
-                    style="width:100%; max-width:350px; border-radius:12px;"
+<div class="max-w-7xl mx-auto px-4 lg:px-8 -mt-60 relative z-20 pb-20">
+    
+    <!-- Top Details Layout: Poster + Metadata -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
+        
+        <!-- Poster Column -->
+        <div class="md:col-span-4 lg:col-span-3">
+            <div class="rounded-2xl overflow-hidden glass-panel border border-neon/30 shadow-neon-lg relative group">
+                <img 
+                    src="{{ movie.poster_url }}" 
+                    alt="{{ movie.title }}" 
+                    class="w-full aspect-[2/3] object-cover"
                 >
-
-            {% endif %}
-
-        </div>
-
-
-        <div class="hero-content">
-
-            <p class="tagline">CINEVERSE MOVIE EXPERIENCE</p>
-
-            <h1>{{ movie.title }}</h1>
-
-            <p class="rating">
-                ★ {{ movie.rating|floatformat:1 }} / 10
-            </p>
-
-            <p class="description">
-                {{ movie.description|default:"Movie description unavailable." }}
-            </p>
-
-            <p>
-                Release Date:
-                {{ movie.release_date|date:"F d, Y"|default:"Not available" }}
-            </p>
-
-            <br>
-
-            <button class="book-btn" disabled>
-                Booking Coming Soon
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- Movie Trailer -->
-
-    <div class="trailer-section">
-
-        <h2>Watch Trailer</h2>
-
-        {% if trailer_url %}
-
-            <div class="trailer-container">
-
-                <iframe
-                    src="{{ trailer_url }}"
-                    title="{{ movie.title }} trailer"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin"
-                    allowfullscreen>
-                </iframe>
-
+                <div class="absolute top-3 right-3 px-2.5 py-1 rounded-xl bg-black/80 backdrop-blur-md border border-white/20 text-neon text-xs font-mono font-bold flex items-center gap-1 shadow">
+                    <i class="fa-solid fa-star text-[10px]"></i>
+                    <span>{{ movie.rating|floatformat:1 }}</span>
+                </div>
             </div>
 
-        {% else %}
+            <!-- Direct 3D Booking Button Under Poster -->
+            <a 
+                href="{% url 'booking_home' %}?movie={{ movie.tmdb_id }}" 
+                class="mt-4 w-full py-3.5 rounded-xl bg-neon text-black font-display font-bold text-sm uppercase tracking-wider text-center hover:bg-neon-hover shadow-neon transition-all flex items-center justify-center gap-2"
+            >
+                <i class="fa-solid fa-vr-cardboard text-base"></i>
+                <span>Enter 3D Auditorium</span>
+            </a>
+        </div>
 
-            <p>Sorry, trailer is currently unavailable.</p>
+        <!-- Metadata & Synopsis Column -->
+        <div class="md:col-span-8 lg:col-span-9 flex flex-col justify-end space-y-4">
+            
+            <div class="flex flex-wrap items-center gap-2.5">
+                <span class="px-2.5 py-1 rounded-md bg-white/10 backdrop-blur-md border border-white/15 text-white text-xs font-semibold">
+                    {{ movie.age_rating|default:"UA 16+" }}
+                </span>
+                <span class="px-2.5 py-1 rounded-md bg-cyber-cyan/15 border border-cyber-cyan/40 text-cyber-cyan text-xs font-mono font-semibold">
+                    IMAX 3D Laser
+                </span>
+                <span class="px-2.5 py-1 rounded-md bg-cyber-purple/15 border border-cyber-purple/40 text-cyber-purple text-xs font-mono font-semibold">
+                    Dolby Atmos 7.1
+                </span>
+                <span class="px-2.5 py-1 rounded-md bg-neon/15 border border-neon/40 text-neon text-xs font-mono font-semibold">
+                    4K RGB
+                </span>
+            </div>
 
-        {% endif %}
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-black text-white tracking-tight leading-none">
+                {{ movie.title }}
+            </h1>
+
+            <div class="flex items-center gap-5 text-sm text-gray-300 font-mono">
+                <span class="text-neon font-bold"><i class="fa-solid fa-star mr-1"></i>{{ movie.rating|floatformat:1 }}/10</span>
+                <span>•</span>
+                <span>{{ movie.genre|default:"Action / Sci-Fi" }}</span>
+                <span>•</span>
+                <span>{{ movie.duration_mins|default:"148" }} Mins</span>
+                <span>•</span>
+                <span>{{ movie.release_date|date:"M d, Y" }}</span>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-5 border border-white/10 space-y-2">
+                <h3 class="text-xs font-mono text-neon uppercase tracking-widest">SYNOPSIS</h3>
+                <p class="text-sm text-gray-300 leading-relaxed font-normal">
+                    {{ movie.description|default:"In a futuristic universe where virtual realities blend with cinematic dimensions, experience the story in high-definition 3D with spatial acoustics." }}
+                </p>
+            </div>
+
+            <!-- Quick Specs Row -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                <div class="p-3 rounded-xl bg-dark-900 border border-white/5">
+                    <p class="text-[10px] font-mono text-gray-400 uppercase">Screen Experience</p>
+                    <p class="text-xs font-bold text-cyber-cyan mt-0.5">3D WebGL Cinema</p>
+                </div>
+                <div class="p-3 rounded-xl bg-dark-900 border border-white/5">
+                    <p class="text-[10px] font-mono text-gray-400 uppercase">Sound Dimension</p>
+                    <p class="text-xs font-bold text-cyber-purple mt-0.5">Atmos 12-Channel</p>
+                </div>
+                <div class="p-3 rounded-xl bg-dark-900 border border-white/5">
+                    <p class="text-[10px] font-mono text-gray-400 uppercase">Seating Tier</p>
+                    <p class="text-xs font-bold text-neon mt-0.5">Royal Recliner</p>
+                </div>
+                <div class="p-3 rounded-xl bg-dark-900 border border-white/5">
+                    <p class="text-[10px] font-mono text-gray-400 uppercase">F&B Service</p>
+                    <p class="text-xs font-bold text-white mt-0.5">In-Seat Delivery</p>
+                </div>
+            </div>
+
+        </div>
 
     </div>
 
-</section>
+    <!-- Official Trailer Video Section -->
+    {% if movie.trailer_url %}
+    <div class="glass-panel rounded-2xl p-6 border border-white/10 mb-12 shadow-glass">
+        <h3 class="text-lg font-display font-bold text-white mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-play text-neon text-sm"></i>
+            <span>Official Cinema Trailer</span>
+        </h3>
+        <div class="relative aspect-video w-full rounded-xl overflow-hidden bg-black shadow-glass">
+            {% if "watch?v=" in movie.trailer_url %}
+            <iframe 
+                class="w-full h-full" 
+                src="https://www.youtube.com/embed/{{ movie.trailer_url|slice:'32:' }}?rel=0" 
+                title="{{ movie.title }}" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen
+            ></iframe>
+            {% else %}
+            <iframe 
+                class="w-full h-full" 
+                src="{{ movie.trailer_url }}" 
+                title="{{ movie.title }}" 
+                allowfullscreen
+            ></iframe>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
 
+    <!-- Multiplexes & Available Showtimes Section -->
+    <div class="glass-panel rounded-2xl p-6 border border-white/10 shadow-glass">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10 mb-6">
+            <div>
+                <p class="text-[10px] font-mono text-neon uppercase tracking-widest">RESERVE 3D AUDITORIUM TICKETS</p>
+                <h3 class="text-2xl font-display font-bold text-white">Select Multiplex & Showtime</h3>
+            </div>
 
-<footer>
+            <!-- Date Selector -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+                {% for d in date_options %}
+                <a 
+                    href="?date={{ d.date_str }}&city={{ city }}"
+                    class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border {% if d.is_selected %}bg-neon text-black font-bold border-neon shadow-neon{% else %}bg-dark-900 text-gray-300 border-white/10 hover:border-neon/40 hover:text-white{% endif %}"
+                >
+                    {{ d.day_name }} {{ d.day_num }} {{ d.month }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
 
-    <p>© 2026 CineVerse. Experience Movies Differently.</p>
+        <div class="space-y-4">
+            {% for item in theatre_showtimes %}
+            <div class="p-4 rounded-xl bg-dark-900/80 border border-white/10 hover:border-white/20 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <h4 class="text-base font-bold text-white">{{ item.theatre.name }}</h4>
+                        <span class="text-xs text-neon font-mono flex items-center gap-1">
+                            <i class="fa-solid fa-star text-[10px]"></i> {{ item.theatre.rating }}
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-400">{{ item.theatre.address|default:item.theatre.location }}</p>
+                    <p class="text-[10px] font-mono text-cyber-cyan mt-1">{{ item.theatre.specs }}</p>
+                </div>
 
-</footer>
+                <!-- Showtimes Pills -->
+                <div class="flex flex-wrap items-center gap-2">
+                    {% for st in item.showtimes %}
+                    <a 
+                        href="{% url 'booking_auditorium' st.id %}"
+                        class="px-3 py-2 rounded-xl bg-dark-800 border border-white/15 text-xs text-gray-200 hover:border-neon hover:text-neon hover:scale-105 transition-all font-mono flex items-center gap-2 shadow"
+                    >
+                        <span class="font-bold text-white">{{ st.show_time|time:"g:i A" }}</span>
+                        <span class="text-[10px] text-gray-400">{{ st.screen_name }}</span>
+                        <span class="text-[10px] text-cyber-cyan uppercase font-bold">{{ st.format_type }}</span>
+                        <span class="w-1.5 h-1.5 rounded-full {% if st.status == 'AVAILABLE' %}bg-cyber-emerald{% else %}bg-amber-400{% endif %}"></span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="py-8 text-center text-gray-400 text-xs italic">
+                No showtimes available for this movie on the selected date. Check other dates or view <a href="{% url 'theatre_selection' %}" class="text-neon underline">all theatres</a>.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 
-</body>
-</html>
+</div>
+{% endblock %}

@@ -1,99 +1,164 @@
+/* =========================================
+   CINEVERSE — PREMIUM BOOKING EXPERIENCE
+   ========================================= */
 
-/* Booking Page */
+:root {
+    --cv-bg: #08090d;
+    --cv-panel: #13151c;
+    --cv-panel-light: #1b1e27;
+    --cv-gold: #d9ad61;
+    --cv-gold-light: #f2d49a;
+    --cv-text: #f5f3ef;
+    --cv-muted: #999ba5;
+    --cv-border: rgba(255,255,255,0.09);
+}
 
 .booking-page {
-    width: 92%;
-    max-width: 1400px;
-    margin: 45px auto;
-    color: #f5f5f5;
+    width: min(94%, 1540px);
+    margin: 55px auto;
+    color: var(--cv-text);
 }
+
+/* Page introduction */
 
 .booking-heading {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 48px;
+}
+
+.booking-heading .tagline,
+.auditorium-heading .tagline,
+.summary-details .tagline {
+    color: var(--cv-gold);
+    letter-spacing: 3px;
+    font-size: 11px;
+    font-weight: 700;
 }
 
 .booking-heading h1 {
-    font-size: clamp(30px, 5vw, 46px);
-    margin: 12px 0;
+    font-size: clamp(34px, 5vw, 58px);
+    font-weight: 750;
+    letter-spacing: -1.5px;
+    margin: 13px 0;
 }
 
 .booking-heading > p:last-child {
-    color: #aaa;
+    color: var(--cv-muted);
+    font-size: 15px;
 }
 
 .active-link {
-    color: #d6a84f !important;
+    color: var(--cv-gold) !important;
 }
+
+/* Movie and showtime selection */
 
 .booking-controls {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-    margin-bottom: 45px;
-    padding: 25px;
-    background: #191919;
-    border: 1px solid #333;
-    border-radius: 14px;
+    gap: 28px;
+    margin-bottom: 65px;
+    padding: 30px;
+    background:
+        linear-gradient(135deg, rgba(217,173,97,0.055), transparent 55%),
+        var(--cv-panel);
+    border: 1px solid var(--cv-border);
+    border-radius: 18px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.22);
 }
 
 .control-group {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .control-group label {
-    color: #d6a84f;
-    font-weight: 600;
+    color: var(--cv-gold-light);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .control-group select {
     width: 100%;
-    padding: 14px;
-    border: 1px solid #444;
-    border-radius: 8px;
-    background: #252525;
-    color: white;
+    min-height: 52px;
+    padding: 0 16px;
+    border: 1px solid #383b45;
+    border-radius: 10px;
+    outline: none;
+    background: #20232c;
+    color: var(--cv-text);
     font-size: 15px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
 }
+
+.control-group select:hover,
+.control-group select:focus {
+    border-color: var(--cv-gold);
+    box-shadow: 0 0 0 3px rgba(217,173,97,0.10);
+}
+
+.control-group select option {
+    background: #171922;
+    color: white;
+}
+
+/* Auditorium heading */
 
 .auditorium-heading {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    gap: 20px;
+    margin-bottom: 22px;
 }
 
 .auditorium-heading h2 {
-    margin-top: 5px;
+    margin: 9px 0 0;
+    font-size: clamp(24px, 3vw, 32px);
+    letter-spacing: -0.5px;
 }
 
 .live-indicator {
-    color: #d6a84f;
-    border: 1px solid #d6a84f;
-    padding: 8px 14px;
-    border-radius: 20px;
-    font-size: 12px;
+    color: var(--cv-gold-light);
+    border: 1px solid rgba(217,173,97,0.55);
+    background: rgba(217,173,97,0.07);
+    padding: 10px 17px;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    white-space: nowrap;
 }
 
+/* 3D cinema viewport */
+
 .theatre-container {
-    background: radial-gradient(ellipse at center, #302020, #101010 75%);
-    border: 1px solid #383838;
-    border-radius: 16px;
+    position: relative;
+    background:
+        radial-gradient(ellipse at 50% 45%, #25202a 0%, #111019 55%, #08090d 100%);
+    border: 1px solid rgba(217,173,97,0.23);
+    border-radius: 18px;
     overflow: hidden;
+    box-shadow:
+        0 25px 75px rgba(0,0,0,0.45),
+        0 0 35px rgba(217,173,97,0.035);
 }
 
 #theatre3D {
-    width: 100%;
-    height: 620px;
     position: relative;
+    width: 100%;
+    height: 700px;
+    overflow: hidden;
 }
 
 #theatre3D canvas {
     display: block;
     width: 100%;
     height: 100%;
+    outline: none;
 }
 
 .loading-message {
@@ -101,138 +166,226 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: #d6a84f;
+    color: var(--cv-gold-light);
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-align: center;
+    z-index: 2;
 }
 
 .theatre-instructions {
     text-align: center;
-    padding: 15px;
-    color: #aaa;
-    font-size: 13px;
-    background: #171717;
+    padding: 17px 15px;
+    color: var(--cv-muted);
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    background: rgba(8,9,13,0.88);
+    border-top: 1px solid var(--cv-border);
 }
+
+/* Seat legend */
 
 .seat-legend {
     display: flex;
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 30px;
-    margin: 25px 0 50px;
-    color: #ccc;
+    gap: 32px;
+    margin: 25px 0 65px;
+    color: #c6c5c1;
+    font-size: 13px;
 }
 
 .seat-legend > div {
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 10px;
 }
 
 .legend-seat {
-    width: 17px;
-    height: 17px;
+    width: 15px;
+    height: 15px;
     display: inline-block;
     border-radius: 5px;
+    box-shadow: 0 2px 7px rgba(0,0,0,0.35);
 }
 
 .legend-seat.available {
-    background: #b83232;
+    background: #a92f40;
 }
 
 .legend-seat.selected {
-    background: #d6a84f;
+    background: var(--cv-gold);
 }
 
 .legend-seat.unavailable {
-    background: #555;
+    background: #555966;
 }
+
+/* Booking summary */
 
 .booking-summary {
     display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 30px;
-    padding: 30px;
-    background: #191919;
-    border: 1px solid #333;
-    border-radius: 14px;
-    margin-bottom: 50px;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 35px;
+    padding: 38px;
+    margin-bottom: 60px;
+    background:
+        linear-gradient(120deg, rgba(217,173,97,0.045), transparent 50%),
+        var(--cv-panel);
+    border: 1px solid var(--cv-border);
+    border-radius: 18px;
+    box-shadow: 0 18px 55px rgba(0,0,0,0.2);
 }
 
 .summary-details h2 {
-    margin: 12px 0;
+    margin: 12px 0 24px;
+    font-size: 25px;
+}
+
+.summary-details > p:not(.tagline) {
+    color: var(--cv-muted);
+    font-size: 14px;
 }
 
 #selectedSeats {
-    color: #d6a84f;
-    margin: 12px 0 25px;
+    color: var(--cv-gold-light);
+    margin: 14px 0 30px;
     min-height: 25px;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 .total-label {
-    color: #aaa;
+    color: var(--cv-muted);
+    font-size: 13px;
 }
 
 #totalAmount {
-    color: #d6a84f;
-    font-size: 32px;
+    color: var(--cv-gold-light);
+    font-size: 38px;
+    margin: 8px 0 0;
+    letter-spacing: -1px;
 }
 
+/* Ticket prices */
+
 .price-details {
-    border-left: 1px solid #444;
-    padding-left: 30px;
+    border-left: 1px solid var(--cv-border);
+    padding-left: 35px;
 }
 
 .price-details h3 {
-    margin-bottom: 18px;
+    margin: 5px 0 23px;
+    font-size: 18px;
 }
 
 .price-details p {
-    color: #ccc;
-    margin: 12px 0;
+    color: #c5c5ca;
+    margin: 15px 0;
+    font-size: 14px;
 }
 
+/* Continue button */
+
 #continueBooking {
-    margin-top: 20px;
+    margin-top: 23px;
     width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 8px;
-    background: #d6a84f;
-    color: #151515;
-    font-weight: bold;
-    font-size: 15px;
+    min-height: 52px;
+    padding: 14px 20px;
+    border: 1px solid var(--cv-gold);
+    border-radius: 10px;
+    background: linear-gradient(135deg, #e9c47e, #c99748);
+    color: #17130d;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.3px;
     cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+
+#continueBooking:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 25px rgba(217,173,97,0.22);
 }
 
 #continueBooking:disabled {
-    background: #555;
-    color: #aaa;
+    background: #373943;
+    border-color: #373943;
+    color: #858792;
     cursor: not-allowed;
 }
 
 .prototype-note {
-    font-size: 12px;
-    line-height: 1.5;
+    color: #858792;
+    font-size: 11px;
+    line-height: 1.7;
+    margin-top: 15px;
 }
 
-@media (max-width: 700px) {
-    .booking-controls,
+/* Responsive design */
+
+@media (max-width: 850px) {
+    .booking-page {
+        width: 94%;
+        margin: 35px auto;
+    }
+
+    .booking-controls {
+        gap: 18px;
+        padding: 22px;
+    }
+
+    #theatre3D {
+        height: 570px;
+    }
+
     .booking-summary {
         grid-template-columns: 1fr;
+        padding: 28px;
     }
 
     .price-details {
         border-left: none;
-        border-top: 1px solid #444;
+        border-top: 1px solid var(--cv-border);
         padding: 25px 0 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .booking-heading {
+        margin-bottom: 32px;
+    }
+
+    .booking-controls {
+        grid-template-columns: 1fr;
+        padding: 19px;
+        margin-bottom: 45px;
+    }
+
+    .auditorium-heading {
+        align-items: flex-start;
+    }
+
+    .live-indicator {
+        padding: 8px 11px;
+        font-size: 9px;
     }
 
     #theatre3D {
         height: 450px;
     }
 
-    .auditorium-heading {
-        align-items: flex-start;
-        gap: 15px;
+    .seat-legend {
+        gap: 17px;
+        font-size: 11px;
+    }
+
+    .booking-summary {
+        padding: 22px;
+    }
+
+    #totalAmount {
+        font-size: 32px;
     }
 }
-

@@ -28,7 +28,7 @@ SECRET_KEY = "django-insecure-w&%&n+cp6wu%i8e+6xj1y5$t_rgt*s*++cu79fg+&+0s$j&=$y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -43,8 +43,13 @@ INSTALLED_APPS = [
 
     'accounts',
     'movies',
+    'cinemas',
     'theatres',
     'bookings',
+    'payments',
+    'core',
+    'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -67,8 +72,10 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
+                'django.template.context_processors.media',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.global_context',
             ],
         },
     },
@@ -127,3 +134,20 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+}
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'

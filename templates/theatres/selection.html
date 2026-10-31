@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Multiplex Theatres & Showtimes | CINEVERSE{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 lg:px-8 py-8">
+    
+    <!-- Header Breadcrumb & Title -->
+    <div class="mb-6">
+        <div class="flex items-center gap-2 text-xs font-mono text-gray-400 mb-2">
+            <a href="/" class="hover:text-neon transition-colors">Home</a>
+            <span>/</span>
+            <span class="text-neon">Theatres & Showtimes</span>
+        </div>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl sm:text-4xl font-display font-black text-white tracking-tight flex items-center gap-3">
+                    <span>Multiplex Theatres</span>
+                    <span class="text-sm font-normal px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-300 font-mono">
+                        {{ city|default:"Kochi" }}
+                    </span>
+                </h1>
+                <p class="text-xs text-gray-400 mt-1">Select your preferred multiplex and showtime to launch the 3D seating experience.</p>
+            </div>
+
+            <!-- Quick City & Movie Selector -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-dark-900 border border-white/10 text-xs">
+                    <span class="text-gray-400 font-mono text-[10px] uppercase">City:</span>
+                    <select onchange="window.location.href='?city=' + this.value + '&date={{ active_date }}'" class="bg-transparent text-white font-bold focus:outline-none cursor-pointer">
+                        {% for c in cities %}
+                        <option value="{{ c }}" class="bg-dark-900 text-white" {% if c == city %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. HORIZONTAL SCROLLABLE DATE SELECTOR -->
+    <div class="glass-panel-neon rounded-2xl p-4 mb-8 border border-white/15 shadow-glass">
+        <div class="flex items-center justify-between gap-4">
+            <span class="text-xs font-mono text-gray-400 uppercase tracking-widest hidden sm:inline flex-shrink-0">
+                <i class="fa-solid fa-calendar-days text-neon mr-1.5"></i> Select Date:
+            </span>
+
+            <div class="flex items-center gap-2.5 overflow-x-auto pb-1 flex-grow scrollbar-none">
+                {% for d in date_options %}
+                <a 
+                    href="?city={{ city }}&date={{ d.date_str }}{% if selected_movie %}&movie={{ selected_movie.tmdb_id }}{% endif %}"
+                    class="px-4 py-2.5 rounded-xl text-center transition-all flex flex-col items-center min-w-[85px] border {% if d.is_selected %}bg-neon text-black font-bold border-neon shadow-neon scale-105{% else %}bg-dark-900/80 text-gray-300 border-white/10 hover:border-neon/40 hover:text-white{% endif %}"
+                >
+                    <span class="text-[10px] uppercase font-mono tracking-wider {% if d.is_selected %}text-black font-bold{% else %}text-gray-400{% endif %}">
+                        {{ d.day_name }}
+                    </span>
+                    <span class="text-sm font-extrabold">{{ d.day_num }} {{ d.month }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Technical Specs & Availability Legend Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-4 px-2 mb-6 text-xs text-gray-400">
+        <!-- Tech Badges Legend -->
+        <div class="flex items-center gap-3">
+            <span class="font-mono text-[10px] uppercase text-gray-500">Formats:</span>
+            <span class="px-2 py-0.5 rounded bg-cyber-cyan/10 border border-cyber-cyan/30 text-cyber-cyan text-[10px] font-mono font-bold">IMAX 3D Laser</span>
+            <span class="px-2 py-0.5 rounded bg-cyber-purple/10 border border-cyber-purple/30 text-cyber-purple text-[10px] font-mono font-bold">Dolby Atmos 7.1</span>
+            <span class="px-2 py-0.5 rounded bg-neon/10 border border-neon/30 text-neon text-[10px] font-mono font-bold">4K RGB Laser</span>
+        </div>
+
+        <!-- Availability Status Legend -->
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-1.5 font-mono text-[11px]">
+                <span class="w-2 h-2 rounded-full bg-cyber-emerald animate-pulse"></span>
+                <span class="text-gray-300">Available</span>
+            </div>
+            <div class="flex items-center gap-1.5 font-mono text-[11px]">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="text-gray-300">Filling Fast</span>
+            </div>
+            <div class="flex items-center gap-1.5 font-mono text-[11px]">
+                <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                <span class="text-gray-400">Sold Out</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. THEATER CARDS LIST -->
+    <div class="space-y-6">
+        {% for item in theatre_showtimes %}
+        <div class="glass-panel rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all shadow-glass">
+            
+            <!-- Theatre Header Info -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-white/10">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-xl font-display font-bold text-white tracking-wide">
+                            {{ item.theatre.name }}
+                        </h3>
+                        <span class="px-2.5 py-0.5 rounded-full bg-neon/10 border border-neon/30 text-neon text-xs font-mono font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-star text-[10px]"></i> {{ item.theatre.rating }}
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-400 flex items-center gap-1.5">
+                        <i class="fa-solid fa-location-dot text-cyber-cyan text-xs"></i>
+                        <span>{{ item.theatre.address|default:item.theatre.location }}</span>
+                    </p>
+                </div>
+
+                <!-- Technical Specs Badges -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/15 text-gray-300 text-xs font-mono">
+                        <i class="fa-solid fa-film text-neon text-[10px] mr-1"></i> {{ item.theatre.specs }}
+                    </span>
+                    <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/15 text-gray-400 text-xs font-mono">
+                        <i class="fa-solid fa-parking text-xs mr-1"></i> Valet Available
+                    </span>
+                    <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/15 text-gray-400 text-xs font-mono">
+                        <i class="fa-solid fa-burger text-xs mr-1"></i> Gourmet Lounge
+                    </span>
+                </div>
+            </div>
+
+            <!-- Showtimes Grouped List -->
+            <div class="pt-5 space-y-4">
+                {% if item.has_showtimes %}
+                
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-neon"></span>
+                        <h4 class="text-xs font-mono uppercase tracking-widest text-gray-300">
+                            Available Showtimes (Click to Enter 3D Auditorium)
+                        </h4>
+                    </div>
+                    <span class="text-[11px] font-mono text-gray-500">Tier prices: ₹180 - ₹450</span>
+                </div>
+
+                <!-- Showtime Pills Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    {% for st in item.showtimes %}
+                    <a 
+                        href="{% url 'booking_auditorium' st.id %}"
+                        class="p-3 rounded-xl bg-dark-900/90 border transition-all duration-200 flex flex-col justify-between space-y-2 group hover:scale-[1.03] {% if st.status == 'SOLD_OUT' %}border-red-900/40 opacity-50 pointer-events-none{% elif st.status == 'FILLING_FAST' %}border-amber-500/40 hover:border-amber-400 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)]{% else %}border-white/15 hover:border-neon hover:shadow-neon{% endif %}"
+                    >
+                        <div class="flex items-center justify-between">
+                            <span class="font-display font-black text-base text-white group-hover:text-neon transition-colors">
+                                {{ st.show_time|time:"g:i A" }}
+                            </span>
+                            <!-- Status Dot -->
+                            <span class="flex h-2 w-2 relative">
+                                {% if st.status == 'AVAILABLE' %}
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-emerald opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-cyber-emerald"></span>
+                                {% elif st.status == 'FILLING_FAST' %}
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
+                                {% else %}
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div>
+                            <p class="text-[11px] font-semibold text-gray-200 truncate">{{ st.movie.title }}</p>
+                            <p class="text-[9px] text-gray-400 font-mono uppercase">{{ st.screen_name }}</p>
+                        </div>
+
+                        <div class="pt-1 border-t border-white/5 flex items-center justify-between text-[10px] font-mono">
+                            <span class="text-cyber-cyan font-bold">{{ st.format_type }}</span>
+                            <span class="text-gray-400 group-hover:text-neon flex items-center gap-1 font-bold">
+                                <span>3D</span> <i class="fa-solid fa-arrow-right text-[8px]"></i>
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+
+                {% else %}
+                <div class="py-6 text-center text-gray-500 text-xs italic">
+                    No showtimes scheduled for this multiplex on {{ active_date }}. Please check another date above.
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+        {% empty %}
+        <div class="glass-panel rounded-2xl p-12 text-center text-gray-400">
+            <i class="fa-solid fa-masks-theater text-4xl mb-3 text-gray-600"></i>
+            <h3 class="text-lg font-bold text-white">No multiplexes found in {{ city }}</h3>
+            <p class="text-xs text-gray-500 mt-1">Please select another city from the location dropdown in the navbar.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
