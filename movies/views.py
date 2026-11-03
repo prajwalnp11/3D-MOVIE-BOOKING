@@ -217,3 +217,11 @@ def movie_detail(request, tmdb_id=None, slug=None):
         'city': city,
         'cast_list': cast_list,
     })
+
+
+def cineverse_experience(request):
+    """
+    Renders the futuristic 6-screen WebGL 3D Cinema Experience
+    """
+    return render(request, 'cineverse_experience.html')
+

@@ -72,5 +72,28 @@ class Movie(models.Model):
             return self.banner.url
         return self.backdrop_url or self.poster_url or ''
 
+    @property
+    def youtube_id(self):
+        if not self.trailer_url:
+            return ''
+        import re
+        patterns = [
+            r'(?:v=|\/embed\/|youtu\.be\/|\/v\/|watch\?v=|\&v=)([a-zA-Z0-9_-]{11})',
+            r'^([a-zA-Z0-9_-]{11})$',
+        ]
+        url = self.trailer_url.strip()
+        for p in patterns:
+            match = re.search(p, url)
+            if match:
+                return match.group(1)
+        return ''
+
+    @property
+    def embed_trailer_url(self):
+        y_id = self.youtube_id
+        if y_id:
+            return f"https://www.youtube.com/embed/{y_id}?rel=0&enablejsapi=1"
+        return self.trailer_url
+
     def __str__(self):
         return self.title

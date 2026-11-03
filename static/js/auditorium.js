@@ -151,32 +151,34 @@ const materials = {
         roughness: 0.25
     }),
 
-    // Tier Seat Materials
+    // Tier Seat Materials (Royal Recliner: Gold, Balcony: Purple, Prime: Green, Classic: Blue)
     seatRoyal: new THREE.MeshStandardMaterial({
-        color: 0x0284c7, // Neon Cyan / Royal Blue
-        roughness: 0.55,
-        metalness: 0.25,
-        emissive: 0x02365c,
-        emissiveIntensity: 0.25
+        color: 0xFACC15, // Gold (#FACC15)
+        roughness: 0.45,
+        metalness: 0.35,
+        emissive: 0x735a02,
+        emissiveIntensity: 0.35
     }),
     seatBalcony: new THREE.MeshStandardMaterial({
-        color: 0x8b5cf6, // Neon Purple / Violet
+        color: 0xA855F7, // Purple (#A855F7)
         roughness: 0.65,
         metalness: 0.15,
-        emissive: 0x3b1875,
-        emissiveIntensity: 0.25
+        emissive: 0x4c1d95,
+        emissiveIntensity: 0.35
     }),
     seatPrime: new THREE.MeshStandardMaterial({
-        color: 0x059669, // Neon Emerald / Green
+        color: 0x22C55E, // Green (#22C55E)
         roughness: 0.65,
         metalness: 0.15,
-        emissive: 0x064e3b,
-        emissiveIntensity: 0.25
+        emissive: 0x065f46,
+        emissiveIntensity: 0.35
     }),
     seatClassic: new THREE.MeshStandardMaterial({
-        color: 0x475569, // Slate Steel
+        color: 0x3B82F6, // Blue (#3B82F6)
         roughness: 0.75,
-        metalness: 0.1
+        metalness: 0.15,
+        emissive: 0x1e3a8a,
+        emissiveIntensity: 0.25
     }),
     seatBooked: new THREE.MeshStandardMaterial({
         color: 0x1e212b, // Dim Charcoal / Sold Out
@@ -184,21 +186,21 @@ const materials = {
         metalness: 0.05
     }),
 
-    // Selected Glowing Material
+    // Selected Glowing Material (Green Glow)
     seatSelected: new THREE.MeshStandardMaterial({
-        color: 0xccff00, // Electric Lime Neon
-        roughness: 0.35,
+        color: 0x22C55E, // Glowing Neon Green
+        roughness: 0.25,
         metalness: 0.2,
-        emissive: 0xccff00,
-        emissiveIntensity: 0.85
+        emissive: 0x22C55E,
+        emissiveIntensity: 1.2
     }),
 
     // Hover Highlight Material
     seatHover: new THREE.MeshStandardMaterial({
         color: 0xffffff,
         roughness: 0.3,
-        emissive: 0x00f0ff,
-        emissiveIntensity: 0.5
+        emissive: 0xFACC15,
+        emissiveIntensity: 0.6
     })
 };
 
@@ -306,7 +308,15 @@ function setupCinemaScreen(videoUrl, title) {
     videoElement.playsInline = true;
     videoElement.autoplay = true;
 
-    // Start video playback
+    // Start video playback with error resilience
+    videoElement.addEventListener('error', () => {
+        console.warn('Auditorium screen video error, attempting fallback stream');
+        if (videoElement.src !== 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4') {
+            videoElement.src = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4';
+            videoElement.play().catch(() => {});
+        }
+    });
+
     videoElement.play().catch(err => {
         console.warn('VideoTexture autoplay waiting for user interaction:', err);
     });
@@ -700,28 +710,36 @@ renderer.domElement.addEventListener('pointerup', (e) => {
 });
 
 // ==========================================
-// 11. CAMERA PRESETS & SMOOTH TRANSITIONS
-// ==========================================
+let isTourActive = false;
+let isHouseLightsOn = false;
+
 export function setCameraPreset(presetName) {
     let targetPos, targetLookAt;
+    isTourActive = false;
 
-    switch (presetName) {
+    switch (presetName.toLowerCase().replace(/['\s-]/g, '')) {
         case 'overview':
             targetPos = new THREE.Vector3(0, 10, 18);
             targetLookAt = new THREE.Vector3(0, 2.5, -2);
             break;
+        case 'frontstage':
+        case 'front':
         case 'screen':
-            targetPos = new THREE.Vector3(0, 4.5, 7.5);
+            targetPos = new THREE.Vector3(0, 2.2, -1.2);
             targetLookAt = new THREE.Vector3(0, 5.2, -7.8);
             break;
         case 'balcony':
-            targetPos = new THREE.Vector3(0, 5.2, 5.5);
-            targetLookAt = new THREE.Vector3(0, 4.5, -6.5);
+            targetPos = new THREE.Vector3(0, 7.8, 12.5);
+            targetLookAt = new THREE.Vector3(0, 4.0, -5.0);
             break;
-        case 'front':
-            targetPos = new THREE.Vector3(0, 1.8, -1.5);
-            targetLookAt = new THREE.Vector3(0, 5.2, -7.8);
+        case 'birdseye':
+        case 'bird':
+            targetPos = new THREE.Vector3(0, 24, 2);
+            targetLookAt = new THREE.Vector3(0, 2.0, 2);
             break;
+        case 'tour':
+            isTourActive = true;
+            return;
         default:
             targetPos = new THREE.Vector3(0, 10, 18);
             targetLookAt = new THREE.Vector3(0, 2.5, -2);
@@ -729,6 +747,26 @@ export function setCameraPreset(presetName) {
 
     animateCamera(targetPos, targetLookAt, 1000);
 }
+
+window.toggleHouseLights = function() {
+    isHouseLightsOn = !isHouseLightsOn;
+    const label = document.getElementById('houseLightsLabel');
+    const icon = document.getElementById('houseLightsIcon');
+
+    if (isHouseLightsOn) {
+        ceilingLight.intensity = 3.2;
+        hemiLight.intensity = 2.4;
+        scene.background.setHex(0x181a24);
+        if (label) label.textContent = 'House Lights: ON';
+        if (icon) icon.className = 'fa-solid fa-lightbulb text-[#FACC15]';
+    } else {
+        ceilingLight.intensity = 1.8;
+        hemiLight.intensity = 1.2;
+        scene.background.setHex(0x06070a);
+        if (label) label.textContent = 'House Lights: Dim (Screening)';
+        if (icon) icon.className = 'fa-regular fa-lightbulb';
+    }
+};
 
 function focusCameraOnSeat(group) {
     const seatPos = new THREE.Vector3();
@@ -912,6 +950,15 @@ function animate() {
         if (progress >= 1.0) {
             cameraAnimation = null;
         }
+    }
+
+    // Automated Tour Orbit
+    if (isTourActive) {
+        const t = time * 0.35;
+        camera.position.x = Math.sin(t) * 16;
+        camera.position.z = Math.cos(t) * 16 + 2;
+        camera.position.y = 8 + Math.sin(t * 1.5) * 2;
+        controls.target.set(0, 2.5, -2);
     }
 
     controls.update();

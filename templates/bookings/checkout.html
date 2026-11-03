@@ -113,35 +113,27 @@
             <div class="glass-panel rounded-3xl p-6 border border-white/10 shadow-glass space-y-4">
                 <h3 class="text-sm font-mono font-bold uppercase tracking-widest text-cyber-cyan flex items-center gap-2">
                     <i class="fa-solid fa-credit-card"></i>
-                    <span>Select Payment Option (Mock Gateway / Razorpay Ready)</span>
+                    <span>Select Payment Option</span>
                 </h3>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <label class="payment-method-card p-4 rounded-2xl bg-dark-900/90 border border-neon text-white flex flex-col justify-between cursor-pointer transition-all shadow-neon/20">
-                        <div class="flex items-center justify-between mb-2">
-                            <i class="fa-solid fa-qrcode text-neon text-xl"></i>
-                            <input type="radio" name="payment_method" value="UPI" checked class="accent-neon">
-                        </div>
-                        <span class="text-xs font-bold block">Instant UPI</span>
-                        <span class="text-[10px] text-gray-400 font-mono">GPay, PhonePe, Paytm</span>
+                <!-- Horizontal selection area offering UPI, Card, and Wallet inside rounded pill buttons -->
+                <div class="grid grid-cols-3 gap-3">
+                    <label class="payment-method-card py-3 px-4 rounded-full bg-dark-900 border border-primary text-white flex items-center justify-center gap-2 cursor-pointer transition-all shadow-[0_0_15px_rgba(250,204,21,0.25)]">
+                        <i class="fa-solid fa-mobile-screen-button text-primary text-sm"></i>
+                        <input type="radio" name="payment_method" value="UPI" checked class="accent-primary">
+                        <span class="text-xs font-bold font-display">UPI</span>
                     </label>
 
-                    <label class="payment-method-card p-4 rounded-2xl bg-dark-900/90 border border-white/10 text-gray-300 hover:border-white/30 flex flex-col justify-between cursor-pointer transition-all">
-                        <div class="flex items-center justify-between mb-2">
-                            <i class="fa-regular fa-credit-card text-cyber-cyan text-xl"></i>
-                            <input type="radio" name="payment_method" value="CARD" class="accent-neon">
-                        </div>
-                        <span class="text-xs font-bold block text-white">Credit / Debit Card</span>
-                        <span class="text-[10px] text-gray-400 font-mono">Visa, MasterCard, RuPay</span>
+                    <label class="payment-method-card py-3 px-4 rounded-full bg-dark-900 border border-white/10 text-gray-300 hover:border-white/30 flex items-center justify-center gap-2 cursor-pointer transition-all">
+                        <i class="fa-regular fa-credit-card text-cyber-cyan text-sm"></i>
+                        <input type="radio" name="payment_method" value="CARD" class="accent-primary">
+                        <span class="text-xs font-bold font-display">Card</span>
                     </label>
 
-                    <label class="payment-method-card p-4 rounded-2xl bg-dark-900/90 border border-white/10 text-gray-300 hover:border-white/30 flex flex-col justify-between cursor-pointer transition-all">
-                        <div class="flex items-center justify-between mb-2">
-                            <i class="fa-solid fa-building-columns text-purple-400 text-xl"></i>
-                            <input type="radio" name="payment_method" value="NET_BANKING" class="accent-neon">
-                        </div>
-                        <span class="text-xs font-bold block text-white">Net Banking</span>
-                        <span class="text-[10px] text-gray-400 font-mono">All Major Banks</span>
+                    <label class="payment-method-card py-3 px-4 rounded-full bg-dark-900 border border-white/10 text-gray-300 hover:border-white/30 flex items-center justify-center gap-2 cursor-pointer transition-all">
+                        <i class="fa-solid fa-wallet text-cyber-purple text-sm"></i>
+                        <input type="radio" name="payment_method" value="WALLET" class="accent-primary">
+                        <span class="text-xs font-bold font-display">Wallet</span>
                     </label>
                 </div>
             </div>
@@ -161,7 +153,7 @@
                     <label class="text-[10px] font-mono text-gray-400 uppercase tracking-wider block mb-2">Booked Seats ({{ seats|length }}):</label>
                     <div class="flex flex-wrap gap-2">
                         {% for s in seats %}
-                        <span class="px-3 py-1.5 rounded-xl bg-neon text-black font-mono font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                        <span class="px-3 py-1.5 rounded-xl bg-primary text-black font-mono font-bold text-xs flex items-center gap-1.5 shadow-sm">
                             <span>{{ s.row }}{{ s.number }}</span>
                             <span class="text-[10px] opacity-75">({{ s.get_category_display }})</span>
                         </span>
@@ -186,19 +178,20 @@
                         <span>₹{{ tax_amount|floatformat:2 }}</span>
                     </div>
 
-                    <div class="flex justify-between items-center text-base font-bold text-neon pt-4 border-t border-white/10">
+                    <div class="flex justify-between items-center text-base font-bold text-primary pt-4 border-t border-white/10">
                         <span>Final Amount:</span>
-                        <span class="text-xl font-mono text-neon font-black">₹{{ grand_total|floatformat:2 }}</span>
+                        <span class="text-xl font-mono text-primary font-black">₹{{ grand_total|floatformat:2 }}</span>
                     </div>
                 </div>
 
-                <!-- Action Button -->
+                <!-- Primary Action: Full-width, bright yellow PAY ₹[Amount] button with PROCESSING... spinner -->
                 <button 
                     type="submit" 
-                    class="w-full py-4 rounded-xl bg-neon text-black font-display font-bold text-sm uppercase tracking-wider text-center hover:bg-neon-hover shadow-neon transition-all flex items-center justify-center gap-2 active:scale-98"
+                    id="djangoCheckoutPayBtn"
+                    onclick="this.disabled=true; this.innerHTML='<span class=\'cv-spinner mr-2\'></span> PROCESSING...'; this.form.submit();"
+                    class="btn-primary-yellow w-full py-4 text-sm font-black shadow-gold"
                 >
-                    <i class="fa-solid fa-lock text-xs"></i>
-                    <span>Proceed to Payment (₹{{ grand_total|floatformat:2 }})</span>
+                    <span>PAY ₹{{ grand_total|floatformat:2 }}</span>
                 </button>
 
                 <div class="space-y-2 pt-2 text-center">

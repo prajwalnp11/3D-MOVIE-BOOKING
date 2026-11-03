@@ -1,0 +1,467 @@
+/**
+ * CINEVERSE DESIGN SYSTEM (v2.0)
+ * Futuristic Premium Dark-Mode 3D Movie Ticket Booking System
+ * Palette: Deep Black (#0a0a0a), Dark Gray (#1a1a1a), Neon Yellow/Gold (#FACC15)
+ * Typography: Modern Extended Sans (Syne/Outfit/Inter) + Cinematic Serif (Cinzel/Playfair Display)
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800;900&family=Syne:wght@500;700;800&display=swap');
+
+:root {
+    /* 1. Core Color Palette */
+    --cv-bg-black: #0a0a0a;
+    --cv-bg-surface: #121212;
+    --cv-bg-surface-elevated: #161616;
+    --cv-bg-gray: #1a1a1a;
+    --cv-bg-gray-light: #262626;
+
+    /* Primary Accent / Call-To-Action */
+    --cv-primary-yellow: #FACC15;
+    --cv-primary-yellow-hover: #eab308;
+    --cv-primary-yellow-light: #fef08a;
+    --cv-primary-yellow-glow: rgba(250, 204, 21, 0.45);
+    --cv-primary-yellow-subtle: rgba(250, 204, 21, 0.12);
+
+    /* Text Tiers */
+    --cv-text-white: #FFFFFF;
+    --cv-text-gray-100: #F3F4F6;
+    --cv-text-gray-300: #D1D5DB;
+    --cv-text-gray-400: #9CA3AF;
+    --cv-text-gray-500: #6B7280;
+    --cv-text-gray-600: #4B5563;
+
+    /* 3D Seat Categories */
+    --cv-seat-royal: #FACC15;      /* Gold */
+    --cv-seat-balcony: #A855F7;    /* Purple */
+    --cv-seat-prime: #22C55E;      /* Green */
+    --cv-seat-classic: #3B82F6;    /* Blue */
+    --cv-seat-selected: #22C55E;   /* Glowing Neon Green */
+    --cv-seat-booked: #1f242f;     /* Sold Out Charcoal */
+
+    /* Glassmorphism Specs */
+    --cv-glass-bg: rgba(18, 18, 18, 0.72);
+    --cv-glass-bg-heavy: rgba(14, 14, 14, 0.88);
+    --cv-glass-bg-gold: rgba(25, 22, 10, 0.82);
+    --cv-glass-border: rgba(255, 255, 255, 0.08);
+    --cv-glass-border-focus: rgba(250, 204, 21, 0.4);
+    --cv-glass-blur: 24px;
+    --cv-glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+    /* Typography Hierarchies */
+    --cv-font-display: 'Syne', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    --cv-font-serif: 'Cinzel', 'Playfair Display', Georgia, serif;
+    --cv-font-serif-body: 'Cormorant Garamond', Georgia, serif;
+    --cv-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --cv-font-mono: 'JetBrains Mono', monospace;
+
+    /* Transitions & Curves */
+    --cv-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --cv-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ==========================================================================
+   Base Elements & Dark Theme Reset
+   ========================================================================== */
+html, body {
+    background-color: var(--cv-bg-black);
+    color: var(--cv-text-white);
+    font-family: var(--cv-font-sans);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+    background: var(--cv-primary-yellow);
+    color: #000000;
+}
+
+/* Custom Futuristic Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--cv-bg-black);
+}
+::-webkit-scrollbar-thumb {
+    background: #262626;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--cv-primary-yellow);
+}
+
+/* ==========================================================================
+   Typography Classes
+   ========================================================================== */
+.font-display {
+    font-family: var(--cv-font-display);
+    letter-spacing: -0.02em;
+}
+
+.font-display-extended {
+    font-family: var(--cv-font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 800;
+}
+
+.font-serif-title {
+    font-family: var(--cv-font-serif);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.font-serif-elegant {
+    font-family: var(--cv-font-serif-body);
+}
+
+.font-tech-mono {
+    font-family: var(--cv-font-mono);
+}
+
+/* ==========================================================================
+   Glassmorphism System
+   ========================================================================== */
+.cv-glass-panel {
+    background: var(--cv-glass-bg);
+    backdrop-filter: blur(var(--cv-glass-blur));
+    -webkit-backdrop-filter: blur(var(--cv-glass-blur));
+    border: 1px solid var(--cv-glass-border);
+    box-shadow: var(--cv-glass-shadow);
+}
+
+.cv-glass-heavy {
+    background: var(--cv-glass-bg-heavy);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
+}
+
+.cv-glass-gold {
+    background: var(--cv-glass-bg-gold);
+    backdrop-filter: blur(var(--cv-glass-blur));
+    -webkit-backdrop-filter: blur(var(--cv-glass-blur));
+    border: 1px solid var(--cv-glass-border-focus);
+    box-shadow: 0 0 30px rgba(250, 204, 21, 0.15), inset 0 1px 0 rgba(250, 204, 21, 0.3);
+}
+
+.cv-glass-pill {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.25s var(--cv-ease-out);
+}
+
+.cv-glass-pill:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: var(--cv-text-white);
+}
+
+/* ==========================================================================
+   Buttons & Interactive Call-to-Actions
+   ========================================================================== */
+.btn-primary-yellow {
+    background-color: var(--cv-primary-yellow);
+    color: #000000;
+    font-family: var(--cv-font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-radius: 9999px;
+    padding: 12px 28px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 25px var(--cv-primary-yellow-glow);
+    transition: all 0.25s var(--cv-ease-out);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary-yellow:hover {
+    background-color: var(--cv-primary-yellow-hover);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 40px rgba(250, 204, 21, 0.65);
+}
+
+.btn-primary-yellow:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.btn-primary-yellow:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-primary-yellow::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 70%
+    );
+    transform: rotate(25deg) translateY(-100%);
+    transition: transform 0.75s ease;
+}
+
+.btn-primary-yellow:hover::after {
+    transform: rotate(25deg) translateY(100%);
+}
+
+.btn-secondary-pill {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--cv-text-gray-100);
+    border-radius: 9999px;
+    padding: 10px 22px;
+    font-family: var(--cv-font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary-pill:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Screen 1: 3D Poster Carousel Styles
+   ========================================================================== */
+.carousel-viewport {
+    perspective: 1200px;
+    perspective-origin: 50% 50%;
+    width: 100%;
+    height: 480px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+}
+
+.carousel-deck {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-style: preserve-3d;
+}
+
+.poster-card {
+    position: absolute;
+    width: 260px;
+    height: 390px;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.6s var(--cv-ease-out), opacity 0.6s var(--cv-ease-out), filter 0.6s var(--cv-ease-out), box-shadow 0.6s var(--cv-ease-out);
+    user-select: none;
+    transform-origin: center center;
+    will-change: transform, opacity, filter;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.poster-card.is-active {
+    transform: translateX(0) translateZ(80px) rotateY(0deg) scale(1.15);
+    opacity: 1;
+    filter: brightness(1);
+    z-index: 30;
+    border-color: rgba(250, 204, 21, 0.6);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 45px rgba(250, 204, 21, 0.4);
+}
+
+.poster-card.is-prev-1 {
+    transform: translateX(-240px) translateZ(-40px) rotateY(28deg) scale(0.92);
+    opacity: 0.65;
+    filter: brightness(0.7) blur(0.5px);
+    z-index: 20;
+}
+
+.poster-card.is-next-1 {
+    transform: translateX(240px) translateZ(-40px) rotateY(-28deg) scale(0.92);
+    opacity: 0.65;
+    filter: brightness(0.7) blur(0.5px);
+    z-index: 20;
+}
+
+.poster-card.is-prev-2 {
+    transform: translateX(-440px) translateZ(-160px) rotateY(42deg) scale(0.78);
+    opacity: 0.35;
+    filter: brightness(0.4) blur(1.5px);
+    z-index: 10;
+}
+
+.poster-card.is-next-2 {
+    transform: translateX(440px) translateZ(-160px) rotateY(-42deg) scale(0.78);
+    opacity: 0.35;
+    filter: brightness(0.4) blur(1.5px);
+    z-index: 10;
+}
+
+.poster-card.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.5) translateZ(-300px);
+    z-index: 0;
+}
+
+/* ==========================================================================
+   Screen 3: 3D Theater & Seats Styling
+   ========================================================================== */
+.seat-legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.seat-legend-dot.royal { background-color: var(--cv-seat-royal); box-shadow: 0 0 10px rgba(250, 204, 21, 0.6); }
+.seat-legend-dot.balcony { background-color: var(--cv-seat-balcony); box-shadow: 0 0 10px rgba(168, 85, 247, 0.6); }
+.seat-legend-dot.prime { background-color: var(--cv-seat-prime); box-shadow: 0 0 10px rgba(34, 197, 94, 0.6); }
+.seat-legend-dot.classic { background-color: var(--cv-seat-classic); box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
+.seat-legend-dot.selected { background-color: var(--cv-seat-selected); box-shadow: 0 0 14px rgba(34, 197, 94, 0.9); }
+.seat-legend-dot.sold { background-color: var(--cv-seat-booked); border: 1px solid rgba(239, 68, 68, 0.4); }
+
+/* Curved Cinema Screen Glow */
+.cinema-screen-ambient {
+    height: 8px;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    background: linear-gradient(180deg, #ffffff 0%, rgba(250, 204, 21, 0.6) 40%, transparent 100%);
+    box-shadow: 0 -8px 35px rgba(250, 204, 21, 0.8), 0 -2px 15px #ffffff;
+}
+
+/* ==========================================================================
+   Screen 6: Floating Digital Ticket Styling
+   ========================================================================== */
+.digital-ticket-container {
+    perspective: 1000px;
+}
+
+.digital-ticket {
+    width: 100%;
+    max-width: 440px;
+    background: #141414;
+    border-radius: 28px;
+    border: 1px solid rgba(250, 204, 21, 0.35);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 50px rgba(250, 204, 21, 0.25);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ticket-notch-left, .ticket-notch-right {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background-color: var(--cv-bg-black);
+    border-radius: 50%;
+    top: 52%;
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+.ticket-notch-left {
+    left: -12px;
+    box-shadow: inset -2px 0 6px rgba(0,0,0,0.8);
+    border-right: 1px solid rgba(250, 204, 21, 0.3);
+}
+
+.ticket-notch-right {
+    right: -12px;
+    box-shadow: inset 2px 0 6px rgba(0,0,0,0.8);
+    border-left: 1px solid rgba(250, 204, 21, 0.3);
+}
+
+.ticket-perforation {
+    position: absolute;
+    top: 52%;
+    left: 14px;
+    right: 14px;
+    height: 2px;
+    background-image: linear-gradient(to right, rgba(250, 204, 21, 0.4) 50%, transparent 50%);
+    background-size: 12px 2px;
+    background-repeat: repeat-x;
+    transform: translateY(-50%);
+    z-index: 5;
+}
+
+/* Audio EQ Visualizer */
+.audio-eq-bars {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 14px;
+}
+
+.audio-eq-bar {
+    width: 2px;
+    background: var(--cv-primary-yellow);
+    border-radius: 1px;
+    animation: soundEq 1.2s infinite ease-in-out;
+}
+
+.audio-eq-bar:nth-child(1) { animation-delay: 0.1s; height: 35%; }
+.audio-eq-bar:nth-child(2) { animation-delay: 0.3s; height: 90%; }
+.audio-eq-bar:nth-child(3) { animation-delay: 0.15s; height: 60%; }
+.audio-eq-bar:nth-child(4) { animation-delay: 0.4s; height: 100%; }
+
+@keyframes soundEq {
+    0%, 100% { height: 25%; }
+    50% { height: 100%; }
+}
+
+/* Spinner */
+.cv-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(0, 0, 0, 0.25);
+    border-top-color: #000000;
+    border-radius: 50%;
+    animation: cvSpin 0.7s linear infinite;
+    display: inline-block;
+}
+
+@keyframes cvSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* Pulse Glows */
+@keyframes glowPulse {
+    0%, 100% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+.animate-glow-pulse {
+    animation: glowPulse 3s ease-in-out infinite;
+}

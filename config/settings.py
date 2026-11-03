@@ -151,3 +151,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+# Referrer-Policy: YouTube iframe embeds require origin/referer headers to avoid Error 153
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
