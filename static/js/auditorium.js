@@ -18,7 +18,7 @@ if (!container) {
 const currentShowtimeId = container.dataset.showtimeId;
 const currentMovieTitle = container.dataset.movieTitle || 'CineVerse Feature';
 const currentTrailerUrl = container.dataset.trailerUrl || '';
-const currentVideoMp4 = container.dataset.videoMp4 || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4';
+const currentVideoMp4 = container.dataset.videoMp4 || 'https://vjs.zencdn.net/v/oceans.mp4';
 
 // Selected Seats Store: key = seat.id -> seat data
 export const selectedSeats = new Map();
@@ -38,16 +38,16 @@ let tooltip = document.getElementById('seatTooltip');
 if (!tooltip) {
     tooltip = document.createElement('div');
     tooltip.id = 'seatTooltip';
-    tooltip.className = 'absolute z-40 hidden pointer-events-none px-3 py-1.5 rounded-xl bg-dark-950/90 backdrop-blur-md border border-neon/50 text-white text-xs font-mono shadow-neon transition-all duration-75';
+    tooltip.className = 'absolute z-40 hidden pointer-events-none px-3.5 py-2 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200 text-slate-800 text-xs font-mono shadow-lg transition-all duration-75';
     container.appendChild(tooltip);
 }
 
 // ==========================================
-// 2. THREE.JS SCENE, CAMERA & RENDERER
+// 2. THREE.JS SCENE, CAMERA & RENDERER (LIGHT THEME)
 // ==========================================
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x06070a);
-scene.fog = new THREE.FogExp2(0x06070a, 0.025);
+scene.background = new THREE.Color(0xf1f5f9); // Light clean slate
+scene.fog = new THREE.FogExp2(0xf1f5f9, 0.015);
 
 const camera = new THREE.PerspectiveCamera(
     46,
@@ -116,23 +116,23 @@ scene.add(backFillLight);
 // ==========================================
 const materials = {
     carpet: new THREE.MeshStandardMaterial({
-        color: 0x0f1118,
-        roughness: 0.95,
+        color: 0x94a3b8, // Slate carpet
+        roughness: 0.92,
         metalness: 0.05
     }),
     wall: new THREE.MeshStandardMaterial({
-        color: 0x0c0d14,
-        roughness: 0.85,
-        metalness: 0.15
+        color: 0xe2e8f0, // Light architectural wall
+        roughness: 0.8,
+        metalness: 0.1
     }),
     ceiling: new THREE.MeshStandardMaterial({
-        color: 0x08090d,
-        roughness: 0.95
+        color: 0xf8fafc,
+        roughness: 0.9
     }),
     acousticPanel: new THREE.MeshStandardMaterial({
-        color: 0x141824,
-        roughness: 0.8,
-        metalness: 0.2
+        color: 0xd4a373, // Warm light oak slats
+        roughness: 0.6,
+        metalness: 0.1
     }),
     neonStripCyan: new THREE.MeshBasicMaterial({
         color: 0x00f0ff
