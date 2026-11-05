@@ -2,8 +2,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponse
+
+def favicon_view(request):
+    return HttpResponse(
+        b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">\xf0\x9f\x8e\xac</text></svg>',
+        content_type='image/svg+xml'
+    )
 
 urlpatterns = [
+    path('favicon.ico', favicon_view, name='favicon'),
     path('admin/', admin.site.urls),
 
     # Authentication & User Profiles
