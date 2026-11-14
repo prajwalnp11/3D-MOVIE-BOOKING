@@ -665,21 +665,23 @@
             const feesText = document.getElementById('fees-text');
             const btnContinue = document.getElementById('btn-continue');
 
-            container.innerHTML = '';
+            // Clear previously added seat chips, leave empty-state alone
+            const chips = container.querySelectorAll('.chip-enter');
+            chips.forEach(chip => chip.remove());
+            
             totalAmount = 0;
 
             if (selectedSeats.size === 0) {
-                container.appendChild(emptyState);
+                if (emptyState) emptyState.style.display = 'block';
                 countEl.innerText = '0 seats';
                 priceEl.innerText = '0';
                 ticketsText.innerText = '0 tickets';
-                feesText.innerText = '+ fees ₹0';
+                if (feesText) feesText.innerText = '+ fees ₹0';
                 btnContinue.disabled = true;
-                emptyState.style.display = 'block';
                 return;
             }
 
-            emptyState.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'none';
             btnContinue.disabled = false;
             countEl.innerText = `${selectedSeats.size} seat${selectedSeats.size > 1 ? 's' : ''}`;
             ticketsText.innerText = `${selectedSeats.size} ticket${selectedSeats.size > 1 ? 's' : ''}`;
