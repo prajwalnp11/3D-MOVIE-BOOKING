@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Movie Booking - {{ selected_showtime.movie.title|default:"RAMAYANA" }}</title>
+    <title>3D Movie Booking - {{ selected_movie.title|default:selected_showtime.movie.title|default:"Singham Again" }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
@@ -44,9 +44,9 @@
         }
         
         .glass-panel {
-            background: rgba(15, 15, 15, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(15, 15, 15, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-left: 1px solid rgba(255, 255, 255, 0.08);
         }
 
@@ -58,39 +58,113 @@
             0% { transform: scale(0.8); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
+
+        /* Audio Equalizer Bars Animation */
+        @keyframes eqWave {
+            0%, 100% { height: 3px; }
+            50% { height: 14px; }
+        }
+        .eq-bar {
+            width: 2.5px;
+            background-color: #facc15;
+            border-radius: 999px;
+            display: inline-block;
+        }
+        .eq-playing .eq-bar:nth-child(1) { animation: eqWave 0.7s infinite ease-in-out 0.0s; }
+        .eq-playing .eq-bar:nth-child(2) { animation: eqWave 0.7s infinite ease-in-out 0.2s; }
+        .eq-playing .eq-bar:nth-child(3) { animation: eqWave 0.7s infinite ease-in-out 0.35s; }
+        .eq-playing .eq-bar:nth-child(4) { animation: eqWave 0.7s infinite ease-in-out 0.15s; }
+        .eq-muted .eq-bar { height: 3px !important; animation: none !important; background-color: #64748b; }
     </style>
 </head>
 <body class="antialiased h-screen w-screen relative">
+
+    <!-- Hidden HTML5 Video for Live 3D Cinema Screen Trailer -->
+    <video id="screen-video" crossorigin="anonymous" playsinline loop autoplay muted class="hidden"></video>
 
     <!-- 3D Canvas Container -->
     <div id="webgl-container"></div>
 
     <!-- Top Navigation / Header -->
-    <header class="absolute top-0 left-0 w-full p-6 flex justify-between items-start z-10 pointer-events-none">
-        <div class="pointer-events-auto flex items-center gap-4">
-            <a href="{% url 'home' %}" class="w-10 h-10 rounded-full bg-black/40 hover:bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition" title="Back to Home">
+    <header class="absolute top-0 left-0 w-full p-4 sm:p-6 flex flex-wrap justify-between items-start z-10 pointer-events-none gap-3">
+        
+        <!-- Left: Back Button & Dynamic Movie / Theatre Meta -->
+        <div class="pointer-events-auto flex items-center gap-3">
+            <a href="{% url 'home' %}" class="w-10 h-10 rounded-full bg-black/40 hover:bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition shadow-lg shrink-0" title="Back to Home">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             </a>
+            
+            {% if selected_movie.poster_url %}
+            <img src="{{ selected_movie.poster_url }}" alt="Poster" class="w-9 h-12 rounded-lg object-cover border border-white/20 shadow-md hidden sm:block">
+            {% endif %}
+
             <div>
-                <h1 class="text-2xl font-bold tracking-wider uppercase text-white drop-shadow-lg">
-                    {{ selected_showtime.movie.title|default:"RAMAYANA" }}
-                </h1>
-                <p class="text-xs text-gray-400 mt-1 font-medium tracking-wide">
-                    {% if selected_showtime %}
-                        {{ selected_showtime.theatre.name }} &bull; {{ selected_showtime.show_date|date:"D, j M" }} &bull; {{ selected_showtime.show_time|time:"g:i A" }} &bull; {{ selected_showtime.format_type|default:"3D Hindi" }}
-                    {% else %}
-                        Cinemax IMAX, Kolar &bull; Mon, 2 Nov &bull; 11:40 AM &bull; 3D Hindi
-                    {% endif %}
+                <div class="flex items-center gap-2">
+                    <h1 id="hud-movie-title" class="text-xl sm:text-2xl font-bold tracking-wider uppercase text-white drop-shadow-lg">
+                        {{ selected_movie.title|default:selected_showtime.movie.title|default:"Singham Again" }}
+                    </h1>
+                    <span class="px-2 py-0.5 rounded-md bg-yellow-400/20 border border-yellow-400/50 text-yellow-400 text-[10px] font-mono font-bold uppercase">
+                        NOW SHOWING
+                    </span>
+                    <span class="px-2 py-0.5 rounded-md bg-white/10 text-gray-300 text-[10px] font-mono hidden md:inline">
+                        {{ selected_movie.certification|default:"UA 16+" }}
+                    </span>
+                </div>
+                <p id="hud-theatre-meta" class="text-xs text-gray-400 mt-0.5 font-medium tracking-wide flex items-center gap-1.5 flex-wrap">
+                    <span class="text-white">{{ selected_showtime.theatre.name|default:"Cinemax IMAX, Kolar" }}</span>
+                    <span>&bull;</span>
+                    <span class="text-yellow-400 font-mono">{{ selected_showtime.show_date|date:"D, j M"|default:"Today" }} at {{ selected_showtime.show_time|time:"g:i A"|default:"11:40 AM" }}</span>
+                    <span>&bull;</span>
+                    <span>{{ selected_showtime.format_type|default:"IMAX 3D Laser" }} ({{ selected_movie.language|default:"Hindi" }})</span>
                 </p>
             </div>
         </div>
         
-        <!-- Camera Controls -->
-        <div class="pointer-events-auto bg-black/40 backdrop-blur-md rounded-full px-2 py-1.5 flex items-center space-x-1 border border-white/10 mr-[340px]">
-            <button onclick="moveCamera('overview')" id="btn-overview" class="px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-white">Overview</button>
-            <button onclick="moveCamera('stage')" id="btn-stage" class="px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300">From stage</button>
-            <button onclick="moveCamera('balcony')" id="btn-balcony" class="px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300">Balcony</button>
-            <button onclick="moveCamera('birdsEye')" id="btn-birdsEye" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-black transition-colors">Bird's eye</button>
+        <!-- Right Action Controls: Movie Switcher, Trailer Sound, Camera Controls -->
+        <div class="pointer-events-auto flex items-center gap-2.5 mr-0 lg:mr-[345px] flex-wrap">
+            
+            <!-- Dynamic Movie Switcher Dropdown -->
+            <div class="flex items-center bg-black/50 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/10 shadow-lg">
+                <span class="text-[10px] font-mono text-gray-400 uppercase tracking-wider mr-2 hidden sm:inline">Movie:</span>
+                <select 
+                    id="movieDropdown"
+                    onchange="if(this.value) window.location.href='/booking/?movie=' + this.value;"
+                    class="bg-transparent text-yellow-400 text-xs font-bold focus:outline-none cursor-pointer pr-1"
+                >
+                    {% for m in movies %}
+                    <option value="{{ m.id }}" class="bg-neutral-900 text-white" {% if m.id == selected_movie.id or m.tmdb_id == selected_movie.tmdb_id %}selected{% endif %}>
+                        {{ m.title }} ({{ m.language }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Trailer Audio Toggle with Equalizer -->
+            <button 
+                id="btn-trailer-audio" 
+                onclick="toggleTrailerAudio()"
+                class="bg-black/50 hover:bg-black/70 backdrop-blur-md rounded-full px-3 py-1.5 flex items-center gap-2 border border-white/10 text-xs font-medium text-gray-200 transition shadow-lg group"
+                title="Toggle Trailer Sound on Cinema Screen"
+            >
+                <svg id="audio-icon-unmuted" class="w-3.5 h-3.5 text-yellow-400 hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"></path></svg>
+                <svg id="audio-icon-muted" class="w-3.5 h-3.5 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                <span id="audio-label" class="text-[11px] font-mono">Trailer Audio</span>
+                <div id="eq-bars-container" class="flex items-end gap-[2px] h-3.5 px-0.5 eq-muted">
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                </div>
+            </button>
+
+            <!-- Camera Controls Pill -->
+            <div class="bg-black/50 backdrop-blur-md rounded-full px-2 py-1 flex items-center space-x-1 border border-white/10 shadow-lg">
+                <button onclick="moveCamera('overview')" id="btn-overview" class="px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-white">Overview</button>
+                <button onclick="moveCamera('stage')" id="btn-stage" class="px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300">Stage</button>
+                <button onclick="moveCamera('balcony')" id="btn-balcony" class="px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300">Balcony</button>
+                <button onclick="moveCamera('birdsEye')" id="btn-birdsEye" class="px-3 py-1 rounded-full text-xs font-semibold bg-white text-black transition-colors">Bird's eye</button>
+            </div>
+
         </div>
     </header>
 
@@ -102,28 +176,28 @@
             <div>
                 <h3 class="text-xs font-bold text-gray-400 tracking-widest mb-3 uppercase">Seat Classes</h3>
                 <div class="flex flex-col gap-2">
-                    <div class="flex items-center gap-3 p-3 rounded-xl border border-purple-500/30 bg-purple-500/10 cursor-pointer hover:bg-purple-500/20 transition">
+                    <div onclick="moveCamera('balcony')" class="flex items-center gap-3 p-3 rounded-xl border border-purple-500/30 bg-purple-500/10 cursor-pointer hover:bg-purple-500/20 transition active:scale-[0.99]" title="View Royal Recliner seats">
                         <div class="w-1.5 h-10 bg-purple-500 rounded-full"></div>
                         <div>
                             <p class="text-sm font-bold text-white">Royal Recliner</p>
                             <p class="text-[10px] text-gray-400">Motorised recliners - ₹500</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3 p-3 rounded-xl border border-orange-500/30 bg-orange-500/10 cursor-pointer hover:bg-orange-500/20 transition">
+                    <div onclick="moveCamera('balcony')" class="flex items-center gap-3 p-3 rounded-xl border border-orange-500/30 bg-orange-500/10 cursor-pointer hover:bg-orange-500/20 transition active:scale-[0.99]" title="View Balcony seats">
                         <div class="w-1.5 h-10 bg-orange-500 rounded-full"></div>
                         <div>
                             <p class="text-sm font-bold text-white">Balcony</p>
                             <p class="text-[10px] text-gray-400">Elevated view - centre aligned - ₹300</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3 p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 cursor-pointer hover:bg-emerald-500/20 transition">
+                    <div onclick="moveCamera('overview')" class="flex items-center gap-3 p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 cursor-pointer hover:bg-emerald-500/20 transition active:scale-[0.99]" title="View Prime seats">
                         <div class="w-1.5 h-10 bg-emerald-500 rounded-full"></div>
                         <div>
                             <p class="text-sm font-bold text-white">Prime</p>
                             <p class="text-[10px] text-gray-400">Sweet spot for sound & picture - ₹200</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3 p-3 rounded-xl border border-blue-500/30 bg-blue-500/10 cursor-pointer hover:bg-blue-500/20 transition">
+                    <div onclick="moveCamera('stage')" class="flex items-center gap-3 p-3 rounded-xl border border-blue-500/30 bg-blue-500/10 cursor-pointer hover:bg-blue-500/20 transition active:scale-[0.99]" title="View Classic front seats">
                         <div class="w-1.5 h-10 bg-blue-500 rounded-full"></div>
                         <div>
                             <p class="text-sm font-bold text-white">Classic</p>
@@ -150,7 +224,7 @@
                         <span id="quick-pick-count" class="text-sm font-bold w-6 text-center">2</span>
                         <button onclick="changeQuickPick(1)" class="text-gray-400 hover:text-white px-2 focus:outline-none">&plus;</button>
                     </div>
-                    <button onclick="pickBestSeats()" class="flex-1 bg-white/10 hover:bg-white/20 transition-colors text-white text-xs font-semibold rounded-full py-1.5 border border-white/5 flex items-center justify-center gap-2">
+                    <button onclick="pickBestSeats()" class="flex-1 bg-white/10 hover:bg-white/20 transition-colors text-white text-xs font-semibold rounded-full py-1.5 border border-white/5 flex items-center justify-center gap-2 active:scale-95">
                         <svg class="w-3 h-3 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.286 1.05A3.981 3.981 0 0115 15a3.981 3.981 0 01-2.666-1.019 1 1 0 01-.286-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.286 1.05A3.981 3.981 0 015 15a3.981 3.981 0 01-2.666-1.019 1 1 0 01-.286-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z"></path></svg>
                         <span id="quick-pick-btn-text">Best 2 seats</span>
                     </button>
@@ -166,7 +240,6 @@
                     <div class="col-span-2 text-center text-xs text-gray-600 py-4 italic" id="empty-state">
                         Click on seats in the 3D map to select them
                     </div>
-                    <!-- Chips inserted here via JS -->
                 </div>
             </div>
         </div>
@@ -196,7 +269,7 @@
             <div class="flex items-center justify-between pb-4 border-b border-white/10">
                 <div>
                     <h3 class="font-bold text-lg text-white">Booking Confirmation</h3>
-                    <p class="text-xs text-gray-400">{{ selected_showtime.movie.title|default:"RAMAYANA" }}</p>
+                    <p class="text-xs text-gray-400">{{ selected_movie.title|default:"Singham Again" }} &bull; {{ selected_showtime.theatre.name|default:"Cinemax IMAX, Kolar" }}</p>
                 </div>
                 <button onclick="closeBookingModal()" class="text-gray-400 hover:text-white text-xl font-bold px-2">&times;</button>
             </div>
@@ -204,6 +277,10 @@
                 <div class="flex justify-between text-xs text-gray-300">
                     <span>Reserved Seats:</span>
                     <span id="modal-seats-list" class="font-bold text-yellow-400 font-mono">-</span>
+                </div>
+                <div class="flex justify-between text-xs text-gray-300">
+                    <span>Showtime:</span>
+                    <span>{{ selected_showtime.show_date|date:"D, j M"|default:"Today" }} at {{ selected_showtime.show_time|time:"g:i A"|default:"11:40 AM" }}</span>
                 </div>
                 <div class="flex justify-between text-xs text-gray-300">
                     <span>Tickets Subtotal:</span>
@@ -236,6 +313,10 @@
 
     <script>
         // Data & State
+        const CURRENT_MOVIE_TITLE = "{{ selected_movie.title|default:'Singham Again'|escapejs }}";
+        const CURRENT_THEATRE_NAME = "{{ selected_showtime.theatre.name|default:'Cinemax IMAX, Kolar'|escapejs }}";
+        const CURRENT_TRAILER_URL = "{{ selected_movie.video_trailer_mp4|default:'https://vjs.zencdn.net/v/oceans.mp4'|escapejs }}";
+
         const TICKET_PRICES = {
             'Recliner': 500,
             'Balcony': 300,
@@ -255,6 +336,7 @@
         const selectedSeats = new Map(); // seatId -> seatObject
         let totalAmount = 0;
         let quickPickCount = 2;
+        let isAudioMuted = true;
 
         // --- THREE.JS SETUP ---
         const container = document.getElementById('webgl-container');
@@ -294,8 +376,8 @@
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
         scene.add(ambientLight);
 
-        // Screen Light (Emitting from front)
-        const screenLight = new THREE.SpotLight(0xa5f3fc, 2.5); // Cyanish light
+        // Screen Projector Light (Cyan light emitting from front onto seats)
+        const screenLight = new THREE.SpotLight(0xa5f3fc, 2.5);
         screenLight.position.set(0, 15, -28);
         screenLight.angle = Math.PI / 3;
         screenLight.penumbra = 0.8;
@@ -306,7 +388,7 @@
         scene.add(screenLight);
         scene.add(screenLight.target);
 
-        // Subtle warm rim light from back
+        // Warm rim light from back
         const rimLight = new THREE.DirectionalLight(0xfcd34d, 0.5);
         rimLight.position.set(0, 10, 40);
         scene.add(rimLight);
@@ -326,36 +408,78 @@
         floor.receiveShadow = true;
         scene.add(floor);
 
-        // Screen
+        // --- THEATRE SCREEN WITH LIVE TRAILER PLAYBACK ---
         const screenGeo = new THREE.PlaneGeometry(36, 16);
         const screenCanvas = document.createElement('canvas');
-        screenCanvas.width = 1024;
-        screenCanvas.height = 512;
+        screenCanvas.width = 1280;
+        screenCanvas.height = 570;
         const ctx = screenCanvas.getContext('2d');
-        // Create a gradient for the screen to simulate a movie playing
-        const grd = ctx.createLinearGradient(0, 0, 1024, 512);
-        grd.addColorStop(0, "#1e3a8a");
-        grd.addColorStop(0.5, "#06b6d4");
-        grd.addColorStop(1, "#312e81");
-        ctx.fillStyle = grd;
-        ctx.fillRect(0, 0, 1024, 512);
 
-        // Cinema Screen Text
-        ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
-        ctx.font = "bold 56px Inter, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("{{ selected_showtime.movie.title|default:'RAMAYANA'|upper }}", 512, 230);
+        // Setup HTML5 Video Element for VideoTexture
+        const videoEl = document.getElementById('screen-video');
+        videoEl.src = CURRENT_TRAILER_URL;
+        videoEl.volume = 0.8;
+        videoEl.muted = true;
+        videoEl.play().catch(() => {});
 
-        ctx.fillStyle = "rgba(250, 204, 21, 0.95)";
-        ctx.font = "bold 24px Inter, sans-serif";
-        ctx.fillText("EXPERIENCE IN IMAX 3D", 512, 280);
+        let screenTexture = null;
+        let isUsingVideoTexture = false;
 
-        ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-        ctx.font = "16px Inter, sans-serif";
-        ctx.fillText("{{ selected_showtime.theatre.name|default:'CINEMAX IMAX, KOLAR'|upper }}", 512, 320);
+        // Try mapping video texture when video is ready
+        videoEl.addEventListener('playing', () => {
+            if (!screenTexture) {
+                try {
+                    screenTexture = new THREE.VideoTexture(videoEl);
+                    screenTexture.minFilter = THREE.LinearFilter;
+                    screenTexture.magFilter = THREE.LinearFilter;
+                    screenMesh.material.map = screenTexture;
+                    screenMesh.material.needsUpdate = true;
+                    isUsingVideoTexture = true;
+                } catch(e) {
+                    isUsingVideoTexture = false;
+                }
+            }
+        });
 
-        const screenTex = new THREE.CanvasTexture(screenCanvas);
-        const screenMeshMat = new THREE.MeshBasicMaterial({ map: screenTex });
+        // Fallback procedural cinema projection on canvas
+        function drawCanvasTrailerScreen(time) {
+            const w = screenCanvas.width;
+            const h = screenCanvas.height;
+
+            const grd = ctx.createLinearGradient(0, 0, w, h);
+            grd.addColorStop(0, "#1e1b4b");
+            grd.addColorStop(0.5, "#0f172a");
+            grd.addColorStop(1, "#311042");
+            ctx.fillStyle = grd;
+            ctx.fillRect(0, 0, w, h);
+
+            // Animated cinema light rays
+            const beamX = ((time * 0.15) % 1.5) * w - 200;
+            const beamGrad = ctx.createLinearGradient(beamX, 0, beamX + 300, h);
+            beamGrad.addColorStop(0, "rgba(250, 204, 21, 0)");
+            beamGrad.addColorStop(0.5, "rgba(250, 204, 21, 0.12)");
+            beamGrad.addColorStop(1, "rgba(6, 182, 212, 0)");
+            ctx.fillStyle = beamGrad;
+            ctx.fillRect(beamX, 0, 300, h);
+
+            // Movie Typography
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 64px Inter, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(CURRENT_MOVIE_TITLE.toUpperCase(), w / 2, h / 2 - 20);
+
+            ctx.fillStyle = "#facc15";
+            ctx.font = "bold 26px Inter, sans-serif";
+            ctx.fillText("NOW RUNNING IN THEATRES • IMAX 3D LASER", w / 2, h / 2 + 35);
+
+            ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+            ctx.font = "20px Inter, sans-serif";
+            ctx.fillText(CURRENT_THEATRE_NAME.toUpperCase() + " • DOLBY ATMOS", w / 2, h / 2 + 80);
+        }
+
+        drawCanvasTrailerScreen(0);
+        const fallbackTex = new THREE.CanvasTexture(screenCanvas);
+        const screenMeshMat = new THREE.MeshBasicMaterial({ map: fallbackTex });
         
         const screenMesh = new THREE.Mesh(screenGeo, screenMeshMat);
         screenMesh.position.set(0, 12, -30);
@@ -376,6 +500,30 @@
             scene.add(rightCurtain);
         }
 
+        // --- TRAILER SOUND TOGGLE FUNCTION ---
+        window.toggleTrailerAudio = function() {
+            isAudioMuted = !isAudioMuted;
+            videoEl.muted = isAudioMuted;
+
+            const iconUnmuted = document.getElementById('audio-icon-unmuted');
+            const iconMuted = document.getElementById('audio-icon-muted');
+            const audioLabel = document.getElementById('audio-label');
+            const eqContainer = document.getElementById('eq-bars-container');
+
+            if (isAudioMuted) {
+                iconUnmuted.classList.add('hidden');
+                iconMuted.classList.remove('hidden');
+                audioLabel.textContent = "Audio: Off";
+                eqContainer.className = "flex items-end gap-[2px] h-3.5 px-0.5 eq-muted";
+            } else {
+                iconUnmuted.classList.remove('hidden');
+                iconMuted.classList.add('hidden');
+                audioLabel.textContent = "Audio: Playing";
+                eqContainer.className = "flex items-end gap-[2px] h-3.5 px-0.5 eq-playing";
+                videoEl.play().catch(() => {});
+            }
+        };
+
         // --- SEAT GENERATION ---
         
         // Cache geometries and materials for performance
@@ -392,7 +540,7 @@
         function createSeat(x, y, z, seatClass, rowId, colId, isBooked = false) {
             const group = new THREE.Group();
             group.position.set(x, y, z);
-            group.rotation.y = Math.PI; // Rotate 180 degrees to face the screen
+            group.rotation.y = Math.PI; // Face the screen
             
             const color = isBooked ? SEAT_COLORS['Booked'] : SEAT_COLORS[seatClass];
             const mat = new THREE.MeshStandardMaterial({ 
@@ -435,7 +583,7 @@
                 class: seatClass,
                 price: TICKET_PRICES[seatClass],
                 isBooked: isBooked,
-                materials: [mat], // Store material reference to update color
+                materials: [mat],
                 group: group,
                 baseY: y
             };
@@ -490,7 +638,6 @@
         let hoveredSeat = null;
 
         function onMouseMove(event) {
-            // Only calc if over canvas, avoid UI interference
             if(event.clientX > window.innerWidth - 340) return; 
 
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -503,7 +650,6 @@
             if (hoveredSeat && hoveredSeat !== (intersects[0] ? intersects[0].object : null)) {
                 if (!hoveredSeat.userData.isBooked && !selectedSeats.has(hoveredSeat.userData.id)) {
                     updateSeatColor(hoveredSeat, hoveredSeat.userData.materials[0].userData.originalColor);
-                    // Reset scale
                     new TWEEN.Tween(hoveredSeat.userData.group.scale)
                         .to({x: 1, y: 1, z: 1}, 200).easing(TWEEN.Easing.Quadratic.Out).start();
                 }
@@ -518,7 +664,7 @@
                     hoveredSeat = object;
                     document.body.style.cursor = 'pointer';
                     if (!selectedSeats.has(object.userData.id)) {
-                        updateSeatColor(object, 0xffffff); // Highlight color
+                        updateSeatColor(object, 0xffffff); // Highlight
                         new TWEEN.Tween(object.userData.group.scale)
                             .to({x: 1.05, y: 1.05, z: 1.05}, 200).easing(TWEEN.Easing.Quadratic.Out).start();
                     }
@@ -529,7 +675,7 @@
         }
 
         function onClick(event) {
-            if(event.clientX > window.innerWidth - 340) return; // Prevent clicking through UI
+            if(event.clientX > window.innerWidth - 340) return; 
             
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(interactableSeats);
@@ -550,10 +696,7 @@
                         .to({y: data.baseY}, 300).easing(TWEEN.Easing.Bounce.Out).start();
 
                 } else {
-                    // Select limits (e.g. max 10)
-                    if(selectedSeats.size >= 10) {
-                        return;
-                    }
+                    if(selectedSeats.size >= 10) return;
                     
                     // Select
                     selectedSeats.set(data.id, object);
@@ -653,7 +796,6 @@
             const feesText = document.getElementById('fees-text');
             const btnContinue = document.getElementById('btn-continue');
 
-            // Clear previously added seat chips, leave empty-state alone
             const chips = container.querySelectorAll('.chip-enter');
             chips.forEach(chip => chip.remove());
             
@@ -677,7 +819,6 @@
             const fees = selectedSeats.size * 25;
             feesText.innerText = `+ fees ₹${fees}`;
 
-            // Sort seats logically
             const sortedSeats = Array.from(selectedSeats.keys()).sort();
 
             sortedSeats.forEach(id => {
@@ -687,7 +828,6 @@
                 const chip = document.createElement('div');
                 chip.className = 'chip-enter bg-white/10 border border-white/20 rounded-xl px-3 py-2 flex justify-between items-center cursor-pointer hover:bg-white/20 transition group';
                 chip.onclick = () => {
-                    // Trigger deselect visually
                     const obj = selectedSeats.get(id);
                     selectedSeats.delete(id);
                     updateSeatColor(obj, obj.userData.materials[0].userData.originalColor);
@@ -712,7 +852,6 @@
                 container.appendChild(chip);
             });
 
-            // Format number to IN locale
             priceEl.innerText = (totalAmount + fees).toLocaleString('en-IN');
         }
 
@@ -740,7 +879,7 @@
         }
 
         function confirmBookingSuccess() {
-            alert(`🎉 Booking Confirmed for ${selectedSeats.size} seats!\nTotal Amount: ₹${(totalAmount + selectedSeats.size * 25).toLocaleString('en-IN')}`);
+            alert(`🎉 Booking Confirmed for ${CURRENT_MOVIE_TITLE}!\nSeats: ${Array.from(selectedSeats.keys()).join(', ')}\nTotal Amount: ₹${(totalAmount + selectedSeats.size * 25).toLocaleString('en-IN')}`);
             closeBookingModal();
         }
 
@@ -749,13 +888,14 @@
             const view = cameraViews[viewName];
             if(!view) return;
 
-            // Update UI buttons active state manually
             document.querySelectorAll('header button').forEach(btn => {
-                btn.className = "px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300";
+                if(btn.id && btn.id.startsWith('btn-')) {
+                    btn.className = "px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300";
+                }
             });
             const activeBtn = document.getElementById('btn-' + viewName);
             if (activeBtn) {
-                activeBtn.className = "px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-black transition-colors";
+                activeBtn.className = "px-3 py-1 rounded-full text-xs font-semibold bg-white text-black transition-colors";
             }
 
             new TWEEN.Tween(camera.position)
@@ -782,9 +922,15 @@
             requestAnimationFrame(animate);
             TWEEN.update(time);
             
-            // Subtle dynamic screen bounce
+            // If fallback canvas is used, update light rays animation
+            if (!isUsingVideoTexture) {
+                drawCanvasTrailerScreen(time);
+                fallbackTex.needsUpdate = true;
+            }
+
+            // Dynamic screen bounce light
             if (screenLight) {
-                screenLight.intensity = 2.4 + Math.sin(time * 0.003) * 0.2;
+                screenLight.intensity = 2.4 + Math.sin(time * 0.003) * 0.25;
             }
 
             controls.update();
@@ -794,9 +940,9 @@
         // Start
         window.onload = () => {
             updateUI();
-            animate();
+            animate(0);
             
-            // Intro animation to overview view
+            // Auto transition to overview view
             setTimeout(() => {
                 moveCamera('overview');
             }, 500);

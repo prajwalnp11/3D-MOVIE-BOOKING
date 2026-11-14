@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Movie Booking - RAMAYANA</title>
+    <title>3D Cinema Auditorium & Seat Booking | CineVerse</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
@@ -27,25 +27,16 @@
             z-index: 0;
         }
 
-        /* Custom Scrollbar for side panel */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.35);
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.35); }
         
         .glass-panel {
-            background: rgba(15, 15, 15, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(12, 12, 12, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-left: 1px solid rgba(255, 255, 255, 0.08);
         }
 
@@ -57,34 +48,117 @@
             0% { transform: scale(0.8); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
+
+        @keyframes eqWave {
+            0%, 100% { height: 4px; }
+            50% { height: 16px; }
+        }
+
+        .eq-bar {
+            width: 2.5px;
+            background-color: #facc15;
+            border-radius: 999px;
+            display: inline-block;
+        }
+        .eq-playing .eq-bar:nth-child(1) { animation: eqWave 0.7s infinite ease-in-out 0.0s; }
+        .eq-playing .eq-bar:nth-child(2) { animation: eqWave 0.7s infinite ease-in-out 0.2s; }
+        .eq-playing .eq-bar:nth-child(3) { animation: eqWave 0.7s infinite ease-in-out 0.35s; }
+        .eq-playing .eq-bar:nth-child(4) { animation: eqWave 0.7s infinite ease-in-out 0.15s; }
+        .eq-muted .eq-bar { height: 3px !important; animation: none !important; background-color: #64748b; }
     </style>
 </head>
 <body class="antialiased h-screen w-screen relative">
+
+    <!-- Hidden HTML5 Video for Live 3D Cinema Screen Trailer Texture -->
+    <video id="screen-video" crossorigin="anonymous" playsinline loop autoplay muted class="hidden"></video>
 
     <!-- 3D Canvas Container -->
     <div id="webgl-container"></div>
 
     <!-- Top Navigation / Header -->
-    <header class="absolute top-0 left-0 w-full p-6 flex justify-between items-start z-10 pointer-events-none">
-        <div class="pointer-events-auto">
-            <h1 class="text-2xl font-bold tracking-wider uppercase text-white drop-shadow-lg">RAMAYANA</h1>
-            <p class="text-xs text-gray-400 mt-1 font-medium tracking-wide">Cinemax IMAX, Kolar &bull; Mon, 2 Nov &bull; 11:40 AM &bull; 3D Hindi</p>
+    <header class="absolute top-0 left-0 w-full p-4 sm:p-6 flex flex-wrap justify-between items-start z-10 pointer-events-none gap-3">
+        
+        <!-- Left: Back Button & Dynamic Movie / Theatre Meta -->
+        <div class="pointer-events-auto flex items-center gap-3">
+            <a href="/" class="w-10 h-10 rounded-full bg-black/50 hover:bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition shadow-lg shrink-0" title="Back to CineVerse">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </a>
+
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 id="hud-movie-title" class="text-xl sm:text-2xl font-black tracking-wider uppercase text-white drop-shadow-lg">
+                        SINGHAM AGAIN
+                    </h1>
+                    <span class="px-2 py-0.5 rounded-md bg-yellow-400/20 border border-yellow-400/50 text-yellow-400 text-[10px] font-mono font-bold uppercase">
+                        NOW SHOWING
+                    </span>
+                    <span id="hud-cert" class="px-2 py-0.5 rounded-md bg-white/10 text-gray-300 text-[10px] font-mono hidden md:inline">
+                        UA 16+
+                    </span>
+                </div>
+                <p id="hud-theatre-meta" class="text-xs text-gray-400 mt-0.5 font-medium tracking-wide flex items-center gap-1.5 flex-wrap">
+                    <span class="text-white">Cinemax IMAX, Kolar</span>
+                    <span>&bull;</span>
+                    <span class="text-yellow-400 font-mono">Today • 11:40 AM</span>
+                    <span>&bull;</span>
+                    <span>IMAX 3D Laser (Hindi)</span>
+                </p>
+            </div>
         </div>
         
-        <!-- Camera Controls -->
-        <div class="pointer-events-auto bg-black/40 backdrop-blur-md rounded-full px-2 py-1.5 flex items-center space-x-1 border border-white/10 mr-[340px]">
-            <button id="btn-overview" onclick="moveCamera('overview', this)" class="px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-white">Overview</button>
-            <button id="btn-stage" onclick="moveCamera('stage', this)" class="px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300">From stage</button>
-            <button id="btn-balcony" onclick="moveCamera('balcony', this)" class="px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300">Balcony</button>
-            <button id="btn-birdsEye" onclick="moveCamera('birdsEye', this)" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-black transition-colors">Bird's eye</button>
+        <!-- Right Action Controls: Movie Switcher, Trailer Sound, Camera Controls -->
+        <div class="pointer-events-auto flex items-center gap-2.5 mr-0 lg:mr-[345px] flex-wrap">
+            
+            <!-- Dynamic Movie Switcher Dropdown (Indian Movies Released & Running in Theatres) -->
+            <div class="flex items-center bg-black/60 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/10 shadow-lg">
+                <span class="text-[10px] font-mono text-gray-400 uppercase tracking-wider mr-2 hidden sm:inline">Movie:</span>
+                <select 
+                    id="movieDropdown"
+                    onchange="changeMovie(parseInt(this.value))"
+                    class="bg-transparent text-yellow-400 text-xs font-bold focus:outline-none cursor-pointer pr-1"
+                >
+                    <!-- Populated by JavaScript with Indian Blockbusters -->
+                </select>
+            </div>
+
+            <!-- Trailer Audio Unmute/Mute Toggle Button -->
+            <button 
+                id="btn-trailer-audio"
+                onclick="toggleTrailerAudio()"
+                class="bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-full px-3 py-1.5 flex items-center gap-2 border border-yellow-400/30 text-white transition shadow-lg group"
+                title="Toggle Trailer Sound"
+            >
+                <div id="eq-bars-container" class="flex items-end gap-[2px] h-3.5 px-0.5 eq-muted">
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                </div>
+                <span id="audio-label" class="text-[11px] font-mono text-yellow-400 font-bold">Audio: Off</span>
+                <svg id="audio-icon-muted" class="w-3.5 h-3.5 text-gray-400 group-hover:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>
+                </svg>
+                <svg id="audio-icon-unmuted" class="w-3.5 h-3.5 text-yellow-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+                </svg>
+            </button>
+
+            <!-- Camera View Angle Controls -->
+            <div class="bg-black/60 backdrop-blur-md rounded-full px-2 py-1.5 flex items-center space-x-1 border border-white/10 shadow-lg">
+                <button id="btn-overview" onclick="moveCamera('overview', this)" class="px-3 sm:px-4 py-1 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-white">Overview</button>
+                <button id="btn-stage" onclick="moveCamera('stage', this)" class="px-3 sm:px-4 py-1 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300">From stage</button>
+                <button id="btn-balcony" onclick="moveCamera('balcony', this)" class="px-3 sm:px-4 py-1 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300">Balcony</button>
+                <button id="btn-birdsEye" onclick="moveCamera('birdsEye', this)" class="px-3 sm:px-4 py-1 rounded-full text-xs font-semibold bg-white text-black transition-colors">Bird's eye</button>
+            </div>
         </div>
     </header>
 
     <!-- UI Overlay Right Panel -->
-    <aside class="absolute top-0 right-0 h-full w-[340px] glass-panel z-10 flex flex-col pointer-events-auto shadow-2xl">
-        <div class="flex-1 overflow-y-auto p-6 pb-32 flex flex-col gap-6">
+    <aside class="absolute top-0 right-0 h-full w-full sm:w-[340px] glass-panel z-10 flex flex-col pointer-events-auto shadow-2xl">
+        <div class="flex-1 overflow-y-auto p-5 sm:p-6 pb-32 flex flex-col gap-6">
             
-            <!-- Seat Classes -->
+            <!-- Seat Classes with Exact Colors & Pricing -->
             <div>
                 <h3 class="text-xs font-bold text-gray-400 tracking-widest mb-3 uppercase">Seat Classes</h3>
                 <div class="flex flex-col gap-2">
@@ -95,8 +169,8 @@
                             <p class="text-[10px] text-gray-400">Motorised recliners - ₹500</p>
                         </div>
                     </div>
-                    <div onclick="focusSection('Balcony')" class="flex items-center gap-3 p-3 rounded-xl border border-orange-500/30 bg-orange-500/10 cursor-pointer hover:bg-orange-500/20 transition active:scale-[0.99]" title="Click to view Balcony seats">
-                        <div class="w-1.5 h-10 bg-orange-500 rounded-full"></div>
+                    <div onclick="focusSection('Balcony')" class="flex items-center gap-3 p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 cursor-pointer hover:bg-amber-500/20 transition active:scale-[0.99]" title="Click to view Balcony seats">
+                        <div class="w-1.5 h-10 bg-amber-500 rounded-full"></div>
                         <div>
                             <p class="text-sm font-bold text-white">Balcony</p>
                             <p class="text-[10px] text-gray-400">Elevated view - centre aligned - ₹300</p>
@@ -119,15 +193,15 @@
                 </div>
             </div>
 
-            <!-- Legends -->
+            <!-- Seat State Legends -->
             <div class="flex items-center gap-4 text-[10px] text-gray-400 font-medium">
-                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-gray-600"></span> Booked</div>
-                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]"></span> Your pick</div>
+                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gray-600"></span> Booked</div>
+                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]"></span> Your pick</div>
             </div>
 
             <div class="h-[1px] w-full bg-white/10"></div>
 
-            <!-- Quick Pick -->
+            <!-- Quick Pick Selection Controls -->
             <div>
                 <h3 class="text-xs font-bold text-gray-400 tracking-widest mb-3 uppercase">Quick Pick</h3>
                 <div class="flex gap-2">
@@ -143,7 +217,7 @@
                 </div>
             </div>
 
-            <!-- Your Seats -->
+            <!-- Selected Seats List -->
             <div>
                 <h3 class="text-xs font-bold text-gray-400 tracking-widest mb-3 uppercase flex justify-between">
                     Your Seats <span id="seat-count" class="text-yellow-400 normal-case">0 seats</span>
@@ -152,13 +226,12 @@
                     <div class="col-span-2 text-center text-xs text-gray-600 py-4 italic" id="empty-state">
                         Click on seats in the 3D map to select them
                     </div>
-                    <!-- Chips inserted here via JS -->
                 </div>
             </div>
         </div>
 
-        <!-- Footer / Checkout -->
-        <div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a] to-transparent pt-12">
+        <!-- Sticky Footer / Summary & Continue -->
+        <div class="absolute bottom-0 left-0 w-full p-5 sm:p-6 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a] to-transparent pt-12">
             <div class="flex justify-between items-end mb-4">
                 <div>
                     <p class="text-xs text-gray-400 font-medium" id="tickets-text">0 tickets</p>
@@ -171,47 +244,44 @@
             <button id="btn-continue" onclick="openCheckoutModal()" class="w-full bg-yellow-400 hover:bg-yellow-300 active:scale-[0.99] text-black font-bold py-3.5 rounded-xl transition-all shadow-[0_4px_14px_rgba(250,204,21,0.4)] flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                 <span>CONTINUE</span>
                 <span class="w-1 h-1 bg-black rounded-full"></span>
-                <span class="text-sm">ADD SNACKS</span>
+                <span class="text-sm">BOOK SEATS</span>
             </button>
         </div>
     </aside>
 
-    <!-- Checkout Modal with E-Pass & Snacks -->
+    <!-- Checkout Modal -->
     <div id="checkout-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-        <div class="bg-[#121212] border border-white/10 rounded-2xl max-w-md w-full p-6 text-white shadow-2xl relative">
-            <div class="flex items-center justify-between pb-4 border-b border-white/10">
-                <div>
-                    <h3 class="font-bold text-lg text-white">Booking Confirmation</h3>
-                    <p class="text-xs text-gray-400">RAMAYANA &bull; Cinemax IMAX, Kolar</p>
+        <div class="bg-dark-900 border border-white/20 rounded-2xl max-w-md w-full p-6 text-white space-y-4 shadow-2xl relative">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg">&times;</button>
+            <h3 class="text-lg font-bold text-white">Booking Confirmation</h3>
+            <div class="text-sm space-y-2 border-y border-white/10 py-3">
+                <div class="flex justify-between text-gray-300">
+                    <span>Movie:</span>
+                    <span id="modal-movie-title" class="text-white font-bold">SINGHAM AGAIN</span>
                 </div>
-                <button onclick="closeCheckoutModal()" class="text-gray-400 hover:text-white text-xl font-bold px-2">&times;</button>
-            </div>
-
-            <div class="py-4 space-y-3">
-                <div class="flex justify-between text-xs text-gray-300">
+                <div class="flex justify-between text-gray-300">
+                    <span>Theatre & Showtime:</span>
+                    <span id="modal-theatre-meta" class="text-white font-medium">Cinemax IMAX • Today 11:40 AM</span>
+                </div>
+                <div class="flex justify-between text-gray-300">
                     <span>Selected Seats:</span>
-                    <span id="modal-seats-list" class="font-bold text-yellow-400 font-mono">-</span>
+                    <span id="modal-seats-list" class="text-yellow-400 font-mono font-bold">-</span>
                 </div>
-                <div class="flex justify-between text-xs text-gray-300">
-                    <span>Showtime:</span>
-                    <span>Mon, 2 Nov &bull; 11:40 AM (3D Hindi)</span>
-                </div>
-                <div class="flex justify-between text-xs text-gray-300">
+                <div class="flex justify-between text-gray-300">
                     <span>Tickets Subtotal:</span>
-                    <span id="modal-subtotal" class="font-bold">₹0</span>
+                    <span id="modal-subtotal">₹0</span>
                 </div>
-                <div class="flex justify-between text-xs text-gray-300">
+                <div class="flex justify-between text-gray-300">
                     <span>Convenience Fee:</span>
-                    <span id="modal-fees">₹45</span>
+                    <span id="modal-fees">₹0</span>
                 </div>
                 <div class="flex justify-between text-sm font-bold text-white pt-2 border-t border-white/10">
                     <span>Grand Total:</span>
                     <span id="modal-total" class="text-yellow-400 text-base">₹0</span>
                 </div>
             </div>
-
             <div class="pt-2 flex gap-3">
-                <button onclick="confirmBooking()" class="flex-1 bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-yellow-400/20 text-xs uppercase tracking-wider">
+                <button onclick="confirmBooking()" class="flex-1 bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-3 rounded-xl transition shadow-lg text-xs uppercase tracking-wider">
                     Proceed to Payment
                 </button>
                 <button onclick="closeCheckoutModal()" class="px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl text-xs transition">
@@ -221,13 +291,107 @@
         </div>
     </div>
 
-    <!-- Include Three.js, Controls & Tween.js -->
+    <!-- Three.js, Controls & Tween.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
 
     <script>
-        // Data & State
+        // --- INDIAN MOVIES CURRENTLY RELEASED & RUNNING IN THEATRES ---
+        const INDIAN_MOVIES = [
+            {
+                id: 21,
+                title: "Singham Again",
+                certification: "UA 16+",
+                language: "Hindi",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 11:40 AM",
+                trailerUrl: "https://vjs.zencdn.net/v/oceans.mp4",
+                poster: "https://image.tmdb.org/t/p/w500/1E5baAaEse26fej7uHcjOgEE2t2.jpg"
+            },
+            {
+                id: 22,
+                title: "Bhool Bhulaiyaa 3",
+                certification: "UA 13+",
+                language: "Hindi",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 02:45 PM",
+                trailerUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
+                poster: "https://image.tmdb.org/t/p/w500/p5ozvmdgsmbWe0H8um47BYBY8Ka.jpg"
+            },
+            {
+                id: 23,
+                title: "Amaran",
+                certification: "UA 16+",
+                language: "Tamil / Hindi",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 06:15 PM",
+                trailerUrl: "https://vjs.zencdn.net/v/oceans.mp4",
+                poster: "https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg"
+            },
+            {
+                id: 24,
+                title: "Kanguva",
+                certification: "UA 16+",
+                language: "Tamil / Hindi",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 09:30 PM",
+                trailerUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
+                poster: "https://image.tmdb.org/t/p/w500/yDHYTjA3R0neXIguistqz4zzvo2.jpg"
+            },
+            {
+                id: 25,
+                title: "Pushpa 2: The Rule",
+                certification: "UA 16+",
+                language: "Telugu / Hindi",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Tomorrow • 10:30 AM",
+                trailerUrl: "https://vjs.zencdn.net/v/oceans.mp4",
+                poster: "https://image.tmdb.org/t/p/w500/b00johM6QvXvB9F04u6yO9aZ1.jpg"
+            },
+            {
+                id: 26,
+                title: "Devara: Part 1",
+                certification: "UA 16+",
+                language: "Telugu / Hindi",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Tomorrow • 02:00 PM",
+                trailerUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
+                poster: "https://image.tmdb.org/t/p/w500/A7EByudX0eOzlkQ2FIbogzyazm2.jpg"
+            },
+            {
+                id: 27,
+                title: "Kalki 2898 AD",
+                certification: "UA 13+",
+                language: "Telugu / Hindi",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Tomorrow • 05:45 PM",
+                trailerUrl: "https://vjs.zencdn.net/v/oceans.mp4",
+                poster: "https://image.tmdb.org/t/p/w500/40X5mCYi9Fw2oP8oM6k1hV9R3.jpg"
+            },
+            {
+                id: 28,
+                title: "Stree 2",
+                certification: "UA 16+",
+                language: "Hindi",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Tomorrow • 09:15 PM",
+                trailerUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
+                poster: "https://image.tmdb.org/t/p/w500/pA0VpSvh7UaQY5Wc0q1hV9R3.jpg"
+            }
+        ];
+
+        let currentMovieIndex = 0;
+        let currentMovie = INDIAN_MOVIES[0];
+
         const TICKET_PRICES = {
             'Recliner': 500,
             'Balcony': 300,
@@ -235,6 +399,7 @@
             'Classic': 150
         };
         
+        // Exact requested seat colors
         const SEAT_COLORS = {
             'Recliner': 0xa855f7, // Purple
             'Balcony': 0xf59e0b,  // Orange
@@ -247,6 +412,7 @@
         const selectedSeats = new Map(); // seatId -> seatObject
         let totalAmount = 0;
         let quickPickCount = 2;
+        let isAudioMuted = true;
 
         // --- THREE.JS SETUP ---
         const container = document.getElementById('webgl-container');
@@ -270,7 +436,7 @@
         controls.minDistance = 10;
         controls.maxDistance = 80;
         
-        // Define Camera Views
+        // Camera Views
         const cameraViews = {
             overview: { pos: new THREE.Vector3(0, 20, 45), target: new THREE.Vector3(0, 0, -10) },
             stage: { pos: new THREE.Vector3(0, 5, -5), target: new THREE.Vector3(0, 5, 20) },
@@ -278,16 +444,15 @@
             birdsEye: { pos: new THREE.Vector3(0, 35, 10), target: new THREE.Vector3(0, 0, 0) }
         };
 
-        // Initialize Camera
         camera.position.copy(cameraViews.birdsEye.pos);
         controls.target.copy(cameraViews.birdsEye.target);
 
         // --- LIGHTING ---
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.35);
         scene.add(ambientLight);
 
-        // Screen Light (Emitting from front)
-        const screenLight = new THREE.SpotLight(0xa5f3fc, 2.5); // Cyanish light
+        // Screen Projector Light (Cyan light emitting from front onto seats)
+        const screenLight = new THREE.SpotLight(0xa5f3fc, 2.8);
         screenLight.position.set(0, 15, -28);
         screenLight.angle = Math.PI / 3;
         screenLight.penumbra = 0.8;
@@ -298,14 +463,12 @@
         scene.add(screenLight);
         scene.add(screenLight.target);
 
-        // Subtle warm rim light from back
+        // Warm rim light from back
         const rimLight = new THREE.DirectionalLight(0xfcd34d, 0.5);
         rimLight.position.set(0, 10, 40);
         scene.add(rimLight);
 
-        // --- BUILD ENVIRONMENT ---
-        
-        // Floor
+        // --- FLOOR ---
         const floorGeo = new THREE.PlaneGeometry(100, 100);
         const floorMat = new THREE.MeshStandardMaterial({ 
             color: 0x0a0a0a, 
@@ -318,48 +481,83 @@
         floor.receiveShadow = true;
         scene.add(floor);
 
-        // Screen
+        // --- LIVE 3D THEATRE SCREEN WITH VIDEO TEXTURE TRAILER PLAYBACK ---
         const screenGeo = new THREE.PlaneGeometry(36, 16);
         const screenCanvas = document.createElement('canvas');
-        screenCanvas.width = 1024;
-        screenCanvas.height = 512;
+        screenCanvas.width = 1280;
+        screenCanvas.height = 570;
         const ctx = screenCanvas.getContext('2d');
-        
-        function updateScreenCanvas(time) {
-            const grd = ctx.createLinearGradient(0, 0, 1024, 512);
-            grd.addColorStop(0, "#1e3a8a");
-            grd.addColorStop(0.5, "#06b6d4");
-            grd.addColorStop(1, "#312e81");
-            ctx.fillStyle = grd;
-            ctx.fillRect(0, 0, 1024, 512);
 
-            // Cinema Screen Watermark / Text
-            ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
-            ctx.font = "bold 56px Inter, sans-serif";
-            ctx.textAlign = "center";
-            ctx.fillText("RAMAYANA", 512, 230);
+        // Setup HTML5 Video Element for VideoTexture
+        const videoEl = document.getElementById('screen-video');
+        videoEl.src = currentMovie.trailerUrl;
+        videoEl.volume = 0.8;
+        videoEl.muted = true;
+        videoEl.play().catch(() => {});
 
-            ctx.fillStyle = "rgba(250, 204, 21, 0.95)";
-            ctx.font = "bold 24px Inter, sans-serif";
-            ctx.fillText("EXPERIENCE IN IMAX 3D", 512, 280);
+        let videoTexture = null;
+        let isUsingVideoTexture = false;
 
-            ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-            ctx.font = "16px Inter, sans-serif";
-            ctx.fillText("DOLBY ATMOS • CINEMAX KOLAR", 512, 320);
-
-            // Subtle moving light shimmer
-            const shimmerX = ((time * 0.12) % 1.4) * 1024 - 200;
-            const shimmerGrad = ctx.createLinearGradient(shimmerX, 0, shimmerX + 180, 512);
-            shimmerGrad.addColorStop(0, "rgba(255,255,255,0)");
-            shimmerGrad.addColorStop(0.5, "rgba(255,255,255,0.08)");
-            shimmerGrad.addColorStop(1, "rgba(255,255,255,0)");
-            ctx.fillStyle = shimmerGrad;
-            ctx.fillRect(shimmerX, 0, 180, 512);
+        function attachVideoTexture() {
+            try {
+                if (!videoTexture) {
+                    videoTexture = new THREE.VideoTexture(videoEl);
+                    videoTexture.minFilter = THREE.LinearFilter;
+                    videoTexture.magFilter = THREE.LinearFilter;
+                }
+                screenMesh.material.map = videoTexture;
+                screenMesh.material.needsUpdate = true;
+                isUsingVideoTexture = true;
+            } catch(e) {
+                isUsingVideoTexture = false;
+            }
         }
 
-        updateScreenCanvas(0);
-        const screenTex = new THREE.CanvasTexture(screenCanvas);
-        const screenMeshMat = new THREE.MeshBasicMaterial({ map: screenTex });
+        videoEl.addEventListener('playing', () => {
+            attachVideoTexture();
+        });
+
+        // Procedural Trailer Screen Canvas (active if video is buffering or as background)
+        function drawCanvasTrailerScreen(time) {
+            const w = screenCanvas.width;
+            const h = screenCanvas.height;
+
+            const grd = ctx.createLinearGradient(0, 0, w, h);
+            grd.addColorStop(0, "#1e1b4b");
+            grd.addColorStop(0.5, "#0f172a");
+            grd.addColorStop(1, "#311042");
+            ctx.fillStyle = grd;
+            ctx.fillRect(0, 0, w, h);
+
+            // Animated cinema light rays
+            const beamX = ((time * 0.15) % 1.5) * w - 200;
+            const beamGrad = ctx.createLinearGradient(beamX, 0, beamX + 300, h);
+            beamGrad.addColorStop(0, "rgba(250, 204, 21, 0)");
+            beamGrad.addColorStop(0.5, "rgba(250, 204, 21, 0.15)");
+            beamGrad.addColorStop(1, "rgba(6, 182, 212, 0)");
+            ctx.fillStyle = beamGrad;
+            ctx.fillRect(beamX, 0, 300, h);
+
+            // Movie Typography
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 64px Inter, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(currentMovie.title.toUpperCase(), w / 2, h / 2 - 20);
+
+            ctx.fillStyle = "#facc15";
+            ctx.font = "bold 26px Inter, sans-serif";
+            ctx.fillText("NOW RUNNING IN THEATRES • " + currentMovie.format.toUpperCase(), w / 2, h / 2 + 35);
+
+            ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+            ctx.font = "20px Inter, sans-serif";
+            ctx.fillText(currentMovie.theatre.toUpperCase() + " • DOLBY ATMOS", w / 2, h / 2 + 80);
+
+            if (fallbackTex) fallbackTex.needsUpdate = true;
+        }
+
+        drawCanvasTrailerScreen(0);
+        const fallbackTex = new THREE.CanvasTexture(screenCanvas);
+        const screenMeshMat = new THREE.MeshBasicMaterial({ map: fallbackTex });
         
         const screenMesh = new THREE.Mesh(screenGeo, screenMeshMat);
         screenMesh.position.set(0, 12, -30);
@@ -380,9 +578,75 @@
             scene.add(rightCurtain);
         }
 
+        // --- TRAILER SOUND TOGGLE FUNCTION ---
+        window.toggleTrailerAudio = function() {
+            isAudioMuted = !isAudioMuted;
+            videoEl.muted = isAudioMuted;
+
+            const iconUnmuted = document.getElementById('audio-icon-unmuted');
+            const iconMuted = document.getElementById('audio-icon-muted');
+            const audioLabel = document.getElementById('audio-label');
+            const eqContainer = document.getElementById('eq-bars-container');
+
+            if (isAudioMuted) {
+                iconUnmuted.classList.add('hidden');
+                iconMuted.classList.remove('hidden');
+                audioLabel.textContent = "Audio: Off";
+                eqContainer.className = "flex items-end gap-[2px] h-3.5 px-0.5 eq-muted";
+            } else {
+                iconUnmuted.classList.remove('hidden');
+                iconMuted.classList.add('hidden');
+                audioLabel.textContent = "Audio: Playing";
+                eqContainer.className = "flex items-end gap-[2px] h-3.5 px-0.5 eq-playing";
+                videoEl.play().catch(() => {});
+            }
+        };
+
+        // --- MOVIE SWITCHER FUNCTION ---
+        window.changeMovie = function(index) {
+            currentMovieIndex = index;
+            currentMovie = INDIAN_MOVIES[index];
+
+            // Update Header HUD
+            document.getElementById('hud-movie-title').textContent = currentMovie.title;
+            document.getElementById('hud-cert').textContent = currentMovie.certification;
+            document.getElementById('hud-theatre-meta').innerHTML = `
+                <span class="text-white">${currentMovie.theatre}</span>
+                <span>&bull;</span>
+                <span class="text-yellow-400 font-mono">${currentMovie.showtime}</span>
+                <span>&bull;</span>
+                <span>${currentMovie.format} (${currentMovie.language})</span>
+            `;
+
+            // Update Modal Information
+            document.getElementById('modal-movie-title').textContent = currentMovie.title;
+            document.getElementById('modal-theatre-meta').textContent = `${currentMovie.theatre} • ${currentMovie.showtime}`;
+
+            // Switch Video Trailer on 3D Screen
+            videoEl.src = currentMovie.trailerUrl;
+            videoEl.currentTime = 0;
+            videoEl.muted = isAudioMuted;
+            videoEl.play().catch(() => {});
+            
+            // Re-render canvas fallback
+            drawCanvasTrailerScreen(0);
+        };
+
+        // Populate Movie Switcher Dropdown
+        function initMovieDropdown() {
+            const dropdown = document.getElementById('movieDropdown');
+            dropdown.innerHTML = '';
+            INDIAN_MOVIES.forEach((movie, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.className = "bg-neutral-900 text-white";
+                opt.textContent = `${movie.title} (${movie.language})`;
+                if (idx === currentMovieIndex) opt.selected = true;
+                dropdown.appendChild(opt);
+            });
+        }
+
         // --- SEAT GENERATION ---
-        
-        // Cache geometries and materials for performance
         const seatBaseGeo = new THREE.BoxGeometry(0.8, 0.3, 0.7);
         const seatBackGeo = new THREE.BoxGeometry(0.8, 1.1, 0.2);
         const armRestGeo = new THREE.BoxGeometry(0.15, 0.5, 0.8);
@@ -396,7 +660,7 @@
         function createSeat(x, y, z, seatClass, rowId, colId, isBooked = false) {
             const group = new THREE.Group();
             group.position.set(x, y, z);
-            group.rotation.y = Math.PI; // Rotate 180 degrees to face the screen
+            group.rotation.y = Math.PI; // Face the screen
             
             const color = isBooked ? SEAT_COLORS['Booked'] : SEAT_COLORS[seatClass];
             const mat = new THREE.MeshStandardMaterial({ 
@@ -439,7 +703,7 @@
                 class: seatClass,
                 price: TICKET_PRICES[seatClass],
                 isBooked: isBooked,
-                materials: [mat], // Store material reference to update color
+                materials: [mat],
                 group: group,
                 baseY: y
             };
@@ -449,53 +713,60 @@
             interactableSeats.push(hitbox);
         }
 
-        // Layout Configuration
+        // Layout Configuration matching exact classes
         const layout = [
             { class: 'Classic', rows: 4, cols: 20, startZ: -10, gapZ: 1.5, startY: 0, slope: 0.2 },
             { class: 'Prime', rows: 6, cols: 22, startZ: -2, gapZ: 1.5, startY: 1.5, slope: 0.4 },
             { class: 'Balcony', rows: 4, cols: 18, startZ: 9, gapZ: 1.8, startY: 5.5, slope: 0.7 },
-            { class: 'Recliner', rows: 2, cols: 14, startZ: 18, gapZ: 2.5, startY: 10, slope: 0.9 }
+            { class: 'Recliner', rows: 2, cols: 12, startZ: 18, gapZ: 2.2, startY: 9.0, slope: 0.8 }
         ];
 
-        let currentRowCode = 65; // 'A'
+        let currentRowChar = 65; // 'A'
 
-        layout.forEach(section => {
-            for (let r = 0; r < section.rows; r++) {
-                const rowLabel = String.fromCharCode(currentRowCode);
-                const rowWidth = (section.cols - 1) * 1.2;
-                const startX = -rowWidth / 2;
+        layout.forEach(sec => {
+            const rowSpacing = sec.gapZ;
+            const colSpacing = sec.class === 'Recliner' ? 1.6 : 1.2;
+
+            for(let r=0; r<sec.rows; r++) {
+                const rowName = String.fromCharCode(currentRowChar++);
+                const z = sec.startZ + (r * rowSpacing);
+                const y = sec.startY + (r * sec.slope);
                 
-                // Curve factor for seating (stadium style)
-                const curveIntensity = 0.03;
+                const totalWidth = (sec.cols - 1) * colSpacing;
+                const startX = -totalWidth / 2;
 
-                for (let c = 1; c <= section.cols; c++) {
-                    // Skip some seats to create aisles
-                    if (section.class !== 'Recliner' && (c === Math.floor(section.cols/4) || c === Math.floor(section.cols*3/4))) continue;
-                    if (section.class === 'Recliner' && c === Math.floor(section.cols/2)) continue;
-
-                    const x = startX + (c - 1) * 1.2;
-                    const zOffset = Math.abs(x) * Math.abs(x) * curveIntensity;
-                    const z = section.startZ + (r * section.gapZ) + zOffset;
-                    const y = section.startY + (r * section.slope);
-
-                    // Randomly book ~15% of seats
-                    const isBooked = Math.random() < 0.15;
+                for(let c=1; c<=sec.cols; c++) {
+                    const x = startX + ((c - 1) * colSpacing);
                     
-                    createSeat(x, y, z, section.class, rowLabel, c, isBooked);
+                    // Pre-book ~15% pseudo-random seats for realistic theatre view
+                    const seed = (currentRowChar * 31 + c * 17) % 100;
+                    const isBooked = seed < 16;
+
+                    // Add an aisle gap in the middle
+                    let adjustedX = x;
+                    if(sec.cols > 14) {
+                        const mid = sec.cols / 2;
+                        if(c > mid) adjustedX += 0.8;
+                        else adjustedX -= 0.8;
+                    }
+
+                    createSeat(adjustedX, y, z, sec.class, rowName, c, isBooked);
                 }
-                currentRowCode++;
             }
         });
 
-
-        // --- INTERACTION & RAYCASTING ---
+        // --- RAYCASTING & INTERACTION ---
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         let hoveredSeat = null;
 
+        window.addEventListener('mousemove', onMouseMove, false);
+        window.addEventListener('click', onClick, false);
+
         function onMouseMove(event) {
-            // Only calc if over canvas, avoid UI interference
-            if(event.clientX > window.innerWidth - 340) return; 
+            // Ignore if pointer is over HUD or side panel
+            if(event.clientX > window.innerWidth - 340 && window.innerWidth >= 640) return;
+            if(event.clientY < 80) return;
 
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -503,147 +774,123 @@
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(interactableSeats);
 
-            // Reset previous hover
-            if (hoveredSeat && hoveredSeat !== (intersects[0] ? intersects[0].object : null)) {
-                if (!hoveredSeat.userData.isBooked && !selectedSeats.has(hoveredSeat.userData.id)) {
-                    updateSeatColor(hoveredSeat, hoveredSeat.userData.materials[0].userData.originalColor);
-                    // Reset scale
-                    new TWEEN.Tween(hoveredSeat.userData.group.scale)
-                        .to({x: 1, y: 1, z: 1}, 200).easing(TWEEN.Easing.Quadratic.Out).start();
-                }
-                document.body.style.cursor = 'default';
-                hoveredSeat = null;
-            }
-
-            // Set new hover
-            if (intersects.length > 0) {
-                const object = intersects[0].object;
-                if (!object.userData.isBooked) {
-                    hoveredSeat = object;
-                    document.body.style.cursor = 'pointer';
-                    if (!selectedSeats.has(object.userData.id)) {
-                        updateSeatColor(object, 0xffffff); // Highlight color
-                        new TWEEN.Tween(object.userData.group.scale)
-                            .to({x: 1.05, y: 1.05, z: 1.05}, 200).easing(TWEEN.Easing.Quadratic.Out).start();
+            if(intersects.length > 0) {
+                const hit = intersects[0].object;
+                if(!hit.userData.isBooked && !selectedSeats.has(hit.userData.id)) {
+                    if(hoveredSeat !== hit) {
+                        resetHover();
+                        hoveredSeat = hit;
+                        document.body.style.cursor = 'pointer';
+                        updateSeatColor(hit, 0xffffff); // Highlight white
                     }
-                } else {
+                } else if(hit.userData.isBooked) {
+                    resetHover();
                     document.body.style.cursor = 'not-allowed';
                 }
+            } else {
+                resetHover();
+                document.body.style.cursor = 'default';
+            }
+        }
+
+        function resetHover() {
+            if(hoveredSeat) {
+                if(!selectedSeats.has(hoveredSeat.userData.id)) {
+                    updateSeatColor(hoveredSeat, hoveredSeat.userData.materials[0].userData.originalColor);
+                }
+                hoveredSeat = null;
             }
         }
 
         function onClick(event) {
-            if(event.clientX > window.innerWidth - 340) return; // Prevent clicking through UI
-            
+            if(event.clientX > window.innerWidth - 340 && window.innerWidth >= 640) return;
+            if(event.clientY < 80) return;
+
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(interactableSeats);
 
-            if (intersects.length > 0) {
-                const object = intersects[0].object;
-                const data = object.userData;
-
-                if (data.isBooked) return;
-
-                if (selectedSeats.has(data.id)) {
-                    // Deselect
-                    selectedSeats.delete(data.id);
-                    updateSeatColor(object, object.userData.materials[0].userData.originalColor);
-                    
-                    // Bounce down
-                    new TWEEN.Tween(object.userData.group.position)
-                        .to({y: data.baseY}, 300).easing(TWEEN.Easing.Bounce.Out).start();
-
-                } else {
-                    // Select limits (e.g. max 10)
-                    if(selectedSeats.size >= 10) {
-                        return;
-                    }
-                    
-                    // Select
-                    selectedSeats.set(data.id, object);
-                    updateSeatColor(object, SEAT_COLORS['Selected']);
-                    
-                    // Bounce up
-                    new TWEEN.Tween(object.userData.group.position)
-                        .to({y: data.baseY + 0.5}, 300).easing(TWEEN.Easing.Back.Out).start();
+            if(intersects.length > 0) {
+                const hit = intersects[0].object;
+                if(!hit.userData.isBooked) {
+                    toggleSeatSelection(hit);
                 }
-
-                updateUI();
             }
         }
 
-        function updateSeatColor(hitboxObject, hexColor) {
-            hitboxObject.userData.materials.forEach(mat => {
+        function updateSeatColor(seatHitbox, hexColor) {
+            seatHitbox.userData.materials.forEach(mat => {
                 mat.color.setHex(hexColor);
                 if(hexColor === SEAT_COLORS['Selected']) {
                     mat.emissive.setHex(0xca8a04);
-                    mat.emissiveIntensity = 0.4;
+                    mat.emissiveIntensity = 0.5;
                 } else {
                     mat.emissive.setHex(0x000000);
+                    mat.emissiveIntensity = 0;
                 }
             });
         }
 
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('click', onClick);
+        function toggleSeatSelection(seatHitbox) {
+            const id = seatHitbox.userData.id;
+            const group = seatHitbox.userData.group;
 
-        // --- QUICK PICK FUNCTIONALITY ---
+            if(selectedSeats.has(id)) {
+                // Deselect
+                selectedSeats.delete(id);
+                updateSeatColor(seatHitbox, seatHitbox.userData.materials[0].userData.originalColor);
+                
+                // Animate down
+                new TWEEN.Tween(group.position)
+                    .to({y: seatHitbox.userData.baseY}, 300)
+                    .easing(TWEEN.Easing.Bounce.Out)
+                    .start();
+            } else {
+                // Select
+                selectedSeats.set(id, seatHitbox);
+                updateSeatColor(seatHitbox, SEAT_COLORS['Selected']);
+
+                // Animate pop up
+                new TWEEN.Tween(group.position)
+                    .to({y: seatHitbox.userData.baseY + 0.3}, 250)
+                    .easing(TWEEN.Easing.Back.Out)
+                    .start();
+            }
+
+            hoveredSeat = null;
+            updateUI();
+        }
+
+        // --- QUICK PICK LOGIC ---
         function changeQuickPick(delta) {
-            quickPickCount = Math.max(1, Math.min(8, quickPickCount + delta));
+            quickPickCount = Math.max(1, Math.min(10, quickPickCount + delta));
             document.getElementById('quick-pick-count').innerText = quickPickCount;
             document.getElementById('quick-pick-btn-text').innerText = `Best ${quickPickCount} seat${quickPickCount > 1 ? 's' : ''}`;
         }
 
         function pickBestSeats() {
-            // Clear current selections
-            selectedSeats.forEach((obj, id) => {
-                updateSeatColor(obj, obj.userData.materials[0].userData.originalColor);
-                new TWEEN.Tween(obj.userData.group.position)
-                    .to({y: obj.userData.baseY}, 300).easing(TWEEN.Easing.Bounce.Out).start();
+            // Clear current selection
+            selectedSeats.forEach(seat => {
+                updateSeatColor(seat, seat.userData.materials[0].userData.originalColor);
+                seat.userData.group.position.y = seat.userData.baseY;
             });
             selectedSeats.clear();
 
-            // Find best available consecutive seats in Prime or Recliner tier
-            const candidateSeats = interactableSeats.filter(s => !s.userData.isBooked && (s.userData.class === 'Prime' || s.userData.class === 'Recliner'));
+            // Prioritize Prime center seats
+            const primeSeats = interactableSeats.filter(s => s.userData.class === 'Prime' && !s.userData.isBooked);
             
-            // Group by row
-            const rowsMap = new Map();
-            candidateSeats.forEach(s => {
-                const r = s.userData.row;
-                if(!rowsMap.has(r)) rowsMap.set(r, []);
-                rowsMap.get(r).push(s);
-            });
+            // Sort by proximity to center column
+            primeSeats.sort((a, b) => Math.abs(a.userData.col - 11) - Math.abs(b.userData.col - 11));
 
-            let picked = [];
-            for (let [r, seats] of rowsMap) {
-                seats.sort((a, b) => a.userData.col - b.userData.col);
-                for (let i = 0; i <= seats.length - quickPickCount; i++) {
-                    let consecutive = true;
-                    for (let j = 0; j < quickPickCount - 1; j++) {
-                        if (seats[i + j + 1].userData.col - seats[i + j].userData.col !== 1) {
-                            consecutive = false;
-                            break;
-                        }
-                    }
-                    if (consecutive) {
-                        picked = seats.slice(i, i + quickPickCount);
-                        break;
-                    }
-                }
-                if (picked.length > 0) break;
+            // Select N seats
+            for(let i=0; i<Math.min(quickPickCount, primeSeats.length); i++) {
+                const s = primeSeats[i];
+                selectedSeats.set(s.userData.id, s);
+                updateSeatColor(s, SEAT_COLORS['Selected']);
+                new TWEEN.Tween(s.userData.group.position)
+                    .to({y: s.userData.baseY + 0.3}, 250 + (i*50))
+                    .easing(TWEEN.Easing.Back.Out)
+                    .start();
             }
-
-            // Fallback if consecutive not found
-            if (picked.length === 0) {
-                picked = candidateSeats.slice(0, quickPickCount);
-            }
-
-            picked.forEach(obj => {
-                selectedSeats.set(obj.userData.id, obj);
-                updateSeatColor(obj, SEAT_COLORS['Selected']);
-                new TWEEN.Tween(obj.userData.group.position)
-                    .to({y: obj.userData.baseY + 0.5}, 300).easing(TWEEN.Easing.Back.Out).start();
-            });
 
             updateUI();
         }
@@ -665,7 +912,7 @@
             const feesText = document.getElementById('fees-text');
             const btnContinue = document.getElementById('btn-continue');
 
-            // Clear previously added seat chips, leave empty-state alone
+            // Clear chips safely without removing emptyState node
             const chips = container.querySelectorAll('.chip-enter');
             chips.forEach(chip => chip.remove());
             
@@ -699,7 +946,6 @@
                 const chip = document.createElement('div');
                 chip.className = 'chip-enter bg-white/10 border border-white/20 rounded-xl px-3 py-2 flex justify-between items-center cursor-pointer hover:bg-white/20 transition group';
                 chip.onclick = () => {
-                    // Trigger deselect visually
                     const obj = selectedSeats.get(id);
                     selectedSeats.delete(id);
                     updateSeatColor(obj, obj.userData.materials[0].userData.originalColor);
@@ -710,7 +956,7 @@
 
                 let classColorClass = 'bg-gray-500';
                 if(seatData.class === 'Recliner') classColorClass = 'bg-purple-500';
-                if(seatData.class === 'Balcony') classColorClass = 'bg-orange-500';
+                if(seatData.class === 'Balcony') classColorClass = 'bg-amber-500';
                 if(seatData.class === 'Prime') classColorClass = 'bg-emerald-500';
                 if(seatData.class === 'Classic') classColorClass = 'bg-blue-500';
 
@@ -724,7 +970,6 @@
                 container.appendChild(chip);
             });
 
-            // Format number to IN locale
             priceEl.innerText = (totalAmount + fees).toLocaleString('en-IN');
         }
 
@@ -735,6 +980,8 @@
             const fees = selectedSeats.size * 25;
             const grandTotal = totalAmount + fees;
 
+            document.getElementById('modal-movie-title').innerText = currentMovie.title;
+            document.getElementById('modal-theatre-meta').innerText = `${currentMovie.theatre} • ${currentMovie.showtime}`;
             document.getElementById('modal-seats-list').innerText = seatsArray.join(', ');
             document.getElementById('modal-subtotal').innerText = `₹${totalAmount.toLocaleString('en-IN')}`;
             document.getElementById('modal-fees').innerText = `₹${fees}`;
@@ -752,7 +999,7 @@
         }
 
         function confirmBooking() {
-            alert(`🎉 Booking Confirmed for ${selectedSeats.size} seats!\nTotal Paid: ₹${(totalAmount + selectedSeats.size * 25).toLocaleString('en-IN')}`);
+            alert(`🎉 Booking Confirmed for ${currentMovie.title}!\nSeats: ${Array.from(selectedSeats.keys()).join(', ')}\nTotal Amount: ₹${(totalAmount + selectedSeats.size * 25).toLocaleString('en-IN')}`);
             closeCheckoutModal();
         }
 
@@ -761,13 +1008,12 @@
             const view = cameraViews[viewName];
             if(!view) return;
 
-            // Update UI buttons active state manually
-            document.querySelectorAll('header button').forEach(btn => {
-                btn.className = "px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300";
+            document.querySelectorAll('header button[id^="btn-"]').forEach(btn => {
+                btn.className = "px-3 sm:px-4 py-1 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300";
             });
             const activeBtn = targetBtn || document.getElementById(`btn-${viewName}`) || document.getElementById('btn-birdsEye');
             if(activeBtn) {
-                activeBtn.className = "px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-black transition-colors";
+                activeBtn.className = "px-3 sm:px-4 py-1 rounded-full text-xs font-semibold bg-white text-black transition-colors";
             }
 
             new TWEEN.Tween(camera.position)
@@ -796,19 +1042,24 @@
             
             // Dynamic screen bounce light
             if (screenLight) {
-                screenLight.intensity = 2.4 + Math.sin(time * 0.003) * 0.2;
+                screenLight.intensity = 2.4 + Math.sin(time * 0.003) * 0.3;
+            }
+
+            // Update canvas if video texture is not active
+            if (!isUsingVideoTexture) {
+                drawCanvasTrailerScreen(time);
             }
 
             controls.update();
             renderer.render(scene, camera);
         }
 
-        // Start
+        // Initialize on Load
         window.onload = () => {
+            initMovieDropdown();
             updateUI();
             animate(0);
             
-            // Intro animation
             setTimeout(() => {
                 moveCamera('overview', document.getElementById('btn-overview'));
             }, 600);

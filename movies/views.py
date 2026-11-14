@@ -221,7 +221,23 @@ def movie_detail(request, tmdb_id=None, slug=None):
 
 def cineverse_experience(request):
     """
-    Renders the futuristic 6-screen WebGL 3D Cinema Experience
+    Renders the interactive WebGL 3D Cinema Auditorium Experience with trailer & Indian movies
     """
-    return render(request, 'cineverse_experience.html')
+    movie_id = request.GET.get('movie')
+    movies = Movie.objects.filter(status='NOW_SHOWING').order_by('-is_featured', '-rating')
+    if not movies.exists():
+        movies = Movie.objects.all().order_by('-rating')
+
+    selected_movie = None
+    if movie_id:
+        from django.db.models import Q
+        selected_movie = Movie.objects.filter(Q(tmdb_id=movie_id) | Q(id=movie_id) | Q(slug=movie_id)).first()
+    if not selected_movie:
+        selected_movie = movies.first()
+
+    return render(request, 'cineverse_experience.html', {
+        'movies': movies,
+        'selected_movie': selected_movie,
+    })
+
 

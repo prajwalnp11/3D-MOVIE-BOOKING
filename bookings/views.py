@@ -14,10 +14,14 @@ from payments.services import PaymentGatewayService
 
 
 def booking_home(request):
+    from django.db.models import Q
     showtime_id = request.GET.get('showtime')
     movie_id = request.GET.get('movie')
 
-    movies = Movie.objects.all().order_by('-rating')
+    # Get all active and running movies
+    movies = Movie.objects.filter(status='NOW_SHOWING').order_by('-is_featured', '-rating')
+    if not movies.exists():
+        movies = Movie.objects.all().order_by('-rating')
 
     showtimes = (
         Showtime.objects
@@ -26,20 +30,46 @@ def booking_home(request):
         .order_by('show_date', 'show_time')
     )
 
+    selected_movie = None
     selected_showtime = None
+
     if showtime_id:
         selected_showtime = showtimes.filter(id=showtime_id).first()
-    elif movie_id:
-        selected_showtime = showtimes.filter(movie__tmdb_id=movie_id).first()
+        if not selected_showtime:
+            selected_showtime = Showtime.objects.filter(id=showtime_id).select_related('movie', 'theatre').first()
+        if selected_showtime:
+            selected_movie = selected_showtime.movie
+
+    if not selected_movie and movie_id:
+        selected_movie = Movie.objects.filter(
+            Q(tmdb_id=movie_id) | Q(id=movie_id) | Q(slug=movie_id)
+        ).first()
+
+    if selected_movie and not selected_showtime:
+        selected_showtime = showtimes.filter(movie=selected_movie).first()
+        if not selected_showtime:
+            selected_showtime = Showtime.objects.filter(movie=selected_movie).select_related('movie', 'theatre').order_by('-show_date').first()
 
     if not selected_showtime:
         selected_showtime = showtimes.first()
+
+    if not selected_movie and selected_showtime:
+        selected_movie = selected_showtime.movie
+    elif not selected_movie:
+        selected_movie = movies.first()
+
+    # Filter showtimes specifically for this selected movie for the switcher
+    movie_showtimes = showtimes.filter(movie=selected_movie) if selected_movie else showtimes[:10]
+    if not movie_showtimes.exists() and selected_movie:
+        movie_showtimes = Showtime.objects.filter(movie=selected_movie).select_related('movie', 'theatre')[:10]
 
     snacks = Snack.objects.all().order_by('category', 'price')
 
     return render(request, 'bookings/booking.html', {
         'movies': movies,
         'showtimes': showtimes,
+        'movie_showtimes': movie_showtimes,
+        'selected_movie': selected_movie,
         'selected_showtime': selected_showtime,
         'snacks': snacks,
     })
@@ -50,18 +80,27 @@ def booking_auditorium(request, showtime_id):
         Showtime.objects.select_related('movie', 'theatre'),
         id=showtime_id
     )
-    movies = Movie.objects.all().order_by('-rating')
+    movies = Movie.objects.filter(status='NOW_SHOWING').order_by('-is_featured', '-rating')
+    if not movies.exists():
+        movies = Movie.objects.all().order_by('-rating')
+
     showtimes = (
         Showtime.objects
         .filter(show_date__gte=timezone.localdate())
         .select_related('movie', 'theatre')
         .order_by('show_date', 'show_time')
     )
+    movie_showtimes = showtimes.filter(movie=showtime.movie)
+    if not movie_showtimes.exists():
+        movie_showtimes = Showtime.objects.filter(movie=showtime.movie).select_related('movie', 'theatre')[:10]
+
     snacks = Snack.objects.all().order_by('category', 'price')
 
     return render(request, 'bookings/booking.html', {
         'movies': movies,
         'showtimes': showtimes,
+        'movie_showtimes': movie_showtimes,
+        'selected_movie': showtime.movie,
         'selected_showtime': showtime,
         'snacks': snacks,
     })
