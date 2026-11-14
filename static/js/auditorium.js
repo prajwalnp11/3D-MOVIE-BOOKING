@@ -151,48 +151,48 @@ const materials = {
         roughness: 0.25
     }),
 
-    // Tier Seat Materials (Royal Recliner: Gold, Balcony: Purple, Prime: Green, Classic: Blue)
+    // Tier Seat Materials (Royal Recliner: Purple #a855f7, Balcony: Orange #f59e0b, Prime: Emerald #10b981, Classic: Blue #3b82f6)
     seatRoyal: new THREE.MeshStandardMaterial({
-        color: 0xFACC15, // Gold (#FACC15)
-        roughness: 0.45,
-        metalness: 0.35,
-        emissive: 0x735a02,
+        color: 0xa855f7, // Purple (#a855f7)
+        roughness: 0.55,
+        metalness: 0.25,
+        emissive: 0x581c87,
         emissiveIntensity: 0.35
     }),
     seatBalcony: new THREE.MeshStandardMaterial({
-        color: 0xA855F7, // Purple (#A855F7)
+        color: 0xf59e0b, // Orange (#f59e0b)
         roughness: 0.65,
         metalness: 0.15,
-        emissive: 0x4c1d95,
+        emissive: 0x78350f,
         emissiveIntensity: 0.35
     }),
     seatPrime: new THREE.MeshStandardMaterial({
-        color: 0x22C55E, // Green (#22C55E)
+        color: 0x10b981, // Emerald/Green (#10b981)
         roughness: 0.65,
         metalness: 0.15,
-        emissive: 0x065f46,
+        emissive: 0x064e3b,
         emissiveIntensity: 0.35
     }),
     seatClassic: new THREE.MeshStandardMaterial({
-        color: 0x3B82F6, // Blue (#3B82F6)
+        color: 0x3b82f6, // Blue (#3b82f6)
         roughness: 0.75,
         metalness: 0.15,
         emissive: 0x1e3a8a,
         emissiveIntensity: 0.25
     }),
     seatBooked: new THREE.MeshStandardMaterial({
-        color: 0x1e212b, // Dim Charcoal / Sold Out
+        color: 0x374151, // Dark Gray (#374151)
         roughness: 0.9,
         metalness: 0.05
     }),
 
-    // Selected Glowing Material (Green Glow)
+    // Selected Glowing Material (Yellow #facc15 with Gold emissive)
     seatSelected: new THREE.MeshStandardMaterial({
-        color: 0x22C55E, // Glowing Neon Green
+        color: 0xfacc15, // Yellow (#facc15)
         roughness: 0.25,
         metalness: 0.2,
-        emissive: 0x22C55E,
-        emissiveIntensity: 1.2
+        emissive: 0xca8a04,
+        emissiveIntensity: 0.85
     }),
 
     // Hover Highlight Material
