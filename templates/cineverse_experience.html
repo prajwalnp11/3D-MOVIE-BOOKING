@@ -342,15 +342,16 @@
         </div>
     </div>
 
-    <!-- Three.js, Controls & Tween.js -->
+    <!-- Three.js, Controls & Tween.js & CSS3DRenderer -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS3DRenderer.js"></script>
+    <script src="{% static 'js/CSS3DRenderer.js' %}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
 
     <script>
-        const CURRENT_MOVIE_TITLE = "{{ selected_movie.title|default:'Singham Again'|escapejs }}";
+        const CURRENT_MOVIE_TITLE = "{{ selected_movie.title|default:'Amaran'|escapejs }}";
         const CURRENT_THEATRE_NAME = "Cinemax IMAX, Kolar";
-        const CURRENT_TRAILER_URL = "{{ selected_movie.video_trailer_mp4|default:'https://vjs.zencdn.net/v/oceans.mp4'|escapejs }}";
         const CURRENT_YOUTUBE_TRAILER = "{{ selected_movie.trailer_url|escapejs }}";
 
         const TICKET_PRICES = {
@@ -375,19 +376,46 @@
         let quickPickCount = 2;
         let isAudioMuted = true;
 
-        // --- THREE.JS SETUP ---
+        // --- THREE.JS & CSS3D SETUP ---
         const container = document.getElementById('webgl-container');
+        container.style.position = 'absolute';
+        container.style.top = '0';
+        container.style.left = '0';
+        container.style.width = '100vw';
+        container.style.height = '100vh';
+        container.style.overflow = 'hidden';
+        container.style.backgroundColor = '#050505';
+
+        // 1. CSS3D Scene & Renderer for Real Cinema Screen Trailer Projection
+        const cssScene = new THREE.Scene();
+        let cssRenderer = null;
+        if (typeof THREE.CSS3DRenderer !== 'undefined') {
+            cssRenderer = new THREE.CSS3DRenderer();
+            cssRenderer.setSize(window.innerWidth, window.innerHeight);
+            cssRenderer.domElement.style.position = 'absolute';
+            cssRenderer.domElement.style.top = '0';
+            cssRenderer.domElement.style.left = '0';
+            cssRenderer.domElement.style.zIndex = '1';
+            cssRenderer.domElement.style.pointerEvents = 'none';
+            container.appendChild(cssRenderer.domElement);
+        }
+
+        // 2. WebGL Scene & Renderer (transparent canvas so trailer is visible between curtains)
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x050505);
-        scene.fog = new THREE.FogExp2(0x050505, 0.015);
+        scene.fog = new THREE.FogExp2(0x050505, 0.012);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         
-        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.domElement.style.position = 'absolute';
+        renderer.domElement.style.top = '0';
+        renderer.domElement.style.left = '0';
+        renderer.domElement.style.zIndex = '2';
+        renderer.domElement.style.pointerEvents = 'auto';
         container.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -442,43 +470,48 @@
         floor.receiveShadow = true;
         scene.add(floor);
 
-        // --- LIVE 3D THEATRE SCREEN WITH VIDEO TEXTURE TRAILER PLAYBACK ---
+        // --- REAL OFFICIAL CINEMA SCREEN TRAILER (YOUTUBE 3D PROJECTION) ---
+        function extractYouTubeId(url) {
+            if (!url) return '';
+            const m = url.match(/(?:v=|\/embed\/|youtu\.be\/|\/v\/|watch\?v=|\&v=)([a-zA-Z0-9_-]{11})/);
+            return m ? m[1] : '';
+        }
+
+        function getYouTubeEmbedUrl(videoId, muted = true) {
+            if (!videoId) return '';
+            const origin = window.location.origin || '';
+            return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${muted ? 1 : 0}&controls=0&loop=1&playlist=${videoId}&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
+        }
+
+        let currentYouTubeId = extractYouTubeId(CURRENT_YOUTUBE_TRAILER) || 'hylIXfZeB4c';
+        let screenIframe = null;
+        let screenCSSObject = null;
+
+        if (cssRenderer && typeof THREE.CSS3DObject !== 'undefined') {
+            screenIframe = document.createElement('iframe');
+            screenIframe.id = 'theatre-screen-youtube-iframe';
+            screenIframe.style.width = '1280px';
+            screenIframe.style.height = '570px';
+            screenIframe.style.border = '0px';
+            screenIframe.style.backgroundColor = '#000000';
+            screenIframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+            screenIframe.setAttribute('allowfullscreen', 'true');
+            screenIframe.src = getYouTubeEmbedUrl(currentYouTubeId, isAudioMuted);
+
+            screenCSSObject = new THREE.CSS3DObject(screenIframe);
+            screenCSSObject.position.set(0, 12, -30);
+            screenCSSObject.scale.set(36 / 1280, 16 / 570, 1);
+            cssScene.add(screenCSSObject);
+        }
+
+        // WebGL Screen Mesh: acts as a raycasting hit-target and cinema bezel
         const screenGeo = new THREE.PlaneGeometry(36, 16);
         const screenCanvas = document.createElement('canvas');
         screenCanvas.width = 1280;
         screenCanvas.height = 570;
         const ctx = screenCanvas.getContext('2d');
 
-        // Setup HTML5 Video Element for VideoTexture
-        const videoEl = document.getElementById('screen-video');
-        videoEl.src = CURRENT_TRAILER_URL;
-        videoEl.volume = 0.8;
-        videoEl.muted = true;
-        videoEl.play().catch(() => {});
-
-        let videoTexture = null;
-        let isUsingVideoTexture = false;
-
-        function attachVideoTexture() {
-            try {
-                if (!videoTexture) {
-                    videoTexture = new THREE.VideoTexture(videoEl);
-                    videoTexture.minFilter = THREE.LinearFilter;
-                    videoTexture.magFilter = THREE.LinearFilter;
-                }
-                screenMesh.material.map = videoTexture;
-                screenMesh.material.needsUpdate = true;
-                isUsingVideoTexture = true;
-            } catch(e) {
-                isUsingVideoTexture = false;
-            }
-        }
-
-        videoEl.addEventListener('playing', () => {
-            attachVideoTexture();
-        });
-
-        // Procedural Trailer Screen Canvas
+        // Procedural Trailer Screen Canvas (backup if offline)
         function drawCanvasTrailerScreen(time) {
             const w = screenCanvas.width;
             const h = screenCanvas.height;
@@ -518,7 +551,12 @@
 
         drawCanvasTrailerScreen(0);
         const fallbackTex = new THREE.CanvasTexture(screenCanvas);
-        const screenMeshMat = new THREE.MeshBasicMaterial({ map: fallbackTex });
+        const screenMeshMat = new THREE.MeshBasicMaterial({ 
+            map: cssRenderer ? null : fallbackTex,
+            color: cssRenderer ? 0x000000 : 0xffffff,
+            opacity: cssRenderer ? 0 : 1,
+            transparent: true
+        });
         
         const screenMesh = new THREE.Mesh(screenGeo, screenMeshMat);
         screenMesh.position.set(0, 12, -30);
@@ -540,9 +578,26 @@
         }
 
         // --- TRAILER SOUND TOGGLE FUNCTION ---
+        function postYouTubeCommand(command, args = []) {
+            if (screenIframe && screenIframe.contentWindow) {
+                screenIframe.contentWindow.postMessage(JSON.stringify({
+                    event: 'command',
+                    func: command,
+                    args: args
+                }), '*');
+            }
+        }
+
         window.toggleTrailerAudio = function() {
             isAudioMuted = !isAudioMuted;
-            videoEl.muted = isAudioMuted;
+
+            if (isAudioMuted) {
+                postYouTubeCommand('mute');
+            } else {
+                postYouTubeCommand('unMute');
+                postYouTubeCommand('setVolume', [100]);
+                postYouTubeCommand('playVideo');
+            }
 
             const iconUnmuted = document.getElementById('audio-icon-unmuted');
             const iconMuted = document.getElementById('audio-icon-muted');
@@ -550,16 +605,15 @@
             const eqContainer = document.getElementById('eq-bars-container');
 
             if (isAudioMuted) {
-                iconUnmuted.classList.add('hidden');
-                iconMuted.classList.remove('hidden');
-                audioLabel.textContent = "Audio: Off";
-                eqContainer.className = "flex items-end gap-[2px] h-3.5 px-0.5 eq-muted";
+                if (iconUnmuted) iconUnmuted.classList.add('hidden');
+                if (iconMuted) iconMuted.classList.remove('hidden');
+                if (audioLabel) audioLabel.textContent = "Audio: Off";
+                if (eqContainer) eqContainer.className = "flex items-end gap-[2px] h-3.5 px-0.5 eq-muted";
             } else {
-                iconUnmuted.classList.remove('hidden');
-                iconMuted.classList.add('hidden');
-                audioLabel.textContent = "Audio: Playing";
-                eqContainer.className = "flex items-end gap-[2px] h-3.5 px-0.5 eq-playing";
-                videoEl.play().catch(() => {});
+                if (iconUnmuted) iconUnmuted.classList.remove('hidden');
+                if (iconMuted) iconMuted.classList.add('hidden');
+                if (audioLabel) audioLabel.textContent = "Audio: Playing";
+                if (eqContainer) eqContainer.className = "flex items-end gap-[2px] h-3.5 px-0.5 eq-playing";
             }
         };
 
@@ -981,6 +1035,9 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            if (cssRenderer) {
+                cssRenderer.setSize(window.innerWidth, window.innerHeight);
+            }
         }
 
         // --- ANIMATION LOOP ---
@@ -992,12 +1049,15 @@
                 screenLight.intensity = 2.4 + Math.sin(time * 0.003) * 0.3;
             }
 
-            if (!isUsingVideoTexture) {
+            if (!cssRenderer) {
                 drawCanvasTrailerScreen(time);
             }
 
             controls.update();
             renderer.render(scene, camera);
+            if (cssRenderer) {
+                cssRenderer.render(cssScene, camera);
+            }
         }
 
         window.onload = () => {
