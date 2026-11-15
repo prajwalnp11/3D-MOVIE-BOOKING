@@ -85,7 +85,7 @@ def home(request):
         })
 
     genres = Genre.objects.all()[:8]
-    languages = ['English', 'Malayalam', 'Hindi', 'Tamil']
+    languages = ['English', 'Kannada', 'Hindi', 'Telugu', 'Tamil', 'Malayalam']
     snacks = Snack.objects.all().order_by('category', 'price')[:4]
 
     return render(request, 'movies/home.html', {
@@ -126,7 +126,7 @@ def movie_list(request):
         movies = movies.filter(Q(title__icontains=search_query) | Q(genre__icontains=search_query) | Q(cast__icontains=search_query))
 
     genres = Genre.objects.all()
-    languages = ['English', 'Malayalam', 'Hindi', 'Tamil']
+    languages = ['English', 'Kannada', 'Hindi', 'Telugu', 'Tamil', 'Malayalam']
 
     return render(request, 'movies/movie_list.html', {
         'movies': movies,

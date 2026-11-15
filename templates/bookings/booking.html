@@ -139,6 +139,17 @@
                 </select>
             </div>
 
+            <!-- Watch Real 4K Official Trailer in Cinema -->
+            <button 
+                id="btn-real-trailer"
+                onclick="openAuditoriumTrailer()"
+                class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-black font-bold rounded-full px-3.5 py-1.5 flex items-center gap-1.5 text-xs shadow-[0_0_15px_rgba(250,204,21,0.4)] transition cursor-pointer"
+                title="Play Real Official Trailer on Theatre Screen"
+            >
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
+                <span class="tracking-wide uppercase text-[10px] font-mono font-black">Real Trailer</span>
+            </button>
+
             <!-- Trailer Audio Toggle with Equalizer -->
             <button 
                 id="btn-trailer-audio" 
@@ -306,6 +317,39 @@
         </div>
     </div>
 
+    <!-- Real Official Trailer Cinema Screen Projection Modal -->
+    <div id="theatre-trailer-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-md">
+        <div class="relative w-full max-w-4xl bg-black border-2 border-yellow-400/60 rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(250,204,21,0.35)] animate-scaleIn">
+            <div class="flex items-center justify-between px-4 py-2.5 bg-neutral-900 border-b border-white/10">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                    <span id="theatre-trailer-title" class="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">
+                        {{ selected_movie.title|default:"Movie" }} • OFFICIAL 4K TRAILER
+                    </span>
+                    <span class="px-2 py-0.5 rounded bg-yellow-400/20 text-yellow-400 text-[10px] font-mono font-bold">
+                        IMAX 3D LASER
+                    </span>
+                </div>
+                <button onclick="closeAuditoriumTrailer()" class="text-gray-400 hover:text-white px-3 py-1 text-xs font-bold transition rounded-lg hover:bg-white/10 flex items-center gap-1 border border-white/10">
+                    ✕ <span>Close (Esc)</span>
+                </button>
+            </div>
+            <div class="relative w-full pt-[56.25%] bg-black">
+                <iframe 
+                    id="theatre-trailer-iframe" 
+                    class="absolute inset-0 w-full h-full border-0" 
+                    src="" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen
+                ></iframe>
+            </div>
+            <div class="px-4 py-2 bg-neutral-950/90 flex items-center justify-between text-xs text-gray-400 font-mono">
+                <span>Cinemax IMAX, Kolar • Dolby Atmos 12-Channel</span>
+                <span class="text-yellow-400 font-semibold">Click Close or press Esc to return to 3D Auditorium</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Include Three.js & Controls & Tween -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -316,6 +360,7 @@
         const CURRENT_MOVIE_TITLE = "{{ selected_movie.title|default:'Singham Again'|escapejs }}";
         const CURRENT_THEATRE_NAME = "{{ selected_showtime.theatre.name|default:'Cinemax IMAX, Kolar'|escapejs }}";
         const CURRENT_TRAILER_URL = "{{ selected_movie.video_trailer_mp4|default:'https://vjs.zencdn.net/v/oceans.mp4'|escapejs }}";
+        const CURRENT_YOUTUBE_TRAILER = "{{ selected_movie.trailer_url|escapejs }}";
 
         const TICKET_PRICES = {
             'Recliner': 500,
@@ -524,6 +569,43 @@
             }
         };
 
+        // --- REAL AUDITORIUM TRAILER MODAL FUNCTIONS ---
+        window.openAuditoriumTrailer = function() {
+            const rawUrl = CURRENT_YOUTUBE_TRAILER;
+            const iframe = document.getElementById('theatre-trailer-iframe');
+            const modal = document.getElementById('theatre-trailer-modal');
+            
+            let videoId = '';
+            if (rawUrl) {
+                const match = rawUrl.match(/(?:v=|\/embed\/|youtu\.be\/|\/v\/|watch\?v=|\&v=)([a-zA-Z0-9_-]{11})/);
+                if (match) videoId = match[1];
+            }
+
+            if (videoId) {
+                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&enablejsapi=1`;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else if (rawUrl) {
+                window.open(rawUrl, '_blank');
+            } else {
+                alert(`Real trailer link coming soon for ${CURRENT_MOVIE_TITLE}`);
+            }
+        };
+
+        window.closeAuditoriumTrailer = function() {
+            const iframe = document.getElementById('theatre-trailer-iframe');
+            const modal = document.getElementById('theatre-trailer-modal');
+            if (iframe) iframe.src = '';
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeAuditoriumTrailer();
+        });
+
         // --- SEAT GENERATION ---
         
         // Cache geometries and materials for performance
@@ -671,6 +753,11 @@
                 } else {
                     document.body.style.cursor = 'not-allowed';
                 }
+            } else if (typeof screenMesh !== 'undefined' && screenMesh) {
+                const screenIntersects = raycaster.intersectObject(screenMesh);
+                if (screenIntersects.length > 0) {
+                    document.body.style.cursor = 'pointer';
+                }
             }
         }
 
@@ -678,6 +765,16 @@
             if(event.clientX > window.innerWidth - 340) return; 
             
             raycaster.setFromCamera(mouse, camera);
+
+            // Clicking on 3D Cinema Screen plays the Real Official Trailer!
+            if (typeof screenMesh !== 'undefined' && screenMesh) {
+                const screenIntersects = raycaster.intersectObject(screenMesh);
+                if (screenIntersects.length > 0) {
+                    openAuditoriumTrailer();
+                    return;
+                }
+            }
+
             const intersects = raycaster.intersectObjects(interactableSeats);
 
             if (intersects.length > 0) {

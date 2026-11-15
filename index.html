@@ -121,6 +121,17 @@
                 </select>
             </div>
 
+            <!-- Watch Real 4K Official Trailer in Cinema -->
+            <button 
+                id="btn-real-trailer"
+                onclick="openAuditoriumTrailer()"
+                class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-black font-bold rounded-full px-3.5 py-1.5 flex items-center gap-1.5 text-xs shadow-[0_0_15px_rgba(250,204,21,0.4)] transition cursor-pointer"
+                title="Play Real Official Trailer on Theatre Screen"
+            >
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
+                <span class="tracking-wide uppercase text-[10px] font-mono font-black">Real Trailer</span>
+            </button>
+
             <!-- Trailer Audio Unmute/Mute Toggle Button -->
             <button 
                 id="btn-trailer-audio"
@@ -291,13 +302,46 @@
         </div>
     </div>
 
+    <!-- Real Official Trailer Cinema Screen Projection Modal -->
+    <div id="theatre-trailer-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-md">
+        <div class="relative w-full max-w-4xl bg-black border-2 border-yellow-400/60 rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(250,204,21,0.35)] animate-scaleIn">
+            <div class="flex items-center justify-between px-4 py-2.5 bg-neutral-900 border-b border-white/10">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                    <span id="theatre-trailer-title" class="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">
+                        OFFICIAL 4K TRAILER
+                    </span>
+                    <span class="px-2 py-0.5 rounded bg-yellow-400/20 text-yellow-400 text-[10px] font-mono font-bold">
+                        IMAX 3D LASER
+                    </span>
+                </div>
+                <button onclick="closeAuditoriumTrailer()" class="text-gray-400 hover:text-white px-3 py-1 text-xs font-bold transition rounded-lg hover:bg-white/10 flex items-center gap-1 border border-white/10">
+                    ✕ <span>Close (Esc)</span>
+                </button>
+            </div>
+            <div class="relative w-full pt-[56.25%] bg-black">
+                <iframe 
+                    id="theatre-trailer-iframe" 
+                    class="absolute inset-0 w-full h-full border-0" 
+                    src="" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen
+                ></iframe>
+            </div>
+            <div class="px-4 py-2 bg-neutral-950/90 flex items-center justify-between text-xs text-gray-400 font-mono">
+                <span>Cinemax IMAX, Kolar • Dolby Atmos 12-Channel</span>
+                <span class="text-yellow-400 font-semibold">Click Close or press Esc to return to 3D Auditorium</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Three.js, Controls & Tween.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
 
     <script>
-        // --- INDIAN MOVIES CURRENTLY RELEASED & RUNNING IN THEATRES ---
+        // --- INDIAN & SANDALWOOD MOVIES CURRENTLY RELEASED & RUNNING IN THEATRES ---
         const INDIAN_MOVIES = [
             {
                 id: 21,
@@ -308,6 +352,7 @@
                 theatre: "Cinemax IMAX, Kolar",
                 showtime: "Today • 11:40 AM",
                 trailerUrl: "https://vjs.zencdn.net/v/oceans.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=MD7v0-igVIM",
                 poster: "https://image.tmdb.org/t/p/w500/2JbNkHg8m7LaBy61LyrnnlenaxY.jpg"
             },
             {
@@ -319,6 +364,7 @@
                 theatre: "Cinemax IMAX, Kolar",
                 showtime: "Today • 02:45 PM",
                 trailerUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=fqc364gMbxI",
                 poster: "https://image.tmdb.org/t/p/w500/3AfHD1HoaQpQwKH8kxRdBKVmzeU.jpg"
             },
             {
@@ -330,6 +376,7 @@
                 theatre: "Cinemax IMAX, Kolar",
                 showtime: "Today • 06:15 PM",
                 trailerUrl: "https://vjs.zencdn.net/v/oceans.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=hylIXfZeB4c",
                 poster: "https://image.tmdb.org/t/p/w500/kcspKUpofalIuPgAndZOMJz0hwg.jpg"
             },
             {
@@ -341,6 +388,7 @@
                 theatre: "Cinemax IMAX, Kolar",
                 showtime: "Today • 09:30 PM",
                 trailerUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=ajnCMSC4VPo",
                 poster: "https://image.tmdb.org/t/p/w500/lycbTFBXqFN1kMdPEsnAFutKEEy.jpg"
             },
             {
@@ -352,6 +400,7 @@
                 theatre: "Cinemax IMAX, Kolar",
                 showtime: "Tomorrow • 10:30 AM",
                 trailerUrl: "https://vjs.zencdn.net/v/oceans.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=1kVK0MZlbI4",
                 poster: "https://image.tmdb.org/t/p/w500/1T21FblunT0y8fz7YaW8JMYgUKm.jpg"
             },
             {
@@ -363,6 +412,7 @@
                 theatre: "Cinemax IMAX, Kolar",
                 showtime: "Tomorrow • 02:00 PM",
                 trailerUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=HNYA6bqL6bU",
                 poster: "https://image.tmdb.org/t/p/w500/lQfuaXjANoTsdx5iS0gCXlK9D2L.jpg"
             },
             {
@@ -374,6 +424,7 @@
                 theatre: "Cinemax IMAX, Kolar",
                 showtime: "Tomorrow • 05:45 PM",
                 trailerUrl: "https://vjs.zencdn.net/v/oceans.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=ilY1xnyOOUE",
                 poster: "https://image.tmdb.org/t/p/w500/rstcAnBeCkxNQjNp3YXrF6IP1tW.jpg"
             },
             {
@@ -385,7 +436,105 @@
                 theatre: "Cinemax IMAX, Kolar",
                 showtime: "Tomorrow • 09:15 PM",
                 trailerUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=VlvOgk5BHS4",
                 poster: "https://image.tmdb.org/t/p/w500/nfnhwfUEFuSOxxf4jDdBlY6Lccw.jpg"
+            },
+            // --- SANDALWOOD (KANNADA) BLOCKBUSTERS ---
+            {
+                id: 29,
+                title: "Bagheera",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 11:40 AM",
+                trailerUrl: "https://vjs.zencdn.net/v/oceans.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=CEfYokG1SF8",
+                poster: "https://image.tmdb.org/t/p/w500/1oyfAHvzk95XCHdQDFvpYgqvLUd.jpg"
+            },
+            {
+                id: 30,
+                title: "Bhairathi Ranagal",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 03:00 PM",
+                trailerUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=Toq88y-7x1o",
+                poster: "https://image.tmdb.org/t/p/w500/ghA56IEkZ1FwJVDWWEihtVnRYvZ.jpg"
+            },
+            {
+                id: 31,
+                title: "Kantara",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 06:45 PM",
+                trailerUrl: "https://vjs.zencdn.net/v/oceans.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=MTECjlKUgEE",
+                poster: "https://image.tmdb.org/t/p/w500/jIsKmkxMzdCZ0Ux1GVSnu8m6Na6.jpg"
+            },
+            {
+                id: 32,
+                title: "K.G.F: Chapter 2",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 09:45 PM",
+                trailerUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=JKa05nyUmuQ",
+                poster: "https://image.tmdb.org/t/p/w500/khNVygolU0TxLIDWff5tQlAhZ23.jpg"
+            },
+            {
+                id: 33,
+                title: "Martin",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Tomorrow • 10:30 AM",
+                trailerUrl: "https://vjs.zencdn.net/v/oceans.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=fqLCas2sWW0",
+                poster: "https://image.tmdb.org/t/p/w500/rmCJCFrEwPC0u0Y1smihwDo4Cf1.jpg"
+            },
+            {
+                id: 34,
+                title: "777 Charlie",
+                certification: "U",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Tomorrow • 02:00 PM",
+                trailerUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=Z3r7f9zw-mo",
+                poster: "https://image.tmdb.org/t/p/w500/qArPmXH0aWsT3SEtYl8XrU2Oz48.jpg"
+            },
+            {
+                id: 35,
+                title: "UI The Movie",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Tomorrow • 05:45 PM",
+                trailerUrl: "https://vjs.zencdn.net/v/oceans.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=eGx2kFakx44",
+                poster: "https://image.tmdb.org/t/p/w500/tWoeysV4ro6wn4TE0QgqMuo6Val.jpg"
+            },
+            {
+                id: 36,
+                title: "Kaatera",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Tomorrow • 09:15 PM",
+                trailerUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=lVuuwNQg74M",
+                poster: "https://image.tmdb.org/t/p/w500/iP7pN1Y9OBE2D9unv2Bfwv8c3R1.jpg"
             }
         ];
 
@@ -602,6 +751,48 @@
             }
         };
 
+        // --- REAL AUDITORIUM TRAILER MODAL FUNCTIONS ---
+        window.openAuditoriumTrailer = function() {
+            const rawUrl = currentMovie ? currentMovie.youtubeTrailer : null;
+            const iframe = document.getElementById('theatre-trailer-iframe');
+            const modal = document.getElementById('theatre-trailer-modal');
+            const titleEl = document.getElementById('theatre-trailer-title');
+            
+            if (titleEl && currentMovie) {
+                titleEl.textContent = `${currentMovie.title.toUpperCase()} — OFFICIAL 4K TRAILER`;
+            }
+
+            let videoId = '';
+            if (rawUrl) {
+                const match = rawUrl.match(/(?:v=|\/embed\/|youtu\.be\/|\/v\/|watch\?v=|\&v=)([a-zA-Z0-9_-]{11})/);
+                if (match) videoId = match[1];
+            }
+
+            if (videoId) {
+                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&enablejsapi=1`;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else if (rawUrl) {
+                window.open(rawUrl, '_blank');
+            } else {
+                alert(`Real trailer link coming soon for ${currentMovie ? currentMovie.title : 'this movie'}`);
+            }
+        };
+
+        window.closeAuditoriumTrailer = function() {
+            const iframe = document.getElementById('theatre-trailer-iframe');
+            const modal = document.getElementById('theatre-trailer-modal');
+            if (iframe) iframe.src = '';
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeAuditoriumTrailer();
+        });
+
         // --- MOVIE SWITCHER FUNCTION ---
         window.changeMovie = function(index) {
             currentMovieIndex = index;
@@ -621,6 +812,11 @@
             // Update Modal Information
             document.getElementById('modal-movie-title').textContent = currentMovie.title;
             document.getElementById('modal-theatre-meta').textContent = `${currentMovie.theatre} • ${currentMovie.showtime}`;
+
+            const trailerTitle = document.getElementById('theatre-trailer-title');
+            if (trailerTitle) {
+                trailerTitle.textContent = `${currentMovie.title.toUpperCase()} — OFFICIAL 4K TRAILER`;
+            }
 
             // Switch Video Trailer on 3D Screen
             videoEl.src = currentMovie.trailerUrl;
@@ -807,6 +1003,16 @@
             if(event.clientY < 80) return;
 
             raycaster.setFromCamera(mouse, camera);
+
+            // Clicking on Cinema Screen plays the Real Official Trailer!
+            if (typeof screenMesh !== 'undefined' && screenMesh) {
+                const screenHits = raycaster.intersectObject(screenMesh);
+                if (screenHits.length > 0) {
+                    openAuditoriumTrailer();
+                    return;
+                }
+            }
+
             const intersects = raycaster.intersectObjects(interactableSeats);
 
             if(intersects.length > 0) {
