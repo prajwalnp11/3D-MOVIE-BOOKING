@@ -87,7 +87,7 @@
             <div>
                 <div class="flex items-center gap-2">
                     <h1 id="hud-movie-title" class="text-xl sm:text-2xl font-black tracking-wider uppercase text-white drop-shadow-lg">
-                        SINGHAM AGAIN
+                        K.G.F: CHAPTER 2
                     </h1>
                     <span class="px-2 py-0.5 rounded-md bg-yellow-400/20 border border-yellow-400/50 text-yellow-400 text-[10px] font-mono font-bold uppercase">
                         NOW SHOWING
@@ -99,9 +99,9 @@
                 <p id="hud-theatre-meta" class="text-xs text-gray-400 mt-0.5 font-medium tracking-wide flex items-center gap-1.5 flex-wrap">
                     <span class="text-white">Cinemax IMAX, Kolar</span>
                     <span>&bull;</span>
-                    <span class="text-yellow-400 font-mono">Today • 11:40 AM</span>
+                    <span class="text-yellow-400 font-mono">Today • 09:45 PM</span>
                     <span>&bull;</span>
-                    <span>IMAX 3D Laser (Hindi)</span>
+                    <span>IMAX 3D Laser (Kannada)</span>
                 </p>
             </div>
         </div>
@@ -345,6 +345,212 @@
     <script>
         // --- INDIAN & SANDALWOOD MOVIES CURRENTLY RELEASED & RUNNING IN THEATRES ---
         const INDIAN_MOVIES = [
+            // --- SANDALWOOD (KANNADA) BLOCKBUSTERS ---
+            {
+                id: 32,
+                title: "K.G.F: Chapter 2",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 09:45 PM",
+                trailerUrl: "/static/videos/trailers/kgf2.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=JKa05nyUmuQ",
+                poster: "https://image.tmdb.org/t/p/w500/khNVygolU0TxLIDWff5tQlAhZ23.jpg"
+            },
+            {
+                id: 31,
+                title: "Kantara",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 06:45 PM",
+                trailerUrl: "/static/videos/trailers/kantara.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=MTECjlKUgEE",
+                poster: "https://image.tmdb.org/t/p/w500/jIsKmkxMzdCZ0Ux1GVSnu8m6Na6.jpg"
+            },
+            {
+                id: 46,
+                title: "Kantara: Chapter 1",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Releasing Soon • 2025",
+                trailerUrl: "/static/videos/trailers/kantara1.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=TMQUFhWm8C0",
+                poster: "https://image.tmdb.org/t/p/w500/hCxdcaRK6jmwnwjitYRejVCU1P0.jpg"
+            },
+            {
+                id: 45,
+                title: "MAX",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 07:15 PM",
+                trailerUrl: "/static/videos/trailers/max.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=aQr3-svRGUI",
+                poster: "https://image.tmdb.org/t/p/w500/4YeUKzChWqTB3FtuRJkxczCkQoi.jpg"
+            },
+            {
+                id: 29,
+                title: "Bagheera",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 11:40 AM",
+                trailerUrl: "/static/videos/trailers/bagheera.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=CEfYokG1SF8",
+                poster: "https://image.tmdb.org/t/p/w500/1oyfAHvzk95XCHdQDFvpYgqvLUd.jpg"
+            },
+            {
+                id: 30,
+                title: "Bhairathi Ranagal",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 03:00 PM",
+                trailerUrl: "/static/videos/trailers/bhairathi_ranagal.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=Toq88y-7x1o",
+                poster: "https://image.tmdb.org/t/p/w500/ghA56IEkZ1FwJVDWWEihtVnRYvZ.jpg"
+            },
+            {
+                id: 35,
+                title: "UI The Movie",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Tomorrow • 05:45 PM",
+                trailerUrl: "/static/videos/trailers/ui.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=eGx2kFakx44",
+                poster: "https://image.tmdb.org/t/p/w500/tWoeysV4ro6wn4TE0QgqMuo6Val.jpg"
+            },
+            {
+                id: 34,
+                title: "777 Charlie",
+                certification: "U",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Tomorrow • 02:00 PM",
+                trailerUrl: "/static/videos/trailers/777charlie.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=Z3r7f9zw-mo",
+                poster: "https://image.tmdb.org/t/p/w500/qArPmXH0aWsT3SEtYl8XrU2Oz48.jpg"
+            },
+            {
+                id: 33,
+                title: "Martin",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Tomorrow • 10:30 AM",
+                trailerUrl: "/static/videos/trailers/martin.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=fqLCas2sWW0",
+                poster: "https://image.tmdb.org/t/p/w500/rmCJCFrEwPC0u0Y1smihwDo4Cf1.jpg"
+            },
+            {
+                id: 36,
+                title: "Kaatera",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Tomorrow • 09:15 PM",
+                trailerUrl: "/static/videos/trailers/kaatera.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=lVuuwNQg74M",
+                poster: "https://image.tmdb.org/t/p/w500/iP7pN1Y9OBE2D9unv2Bfwv8c3R1.jpg"
+            },
+            {
+                id: 50,
+                title: "Bheema",
+                certification: "A",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 04:30 PM",
+                trailerUrl: "/static/videos/trailers/bheema.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=i0psLSoKa3U",
+                poster: "https://image.tmdb.org/t/p/w500/nv8rsLyTQldLdFdcglMLFkCeZEz.jpg"
+            },
+            {
+                id: 51,
+                title: "Krishnam Pranaya Sakhi",
+                certification: "U",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Today • 01:15 PM",
+                trailerUrl: "/static/videos/trailers/777charlie.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=t_l9FfmQpsA",
+                poster: "https://image.tmdb.org/t/p/w500/y5giArJfFI2dBySP0KxV8riTipn.jpg"
+            },
+            {
+                id: 47,
+                title: "Toxic: A Fairy Tale for Grown-ups",
+                certification: "A",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Releasing Soon • 2026",
+                trailerUrl: "/static/videos/trailers/kgf2.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=EfluEyQ5QIA",
+                poster: "https://image.tmdb.org/t/p/w500/5RTd3YCLWbEhbe9OXRuNX3pbT5U.jpg"
+            },
+            {
+                id: 48,
+                title: "KD – The Devil",
+                certification: "UA 16+",
+                language: "Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Releasing Soon • 2026",
+                trailerUrl: "/static/videos/trailers/kd.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=yQLKrS5N4KU",
+                poster: "https://image.tmdb.org/t/p/w500/nEuEMJrnLBneE9tJlmzbhCFLu95.jpg"
+            },
+            // --- NEWLY RELEASING & MAJOR BLOCKBUSTERS ---
+            {
+                id: 43,
+                title: "Ramayana: Rise of a Legend",
+                certification: "U",
+                language: "Hindi / Kannada / Pan-India",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Releasing Soon • Diwali 2026",
+                trailerUrl: "/static/videos/trailers/ramayana.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=goXqZKvxEu8",
+                poster: "https://image.tmdb.org/t/p/w500/vBQ7wks68OhJKlb3RnXSl2yXBXK.jpg"
+            },
+            {
+                id: 44,
+                title: "Scene",
+                certification: "UA 16+",
+                language: "Tamil / Kannada",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Releasing Soon • Nov 2026",
+                trailerUrl: "/static/videos/trailers/goat.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=jxCRlebieWc",
+                poster: "https://image.tmdb.org/t/p/w500/1vjVJKpdT6gha7cpkmDJODpk8mU.jpg"
+            },
+            {
+                id: 25,
+                title: "Pushpa 2: The Rule",
+                certification: "UA 16+",
+                language: "Telugu / Hindi",
+                format: "IMAX 3D Laser",
+                theatre: "Cinemax IMAX, Kolar",
+                showtime: "Releasing Soon • Dec 5, 2024",
+                trailerUrl: "/static/videos/trailers/pushpa2.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=1kVK0MZlbI4",
+                poster: "https://image.tmdb.org/t/p/w500/1T21FblunT0y8fz7YaW8JMYgUKm.jpg"
+            },
             {
                 id: 21,
                 title: "Singham Again",
@@ -394,18 +600,6 @@
                 poster: "https://image.tmdb.org/t/p/w500/lycbTFBXqFN1kMdPEsnAFutKEEy.jpg"
             },
             {
-                id: 25,
-                title: "Pushpa 2: The Rule",
-                certification: "UA 16+",
-                language: "Telugu / Hindi",
-                format: "IMAX 3D Laser",
-                theatre: "Cinemax IMAX, Kolar",
-                showtime: "Tomorrow • 10:30 AM",
-                trailerUrl: "/static/videos/trailers/pushpa2.mp4",
-                youtubeTrailer: "https://www.youtube.com/watch?v=1kVK0MZlbI4",
-                poster: "https://image.tmdb.org/t/p/w500/1T21FblunT0y8fz7YaW8JMYgUKm.jpg"
-            },
-            {
                 id: 26,
                 title: "Devara: Part 1",
                 certification: "UA 16+",
@@ -441,104 +635,30 @@
                 youtubeTrailer: "https://www.youtube.com/watch?v=VlvOgk5BHS4",
                 poster: "https://image.tmdb.org/t/p/w500/nfnhwfUEFuSOxxf4jDdBlY6Lccw.jpg"
             },
-            // --- SANDALWOOD (KANNADA) BLOCKBUSTERS ---
             {
-                id: 29,
-                title: "Bagheera",
+                id: 52,
+                title: "Baby John",
                 certification: "UA 16+",
-                language: "Kannada",
+                language: "Hindi",
                 format: "IMAX 3D Laser",
                 theatre: "Cinemax IMAX, Kolar",
-                showtime: "Today • 11:40 AM",
-                trailerUrl: "/static/videos/trailers/bagheera.mp4",
-                youtubeTrailer: "https://www.youtube.com/watch?v=CEfYokG1SF8",
-                poster: "https://image.tmdb.org/t/p/w500/1oyfAHvzk95XCHdQDFvpYgqvLUd.jpg"
+                showtime: "Releasing Soon • Dec 25, 2024",
+                trailerUrl: "/static/videos/trailers/singham_again.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=lVjieoMPN-c",
+                poster: "https://image.tmdb.org/t/p/w500/5Oqsh17dq0cIRFPynPNy5elmyxW.jpg"
             },
             {
-                id: 30,
-                title: "Bhairathi Ranagal",
+                id: 53,
+                title: "Game Changer",
                 certification: "UA 16+",
-                language: "Kannada",
+                language: "Telugu / Hindi",
                 format: "IMAX 3D Laser",
                 theatre: "Cinemax IMAX, Kolar",
-                showtime: "Today • 03:00 PM",
-                trailerUrl: "/static/videos/trailers/bhairathi_ranagal.mp4",
-                youtubeTrailer: "https://www.youtube.com/watch?v=Toq88y-7x1o",
-                poster: "https://image.tmdb.org/t/p/w500/ghA56IEkZ1FwJVDWWEihtVnRYvZ.jpg"
+                showtime: "Releasing Soon • Jan 10, 2025",
+                trailerUrl: "/static/videos/trailers/game_changer.mp4",
+                youtubeTrailer: "https://www.youtube.com/watch?v=QSu9-DBjMPI",
+                poster: "https://image.tmdb.org/t/p/w500/10RO28zezJILeRLu3xruIA9HDtc.jpg"
             },
-            {
-                id: 31,
-                title: "Kantara",
-                certification: "UA 16+",
-                language: "Kannada",
-                format: "IMAX 3D Laser",
-                theatre: "Cinemax IMAX, Kolar",
-                showtime: "Today • 06:45 PM",
-                trailerUrl: "/static/videos/trailers/kantara.mp4",
-                youtubeTrailer: "https://www.youtube.com/watch?v=MTECjlKUgEE",
-                poster: "https://image.tmdb.org/t/p/w500/jIsKmkxMzdCZ0Ux1GVSnu8m6Na6.jpg"
-            },
-            {
-                id: 32,
-                title: "K.G.F: Chapter 2",
-                certification: "UA 16+",
-                language: "Kannada",
-                format: "IMAX 3D Laser",
-                theatre: "Cinemax IMAX, Kolar",
-                showtime: "Today • 09:45 PM",
-                trailerUrl: "/static/videos/trailers/kgf2.mp4",
-                youtubeTrailer: "https://www.youtube.com/watch?v=JKa05nyUmuQ",
-                poster: "https://image.tmdb.org/t/p/w500/khNVygolU0TxLIDWff5tQlAhZ23.jpg"
-            },
-            {
-                id: 33,
-                title: "Martin",
-                certification: "UA 16+",
-                language: "Kannada",
-                format: "IMAX 3D Laser",
-                theatre: "Cinemax IMAX, Kolar",
-                showtime: "Tomorrow • 10:30 AM",
-                trailerUrl: "/static/videos/trailers/martin.mp4",
-                youtubeTrailer: "https://www.youtube.com/watch?v=fqLCas2sWW0",
-                poster: "https://image.tmdb.org/t/p/w500/rmCJCFrEwPC0u0Y1smihwDo4Cf1.jpg"
-            },
-            {
-                id: 34,
-                title: "777 Charlie",
-                certification: "U",
-                language: "Kannada",
-                format: "IMAX 3D Laser",
-                theatre: "Cinemax IMAX, Kolar",
-                showtime: "Tomorrow • 02:00 PM",
-                trailerUrl: "/static/videos/trailers/777charlie.mp4",
-                youtubeTrailer: "https://www.youtube.com/watch?v=Z3r7f9zw-mo",
-                poster: "https://image.tmdb.org/t/p/w500/qArPmXH0aWsT3SEtYl8XrU2Oz48.jpg"
-            },
-            {
-                id: 35,
-                title: "UI The Movie",
-                certification: "UA 16+",
-                language: "Kannada",
-                format: "IMAX 3D Laser",
-                theatre: "Cinemax IMAX, Kolar",
-                showtime: "Tomorrow • 05:45 PM",
-                trailerUrl: "/static/videos/trailers/ui.mp4",
-                youtubeTrailer: "https://www.youtube.com/watch?v=eGx2kFakx44",
-                poster: "https://image.tmdb.org/t/p/w500/tWoeysV4ro6wn4TE0QgqMuo6Val.jpg"
-            },
-            {
-                id: 36,
-                title: "Kaatera",
-                certification: "UA 16+",
-                language: "Kannada",
-                format: "IMAX 3D Laser",
-                theatre: "Cinemax IMAX, Kolar",
-                showtime: "Tomorrow • 09:15 PM",
-                trailerUrl: "/static/videos/trailers/kaatera.mp4",
-                youtubeTrailer: "https://www.youtube.com/watch?v=lVuuwNQg74M",
-                poster: "https://image.tmdb.org/t/p/w500/iP7pN1Y9OBE2D9unv2Bfwv8c3R1.jpg"
-            },
-            // --- MORE 2024 LATEST INDIAN & GLOBAL BLOCKBUSTERS ---
             {
                 id: 37,
                 title: "The Greatest of All Time (GOAT)",
@@ -1186,14 +1306,31 @@
         function initMovieDropdown() {
             const dropdown = document.getElementById('movieDropdown');
             dropdown.innerHTML = '';
+
+            const optgroupKannada = document.createElement('optgroup');
+            optgroupKannada.label = "⭐ Sandalwood (Kannada) Blockbusters";
+            optgroupKannada.className = "bg-neutral-900 text-yellow-400 font-bold";
+
+            const optgroupOthers = document.createElement('optgroup');
+            optgroupOthers.label = "🔥 Newly Releasing & Global Blockbusters";
+            optgroupOthers.className = "bg-neutral-900 text-cyan-400 font-bold";
+
             INDIAN_MOVIES.forEach((movie, idx) => {
                 const opt = document.createElement('option');
                 opt.value = idx;
-                opt.className = "bg-neutral-900 text-white";
+                opt.className = "bg-neutral-900 text-white font-normal";
                 opt.textContent = `${movie.title} (${movie.language})`;
                 if (idx === currentMovieIndex) opt.selected = true;
-                dropdown.appendChild(opt);
+
+                if (movie.language.toLowerCase().includes('kannada')) {
+                    optgroupKannada.appendChild(opt);
+                } else {
+                    optgroupOthers.appendChild(opt);
+                }
             });
+
+            dropdown.appendChild(optgroupKannada);
+            dropdown.appendChild(optgroupOthers);
         }
 
         // --- SEAT GENERATION ---

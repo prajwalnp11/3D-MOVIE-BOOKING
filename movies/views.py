@@ -11,20 +11,24 @@ def home(request):
     city = request.GET.get('city') or request.session.get('selected_city') or 'Kochi'
     request.session['selected_city'] = city
 
-    # 1. Featured & Trending Movies
+    # 1. Featured, Trending, Sandalwood & Upcoming Movies
     all_movies = Movie.objects.all().order_by('-rating')
-    featured_movies = Movie.objects.filter(is_featured=True).order_by('-rating')[:5]
+    featured_movies = Movie.objects.filter(is_featured=True).order_by('-rating')[:6]
     if not featured_movies.exists():
-        featured_movies = all_movies[:5]
+        featured_movies = all_movies[:6]
 
     trending_movies = Movie.objects.filter(is_trending=True).order_by('-rating')[:8]
-    now_showing_movies = Movie.objects.filter(status='NOW_SHOWING').order_by('-rating')[:8]
+    now_showing_movies = Movie.objects.filter(status='NOW_SHOWING').order_by('-rating')[:16]
     if not now_showing_movies.exists():
-        now_showing_movies = all_movies[:8]
+        now_showing_movies = all_movies[:16]
 
-    upcoming_movies = Movie.objects.filter(status='UPCOMING').order_by('-release_date')[:8]
+    # Dedicated Sandalwood (Kannada) blockbusters spotlight
+    sandalwood_movies = Movie.objects.filter(language__icontains='Kannada').order_by('-rating', '-release_date')[:12]
+
+    # Newly releasing & upcoming blockbusters
+    upcoming_movies = Movie.objects.filter(status='UPCOMING').order_by('-rating', 'release_date')[:12]
     if not upcoming_movies.exists():
-        upcoming_movies = all_movies[8:16]
+        upcoming_movies = all_movies[12:20]
 
     # 2. Popular Cinemas in selected city
     popular_cinemas = Cinema.objects.filter(city__iexact=city).order_by('-rating')[:4]
@@ -85,13 +89,14 @@ def home(request):
         })
 
     genres = Genre.objects.all()[:8]
-    languages = ['English', 'Kannada', 'Hindi', 'Telugu', 'Tamil', 'Malayalam']
+    languages = ['Kannada', 'Hindi', 'Telugu', 'Tamil', 'Malayalam', 'English']
     snacks = Snack.objects.all().order_by('category', 'price')[:4]
 
     return render(request, 'movies/home.html', {
         'featured_movies': featured_movies,
         'trending_movies': trending_movies,
         'now_showing_movies': now_showing_movies,
+        'sandalwood_movies': sandalwood_movies,
         'upcoming_movies': upcoming_movies,
         'popular_cinemas': popular_cinemas,
         'cinemas_with_shows': cinemas_with_shows,
@@ -126,7 +131,7 @@ def movie_list(request):
         movies = movies.filter(Q(title__icontains=search_query) | Q(genre__icontains=search_query) | Q(cast__icontains=search_query))
 
     genres = Genre.objects.all()
-    languages = ['English', 'Kannada', 'Hindi', 'Telugu', 'Tamil', 'Malayalam']
+    languages = ['Kannada', 'Hindi', 'Telugu', 'Tamil', 'Malayalam', 'English']
 
     return render(request, 'movies/movie_list.html', {
         'movies': movies,
@@ -224,9 +229,7 @@ def cineverse_experience(request):
     Renders the interactive WebGL 3D Cinema Auditorium Experience with trailer & Indian movies
     """
     movie_id = request.GET.get('movie')
-    movies = Movie.objects.filter(status='NOW_SHOWING').order_by('-is_featured', '-rating')
-    if not movies.exists():
-        movies = Movie.objects.all().order_by('-rating')
+    movies = Movie.objects.all().order_by('-rating', '-release_date')
 
     selected_movie = None
     if movie_id:

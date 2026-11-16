@@ -18,10 +18,8 @@ def booking_home(request):
     showtime_id = request.GET.get('showtime')
     movie_id = request.GET.get('movie')
 
-    # Get all active and running movies
-    movies = Movie.objects.filter(status='NOW_SHOWING').order_by('-is_featured', '-rating')
-    if not movies.exists():
-        movies = Movie.objects.all().order_by('-rating')
+    # Get all active, running and newly releasing movies
+    movies = Movie.objects.all().order_by('-rating', '-release_date')
 
     showtimes = (
         Showtime.objects

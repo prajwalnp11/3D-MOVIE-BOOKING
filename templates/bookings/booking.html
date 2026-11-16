@@ -131,11 +131,24 @@
                     onchange="if(this.value) window.location.href='/booking/?movie=' + this.value;"
                     class="bg-transparent text-yellow-400 text-xs font-bold focus:outline-none cursor-pointer pr-1"
                 >
+                    <optgroup label="⭐ Sandalwood (Kannada) Blockbusters" class="bg-neutral-900 text-yellow-400 font-bold">
                     {% for m in movies %}
-                    <option value="{{ m.id }}" class="bg-neutral-900 text-white" {% if m.id == selected_movie.id or m.tmdb_id == selected_movie.tmdb_id %}selected{% endif %}>
-                        {{ m.title }} ({{ m.language }})
-                    </option>
+                        {% if 'Kannada' in m.language %}
+                        <option value="{{ m.id }}" class="bg-neutral-900 text-white font-normal" {% if m.id == selected_movie.id or m.tmdb_id == selected_movie.tmdb_id %}selected{% endif %}>
+                            {{ m.title }} ({{ m.language }})
+                        </option>
+                        {% endif %}
                     {% endfor %}
+                    </optgroup>
+                    <optgroup label="🔥 Newly Releasing & Global Blockbusters" class="bg-neutral-900 text-cyan-400 font-bold">
+                    {% for m in movies %}
+                        {% if 'Kannada' not in m.language %}
+                        <option value="{{ m.id }}" class="bg-neutral-900 text-white font-normal" {% if m.id == selected_movie.id or m.tmdb_id == selected_movie.tmdb_id %}selected{% endif %}>
+                            {{ m.title }} ({{ m.language }})
+                        </option>
+                        {% endif %}
+                    {% endfor %}
+                    </optgroup>
                 </select>
             </div>
 

@@ -94,9 +94,9 @@
             {% for lang in languages %}
             <a 
                 href="{% url 'movie_list' %}?language={{ lang }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_genre %}genre={{ selected_genre }}{% endif %}"
-                class="px-3 py-1 rounded-lg text-xs whitespace-nowrap border transition-all {% if selected_language == lang %}bg-cyber-cyan/20 text-cyber-cyan font-bold border-cyber-cyan/50{% else %}bg-dark-900/80 text-gray-400 border-white/10 hover:border-white/30 hover:text-white{% endif %}"
+                class="px-3 py-1 rounded-lg text-xs whitespace-nowrap border transition-all {% if selected_language == lang %}bg-amber-400 text-black font-bold border-amber-400 shadow{% elif lang == 'Kannada' %}bg-amber-400/10 text-amber-400 font-bold border-amber-400/30 hover:border-amber-400{% else %}bg-dark-900/80 text-gray-400 border-white/10 hover:border-white/30 hover:text-white{% endif %}"
             >
-                {{ lang }}
+                {% if lang == 'Kannada' %}⭐ Sandalwood (Kannada){% else %}{{ lang }}{% endif %}
             </a>
             {% endfor %}
         </div>
