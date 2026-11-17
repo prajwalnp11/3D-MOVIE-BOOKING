@@ -1,7 +1,9 @@
+import os
 import multiprocessing
 
-bind = "127.0.0.1:8000"
-workers = multiprocessing.cpu_count() * 2 + 1
+port = os.getenv("PORT", "8000")
+bind = f"0.0.0.0:{port}"
+workers = int(os.getenv("WEB_CONCURRENCY", "3"))
 worker_class = "sync"
 timeout = 120
 keepalive = 5
