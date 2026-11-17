@@ -4,10 +4,10 @@
 {% block title %}Digital E-Ticket: {{ booking.booking_id }} | CINEVERSE{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-12">
+<div class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12">
     
     <!-- Breadcrumb -->
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6 sm:mb-8">
         <div class="flex items-center gap-2 text-xs font-mono text-gray-400">
             <a href="/" class="hover:text-neon">Home</a>
             <span>/</span>
@@ -16,19 +16,19 @@
             <span class="text-neon">{{ booking.booking_id }}</span>
         </div>
         
-        <div class="flex items-center gap-3">
-            <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-neon hover:text-black text-xs font-bold transition-all flex items-center gap-2">
+        <div class="flex items-center gap-2.5">
+            <button onclick="window.print()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-white/10 hover:bg-neon hover:text-black text-xs font-bold transition-all flex items-center gap-2">
                 <i class="fa-solid fa-print"></i>
                 <span>Print Ticket</span>
             </button>
-            <a href="{% url 'my_bookings' %}" class="px-4 py-2 rounded-xl bg-dark-900 border border-white/15 text-xs text-gray-300 hover:text-white">
+            <a href="{% url 'my_bookings' %}" class="px-3.5 sm:px-4 py-2 rounded-xl bg-dark-900 border border-white/15 text-xs text-gray-300 hover:text-white">
                 All Bookings
             </a>
         </div>
     </div>
 
     <!-- DIGITAL E-TICKET -->
-    <div class="relative rounded-3xl glass-panel-neon border border-neon/40 shadow-neon-lg overflow-hidden p-6 sm:p-10 space-y-8" id="eTicketCard">
+    <div class="relative rounded-2xl sm:rounded-3xl glass-panel-neon border border-neon/40 shadow-neon-lg overflow-hidden p-4 sm:p-8 lg:p-10 space-y-6 sm:space-y-8" id="eTicketCard">
         
         <!-- Top Hologram Banner -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">

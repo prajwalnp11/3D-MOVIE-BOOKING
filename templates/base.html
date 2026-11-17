@@ -3,7 +3,7 @@
 <html lang="en" class="dark scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>{% block title %}CINEVERSE | Premium Cinematic Movie Ticket Booking{% endblock %}</title>
 
@@ -302,13 +302,103 @@
                 </div>
                 {% endif %}
 
+                <!-- Mobile Hamburger Button -->
+                <button 
+                    id="mobileMenuToggleBtn"
+                    type="button" 
+                    onclick="toggleBaseMobileDrawer(true)"
+                    class="md:hidden flex items-center justify-center w-9 h-9 rounded-xl bg-dark-900 border border-white/10 text-gray-200 hover:text-primary hover:border-primary transition shrink-0"
+                    aria-label="Open menu"
+                >
+                    <i class="fa-solid fa-bars text-sm"></i>
+                </button>
+
             </div>
 
         </div>
     </header>
 
+    <!-- Mobile Slide-out Drawer Backdrop -->
+    <div id="mobileNavBackdrop" onclick="toggleBaseMobileDrawer(false)" class="fixed inset-0 bg-black/80 z-50 hidden backdrop-blur-sm transition-opacity md:hidden"></div>
+
+    <!-- Mobile Navigation Drawer -->
+    <aside id="mobileNavDrawer" class="fixed top-0 right-0 bottom-0 w-[290px] max-w-[85vw] glass-panel-gold z-50 flex flex-col pointer-events-auto shadow-2xl transition-transform duration-300 ease-in-out translate-x-full md:hidden border-l border-white/20 p-5 overflow-y-auto">
+        <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+                <span class="font-display font-black text-lg text-white">CINE<span class="text-primary">VERSE</span></span>
+            </div>
+            <button type="button" onclick="toggleBaseMobileDrawer(false)" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white flex items-center justify-center text-xs">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Search Form -->
+        <form action="{% url 'movie_list' %}" method="GET" class="relative mb-5">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+            </div>
+            <input 
+                type="text" 
+                name="q"
+                placeholder="Search movies, genre..." 
+                class="w-full pl-9 pr-3 py-2 bg-dark-900 border border-white/15 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-primary"
+            >
+        </form>
+
+        <!-- Navigation Links -->
+        <div class="space-y-1 text-xs font-mono font-medium text-gray-300">
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest px-2 py-1">Menu</p>
+            <a href="{% url 'home' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-primary transition">
+                <i class="fa-solid fa-house text-primary w-4"></i> Home
+            </a>
+            <a href="{% url 'movie_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-primary transition">
+                <i class="fa-solid fa-film text-cyber-cyan w-4"></i> Now Showing Movies
+            </a>
+            <a href="{% url 'cineverse_experience' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-yellow-400/15 border border-yellow-400/40 text-yellow-300 font-bold transition">
+                <i class="fa-solid fa-vr-cardboard text-primary w-4"></i> 3D Cinema Experience
+            </a>
+            <a href="{% url 'cinema_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-primary transition">
+                <i class="fa-solid fa-masks-theater text-cyber-purple w-4"></i> Cinemas & Theatres
+            </a>
+            <a href="{% url 'home' %}#events" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-primary transition">
+                <i class="fa-solid fa-calendar-day text-emerald-400 w-4"></i> Film Festivals & Events
+            </a>
+        </div>
+
+        <!-- User Profile / Auth Section in Drawer -->
+        <div class="mt-6 pt-5 border-t border-white/10 space-y-2">
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest px-2">Account</p>
+            {% if request.user.is_authenticated %}
+            <div class="px-3 py-2 rounded-xl bg-white/5 border border-white/10 mb-2">
+                <p class="text-xs font-bold text-white">{{ request.user.username }}</p>
+                <p class="text-[10px] text-gray-400 truncate">{{ request.user.email }}</p>
+            </div>
+            <a href="{% url 'my_bookings' %}" class="flex items-center gap-3 px-3 py-2 text-xs rounded-xl hover:bg-white/10 text-gray-200 transition">
+                <i class="fa-solid fa-ticket text-cyber-cyan w-4"></i> My Tickets
+            </a>
+            <a href="{% url 'profile' %}" class="flex items-center gap-3 px-3 py-2 text-xs rounded-xl hover:bg-white/10 text-gray-200 transition">
+                <i class="fa-solid fa-user-gear text-primary w-4"></i> Profile Settings
+            </a>
+            {% if request.user.is_staff %}
+            <a href="/admin/" class="flex items-center gap-3 px-3 py-2 text-xs rounded-xl hover:bg-white/10 text-cyber-purple transition">
+                <i class="fa-solid fa-shield-halved w-4"></i> Django Admin
+            </a>
+            {% endif %}
+            <a href="{% url 'logout' %}" class="flex items-center gap-3 px-3 py-2 text-xs rounded-xl text-red-400 hover:bg-red-500/15 transition">
+                <i class="fa-solid fa-arrow-right-from-bracket w-4"></i> Sign Out
+            </a>
+            {% else %}
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <a href="{% url 'login' %}" class="py-2.5 rounded-xl bg-white/10 text-white text-xs text-center font-bold">Login</a>
+                <a href="{% url 'register' %}" class="py-2.5 rounded-xl bg-primary text-black text-xs text-center font-black">Register</a>
+            </div>
+            {% endif %}
+        </div>
+    </aside>
+
     <!-- Main Content Injection -->
-    <main class="flex-grow z-10">
+    <main class="flex-grow z-10 pb-24 md:pb-0">
         {% block content %}{% endblock %}
     </main>
 
@@ -454,7 +544,51 @@
                 }, 250);
             });
         }
+
+        // Mobile Base Navigation Drawer Toggle
+        function toggleBaseMobileDrawer(open) {
+            const drawer = document.getElementById('mobileNavDrawer');
+            const backdrop = document.getElementById('mobileNavBackdrop');
+            if (!drawer) return;
+            if (open) {
+                drawer.classList.remove('translate-x-full');
+                if (backdrop) backdrop.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                drawer.classList.add('translate-x-full');
+                if (backdrop) backdrop.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
     </script>
+
+    <!-- Global App-Style Mobile Bottom Navigation Bar -->
+    {% block bottom_nav %}
+    <nav id="globalMobileBottomNav" class="md:hidden fixed bottom-0 inset-x-0 z-30 bg-[#0a0a0c]/95 backdrop-blur-2xl border-t border-white/10 px-2 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom,0.6rem))] flex items-center justify-around text-gray-400 shadow-2xl">
+        <a href="{% url 'home' %}" class="flex flex-col items-center gap-1 text-[10px] font-mono hover:text-primary transition py-1 {% if request.path == '/' %}text-primary font-bold{% endif %}">
+            <i class="fa-solid fa-house text-sm"></i>
+            <span>Home</span>
+        </a>
+        <a href="{% url 'movie_list' %}" class="flex flex-col items-center gap-1 text-[10px] font-mono hover:text-primary transition py-1 {% if '/movies/' in request.path %}text-primary font-bold{% endif %}">
+            <i class="fa-solid fa-film text-sm"></i>
+            <span>Movies</span>
+        </a>
+        <a href="{% url 'booking_home' %}" class="flex flex-col items-center gap-1 text-[10px] font-mono hover:text-primary transition relative group py-1">
+            <div class="w-8 h-8 -mt-4 rounded-full bg-gradient-to-tr from-yellow-500 to-amber-600 flex items-center justify-center text-black shadow-[0_0_15px_rgba(250,204,21,0.5)] active:scale-95 transition">
+                <i class="fa-solid fa-vr-cardboard text-xs"></i>
+            </div>
+            <span class="text-yellow-400 font-bold">3D Cinema</span>
+        </a>
+        <a href="{% url 'my_bookings' %}" class="flex flex-col items-center gap-1 text-[10px] font-mono hover:text-primary transition py-1 {% if '/my-bookings/' in request.path %}text-primary font-bold{% endif %}">
+            <i class="fa-solid fa-ticket text-sm"></i>
+            <span>Tickets</span>
+        </a>
+        <a href="{% if request.user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'login' %}{% endif %}" class="flex flex-col items-center gap-1 text-[10px] font-mono hover:text-primary transition py-1 {% if '/accounts/' in request.path %}text-primary font-bold{% endif %}">
+            <i class="fa-solid fa-user text-sm"></i>
+            <span>Account</span>
+        </a>
+    </nav>
+    {% endblock %}
 
     {% block extra_scripts %}{% endblock %}
 </body>

@@ -4,7 +4,7 @@
 {% block title %}All Movies | CINEVERSE Cinema Experience{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 lg:px-8 py-10">
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
 
     <!-- Page Title & Search Header -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-white/10">
@@ -13,7 +13,7 @@
                 <span class="w-2.5 h-2.5 rounded-full bg-neon animate-pulse"></span>
                 <p class="text-xs font-mono font-bold tracking-widest text-neon uppercase">CATALOGUE</p>
             </div>
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-display font-black text-white tracking-tight">
+            <h1 class="text-2xl sm:text-4xl lg:text-5xl font-display font-black text-white tracking-tight">
                 Explore All Movies
             </h1>
             <p class="text-xs sm:text-sm text-gray-400 mt-1">Discover what's playing now in {{ city|default:"Kochi" }} and book immersive cinema seats.</p>
@@ -116,7 +116,7 @@
     {% endif %}
 
     <!-- Movies Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3.5 sm:gap-6">
         {% for movie in movies %}
         <div class="group relative flex flex-col rounded-2xl overflow-hidden glass-panel border border-white/10 hover:border-neon transition-all duration-300 hover:shadow-neon hover:-translate-y-2">
             
@@ -138,7 +138,7 @@
             </div>
 
             <!-- Card Body -->
-            <div class="p-4 flex flex-col flex-grow justify-between bg-dark-900/90 border-t border-white/5 space-y-3">
+            <div class="p-3 sm:p-4 flex flex-col flex-grow justify-between bg-dark-900/90 border-t border-white/5 space-y-2 sm:space-y-3">
                 <div>
                     <h3 class="font-display font-bold text-base text-white truncate group-hover:text-neon transition-colors">
                         {{ movie.title }}

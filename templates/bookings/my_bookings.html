@@ -4,16 +4,16 @@
 {% block title %}My E-Tickets Vault | CINEVERSE{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 lg:px-8 py-10">
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
     
     <!-- Vault Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-white/10">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8 pb-5 sm:pb-6 border-b border-white/10">
         <div>
             <div class="flex items-center gap-2 mb-1">
                 <span class="w-2.5 h-2.5 rounded-full bg-neon animate-pulse"></span>
-                <p class="text-xs font-mono font-bold tracking-widest text-neon uppercase">DIGITAL PASS VAULT</p>
+                <p class="text-[10px] sm:text-xs font-mono font-bold tracking-widest text-neon uppercase">DIGITAL PASS VAULT</p>
             </div>
-            <h1 class="text-3xl sm:text-4xl font-display font-black text-white tracking-tight">
+            <h1 class="text-2xl sm:text-4xl font-display font-black text-white tracking-tight">
                 My Booked E-Tickets
             </h1>
             <p class="text-xs text-gray-400 mt-1">Access all your active movie passes, seat reservations, and digital QR codes.</p>
@@ -21,7 +21,7 @@
 
         <a 
             href="{% url 'movie_list' %}"
-            class="px-5 py-2.5 rounded-xl bg-neon text-black font-display font-bold text-xs uppercase tracking-wider hover:bg-neon-hover transition-all shadow-neon flex items-center gap-2 self-start"
+            class="px-4 sm:px-5 py-2.5 rounded-xl bg-neon text-black font-display font-bold text-xs uppercase tracking-wider hover:bg-neon-hover transition-all shadow-neon flex items-center gap-2 self-start"
         >
             <i class="fa-solid fa-plus"></i>
             <span>Book New Tickets</span>
@@ -31,13 +31,13 @@
     <!-- Bookings Cards Grid -->
     <div class="space-y-6">
         {% for b in bookings %}
-        <div class="glass-panel rounded-3xl p-6 border border-white/10 hover:border-neon/50 transition-all shadow-glass flex flex-col md:flex-row gap-6">
+        <div class="glass-panel rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-white/10 hover:border-neon/50 transition-all shadow-glass flex flex-col sm:flex-row gap-4 sm:gap-6">
             
             <!-- Poster -->
             <img 
                 src="{{ b.movie.poster_url }}" 
                 alt="{{ b.movie.title }}" 
-                class="w-full sm:w-32 h-44 object-cover rounded-2xl border border-white/15 flex-shrink-0 shadow"
+                class="w-24 sm:w-32 aspect-[2/3] object-cover rounded-xl sm:rounded-2xl border border-white/15 flex-shrink-0 shadow mx-auto sm:mx-0"
             >
 
             <!-- Booking Info -->

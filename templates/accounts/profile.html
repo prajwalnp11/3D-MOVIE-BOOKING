@@ -4,12 +4,12 @@
 {% block title %}My Profile & Account | CINEVERSE VIP{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 lg:px-8 py-10">
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
 
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-white/10 mb-8">
-        <div class="flex items-center gap-4">
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-neon to-amber-500 text-black flex items-center justify-center text-2xl font-black shadow-neon">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 sm:pb-8 border-b border-white/10 mb-6 sm:mb-8">
+        <div class="flex items-center gap-3.5 sm:gap-4">
+            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-neon to-amber-500 text-black flex items-center justify-center text-xl sm:text-2xl font-black shadow-neon">
                 {{ user.username|slice:":1"|upper }}
             </div>
             <div>
@@ -19,7 +19,7 @@
                     </span>
                     <span class="text-xs text-gray-400 font-mono">Joined {{ user.date_joined|date:"M Y" }}</span>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-display font-black text-white">
+                <h1 class="text-xl sm:text-3xl font-display font-black text-white">
                     {{ user.get_full_name|default:user.username }}
                 </h1>
                 <p class="text-xs text-gray-400 font-mono">{{ user.email }}</p>
@@ -48,8 +48,8 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         <!-- Left Column: Edit Profile Form -->
-        <div class="lg:col-span-5 glass-panel rounded-3xl p-6 sm:p-8 border border-white/10 shadow-glass space-y-6">
-            <h2 class="text-lg font-display font-bold text-white flex items-center gap-2">
+        <div class="lg:col-span-5 glass-panel rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10 shadow-glass space-y-6">
+            <h2 class="text-base sm:text-lg font-display font-bold text-white flex items-center gap-2">
                 <i class="fa-solid fa-user-pen text-neon text-sm"></i>
                 <span>Account Information</span>
             </h2>
@@ -57,7 +57,7 @@
             <form method="POST" action="{% url 'profile' %}" enctype="multipart/form-data" class="space-y-4">
                 {% csrf_token %}
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-mono text-gray-300 mb-1">First Name</label>
                         <input 

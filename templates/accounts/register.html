@@ -4,8 +4,8 @@
 {% block title %}Create Your Account | CINEVERSE VIP{% endblock %}
 
 {% block content %}
-<div class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="w-full max-w-md space-y-8 glass-panel rounded-3xl p-8 sm:p-10 border border-white/10 shadow-glass">
+<div class="min-h-[80vh] flex items-center justify-center py-8 sm:py-12 px-3 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-6 sm:space-y-8 glass-panel rounded-2xl sm:rounded-3xl p-5 sm:p-10 border border-white/10 shadow-glass">
         
         <!-- Header -->
         <div class="text-center space-y-2">
@@ -38,7 +38,7 @@
         <form method="POST" action="{% url 'register' %}" class="space-y-4">
             {% csrf_token %}
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-mono text-gray-300 mb-1">First Name</label>
                     <input 
@@ -81,7 +81,7 @@
                 >
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-mono text-gray-300 mb-1">Phone Number</label>
                     <input 

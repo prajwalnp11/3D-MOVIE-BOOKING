@@ -196,6 +196,46 @@
         </div>
     </header>
 
+    <!-- Floating Screen Indicator (Prominent above seats) -->
+    <div class="pointer-events-none absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center">
+        <div class="w-44 sm:w-64 h-1 rounded-full bg-gradient-to-r from-transparent via-yellow-400 to-transparent shadow-[0_0_15px_rgba(250,204,21,0.9)]"></div>
+        <span class="text-[9px] sm:text-[10px] font-mono tracking-[0.25em] text-yellow-400 font-extrabold uppercase mt-1 flex items-center gap-1 drop-shadow-md">
+            <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 20 20"><path d="M10 3l7 7-1.41 1.41L11 6.83V17H9V6.83L4.41 11.41 3 10l7-7z"/></svg>
+            CINEMA SCREEN &bull; ALL EYES THIS WAY
+        </span>
+    </div>
+
+    <!-- Mobile Floating Seat Classes Chips (Accessible without opening drawer) -->
+    <div class="lg:hidden absolute top-28 left-0 right-0 z-10 px-3 flex items-center justify-center pointer-events-none">
+        <div class="pointer-events-auto flex items-center gap-1.5 overflow-x-auto py-1 px-2.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15 shadow-xl max-w-full scrollbar-none">
+            <button onclick="focusSection('Recliner')" class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold flex items-center gap-1 bg-purple-950/70 text-purple-300 border border-purple-500/40 active:scale-95 whitespace-nowrap" title="Royal Recliner: ₹500">
+                <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span> Recliner ₹500
+            </button>
+            <button onclick="focusSection('Balcony')" class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold flex items-center gap-1 bg-amber-950/70 text-amber-300 border border-amber-500/40 active:scale-95 whitespace-nowrap" title="Balcony: ₹300">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Balcony ₹300
+            </button>
+            <button onclick="focusSection('Prime')" class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold flex items-center gap-1 bg-emerald-950/70 text-emerald-300 border border-emerald-500/40 active:scale-95 whitespace-nowrap" title="Prime: ₹200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Prime ₹200
+            </button>
+            <button onclick="focusSection('Classic')" class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold flex items-center gap-1 bg-blue-950/70 text-blue-300 border border-blue-500/40 active:scale-95 whitespace-nowrap" title="Classic: ₹150">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Classic ₹150
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating On-Screen Touch Controls (Zoom & Reset Camera) -->
+    <div class="fixed right-3 sm:right-5 bottom-24 lg:bottom-8 z-20 flex flex-col gap-2 pointer-events-auto">
+        <button onclick="zoom3D(1)" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/65 hover:bg-black/85 backdrop-blur-md border border-white/20 text-white flex items-center justify-center font-bold text-base shadow-xl active:scale-90 transition" title="Zoom In">
+            +
+        </button>
+        <button onclick="zoom3D(-1)" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/65 hover:bg-black/85 backdrop-blur-md border border-white/20 text-white flex items-center justify-center font-bold text-base shadow-xl active:scale-90 transition" title="Zoom Out">
+            &minus;
+        </button>
+        <button onclick="resetCameraView()" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/65 hover:bg-black/85 backdrop-blur-md border border-white/20 text-yellow-400 flex items-center justify-center text-xs shadow-xl active:scale-90 transition" title="Reset View">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg>
+        </button>
+    </div>
+
     <!-- Mobile Drawer Backdrop Overlay -->
     <div id="mobile-drawer-backdrop" onclick="toggleMobileDrawer(false)" class="fixed inset-0 bg-black/75 z-30 hidden backdrop-blur-sm transition-opacity lg:hidden"></div>
 
@@ -306,24 +346,25 @@
         </div>
     </aside>
 
-    <!-- Mobile Bottom Quick Bar (always visible on mobile screens) -->
-    <div id="mobile-bottom-bar" class="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-[#0a0a0c]/90 backdrop-blur-xl border-t border-white/15 px-4 py-2.5 flex items-center justify-between gap-3 shadow-2xl">
-        <div onclick="toggleMobileDrawer(true)" class="cursor-pointer flex-1">
+    <!-- Mobile Bottom Quick Bar (Compact Sticky Booking Summary with Safe Area Support) -->
+    <div id="mobile-bottom-bar" class="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-[#0a0a0c]/95 backdrop-blur-2xl border-t border-white/15 px-4 pt-3 pb-[max(0.85rem,env(safe-area-inset-bottom,0.85rem))] flex items-center justify-between gap-3 shadow-[0_-10px_30px_rgba(0,0,0,0.8)]">
+        <div onclick="toggleMobileDrawer(true)" class="cursor-pointer flex-1 min-w-0">
             <div class="flex items-center gap-2">
-                <span id="mobile-seat-count" class="text-xs font-bold text-white bg-white/10 px-2.5 py-0.5 rounded-full">0 seats</span>
-                <span id="mobile-total-price" class="text-base font-black text-yellow-400">₹0</span>
+                <span id="mobile-seat-count" class="text-xs font-bold text-white bg-white/10 px-2.5 py-0.5 rounded-full font-mono shrink-0">0 seats</span>
+                <span id="mobile-total-price" class="text-base font-black text-yellow-400 font-mono">₹0</span>
             </div>
-            <p class="text-[10px] text-gray-400 flex items-center gap-1 mt-0.5">
-                <span>Seat Info & Classes</span>
-                <span class="text-yellow-400 text-xs">▲</span>
+            <p class="text-[10px] text-gray-400 flex items-center gap-1 mt-0.5 truncate">
+                <span id="mobile-seats-preview" class="truncate">Tap 3D seats to select</span>
+                <span class="text-yellow-400 text-xs shrink-0">▲</span>
             </p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-            <button type="button" onclick="toggleMobileDrawer(true)" class="bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl border border-white/10 active:scale-95 transition">
-                🎟️ Details
+            <button type="button" onclick="pickBestSeats()" class="bg-white/10 hover:bg-white/20 text-yellow-400 text-xs font-semibold px-2.5 py-2 rounded-xl border border-white/10 active:scale-95 transition flex items-center gap-1" title="Quick Pick Best Seats">
+                <span>★ Best 2</span>
             </button>
-            <button type="button" id="mobile-btn-book" onclick="openCheckoutModal()" disabled class="bg-yellow-400 hover:bg-yellow-300 disabled:opacity-40 disabled:cursor-not-allowed text-black text-xs font-black px-4 py-2 rounded-xl transition shadow-[0_0_15px_rgba(250,204,21,0.3)] active:scale-95">
-                BOOK SEATS &rarr;
+            <button type="button" id="mobile-btn-book" onclick="openCheckoutModal()" disabled class="bg-yellow-400 hover:bg-yellow-300 disabled:opacity-40 disabled:cursor-not-allowed text-black text-xs font-black px-4 py-2 rounded-xl transition shadow-[0_0_15px_rgba(250,204,21,0.4)] active:scale-95 uppercase tracking-wider flex items-center gap-1.5">
+                <span>CONTINUE</span>
+                <svg class="w-3 h-3 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
             </button>
         </div>
     </div>
@@ -1269,6 +1310,8 @@
                 if (mobilePrice) mobilePrice.innerText = '₹0';
                 if (mobileBtn) mobileBtn.disabled = true;
                 if (headerBadge) headerBadge.classList.add('hidden');
+                const mobPreview = document.getElementById('mobile-seats-preview');
+                if (mobPreview) mobPreview.innerText = 'Tap 3D seats to select';
                 return;
             }
 
@@ -1324,6 +1367,26 @@
                 headerBadge.innerText = selectedSeats.size;
                 headerBadge.classList.remove('hidden');
             }
+            const mobPreview = document.getElementById('mobile-seats-preview');
+            if (mobPreview) mobPreview.innerText = sortedSeats.join(', ');
+        }
+
+        // --- 3D ZOOM & RESET TOUCH CONTROLS ---
+        function zoom3D(dir) {
+            if (!camera) return;
+            const factor = dir > 0 ? 0.8 : 1.25;
+            new TWEEN.Tween(camera.position)
+                .to({
+                    x: camera.position.x * factor,
+                    y: Math.max(1, camera.position.y * factor),
+                    z: camera.position.z * factor
+                }, 300)
+                .easing(TWEEN.Easing.Cubic.Out)
+                .start();
+        }
+
+        function resetCameraView() {
+            moveCamera('overview');
         }
 
         // --- CHECKOUT MODAL ---

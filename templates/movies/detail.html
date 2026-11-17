@@ -15,14 +15,14 @@
     <div class="absolute inset-0 bg-gradient-to-r from-dark-950 via-dark-950/85 to-transparent"></div>
 </div>
 
-<div class="max-w-7xl mx-auto px-4 lg:px-8 -mt-64 relative z-20 pb-20">
+<div class="max-w-7xl mx-auto px-4 lg:px-8 -mt-28 sm:-mt-44 md:-mt-64 relative z-20 pb-20">
     
     <!-- 2. Top Details Layout: Poster + Metadata -->
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 mb-12">
         
         <!-- Poster Column -->
-        <div class="md:col-span-4 lg:col-span-3">
-            <div class="rounded-2xl overflow-hidden glass-panel border border-neon/30 shadow-neon-lg relative group">
+        <div class="md:col-span-4 lg:col-span-3 flex flex-col items-center sm:items-stretch">
+            <div class="w-48 sm:w-full rounded-2xl overflow-hidden glass-panel border border-neon/30 shadow-neon-lg relative group">
                 <img 
                     src="{{ movie.poster_url }}" 
                     alt="{{ movie.title }}" 
@@ -37,7 +37,7 @@
             <!-- Direct 3D Booking Button Under Poster -->
             <a 
                 href="{% url 'booking_home' %}?movie={{ movie.tmdb_id }}" 
-                class="mt-4 w-full py-3.5 rounded-xl bg-neon text-black font-display font-bold text-sm uppercase tracking-wider text-center hover:bg-neon-hover shadow-neon transition-all flex items-center justify-center gap-2"
+                class="mt-4 w-48 sm:w-full py-3.5 rounded-xl bg-neon text-black font-display font-bold text-xs sm:text-sm uppercase tracking-wider text-center hover:bg-neon-hover shadow-neon transition-all flex items-center justify-center gap-2 active:scale-95"
             >
                 <i class="fa-solid fa-vr-cardboard text-base"></i>
                 <span>Enter 3D Auditorium</span>

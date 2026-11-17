@@ -4,7 +4,7 @@
 {% block title %}Multiplex Theatres & Showtimes | CINEVERSE{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
     
     <!-- Header Breadcrumb & Title -->
     <div class="mb-6">
@@ -15,9 +15,9 @@
         </div>
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h1 class="text-3xl sm:text-4xl font-display font-black text-white tracking-tight flex items-center gap-3">
+                <h1 class="text-2xl sm:text-4xl font-display font-black text-white tracking-tight flex flex-wrap items-center gap-2 sm:gap-3">
                     <span>Multiplex Theatres</span>
-                    <span class="text-sm font-normal px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-300 font-mono">
+                    <span class="text-xs sm:text-sm font-normal px-2.5 sm:px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-300 font-mono">
                         {{ city|default:"Kochi" }}
                     </span>
                 </h1>
@@ -39,7 +39,7 @@
     </div>
 
     <!-- 1. HORIZONTAL SCROLLABLE DATE SELECTOR -->
-    <div class="glass-panel-neon rounded-2xl p-4 mb-8 border border-white/15 shadow-glass">
+    <div class="glass-panel-neon rounded-2xl p-3 sm:p-4 mb-6 sm:mb-8 border border-white/15 shadow-glass">
         <div class="flex items-center justify-between gap-4">
             <span class="text-xs font-mono text-gray-400 uppercase tracking-widest hidden sm:inline flex-shrink-0">
                 <i class="fa-solid fa-calendar-days text-neon mr-1.5"></i> Select Date:
@@ -62,28 +62,28 @@
     </div>
 
     <!-- Technical Specs & Availability Legend Bar -->
-    <div class="flex flex-wrap items-center justify-between gap-4 px-2 mb-6 text-xs text-gray-400">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-1 sm:px-2 mb-6 text-xs text-gray-400">
         <!-- Tech Badges Legend -->
-        <div class="flex items-center gap-3">
-            <span class="font-mono text-[10px] uppercase text-gray-500">Formats:</span>
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span class="font-mono text-[10px] uppercase text-gray-500 mr-1">Formats:</span>
             <span class="px-2 py-0.5 rounded bg-cyber-cyan/10 border border-cyber-cyan/30 text-cyber-cyan text-[10px] font-mono font-bold">IMAX 3D Laser</span>
             <span class="px-2 py-0.5 rounded bg-cyber-purple/10 border border-cyber-purple/30 text-cyber-purple text-[10px] font-mono font-bold">Dolby Atmos 7.1</span>
             <span class="px-2 py-0.5 rounded bg-neon/10 border border-neon/30 text-neon text-[10px] font-mono font-bold">4K RGB Laser</span>
         </div>
 
         <!-- Availability Status Legend -->
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 sm:gap-4 self-end sm:self-auto">
             <div class="flex items-center gap-1.5 font-mono text-[11px]">
                 <span class="w-2 h-2 rounded-full bg-cyber-emerald animate-pulse"></span>
                 <span class="text-gray-300">Available</span>
             </div>
             <div class="flex items-center gap-1.5 font-mono text-[11px]">
                 <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                <span class="text-gray-300">Filling Fast</span>
+                <span class="text-gray-300">Fast</span>
             </div>
             <div class="flex items-center gap-1.5 font-mono text-[11px]">
                 <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                <span class="text-gray-400">Sold Out</span>
+                <span class="text-gray-400">Full</span>
             </div>
         </div>
     </div>
@@ -91,7 +91,7 @@
     <!-- 2. THEATER CARDS LIST -->
     <div class="space-y-6">
         {% for item in theatre_showtimes %}
-        <div class="glass-panel rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all shadow-glass">
+        <div class="glass-panel rounded-2xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all shadow-glass">
             
             <!-- Theatre Header Info -->
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-white/10">
@@ -139,11 +139,11 @@
                 </div>
 
                 <!-- Showtime Pills Grid -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
                     {% for st in item.showtimes %}
                     <a 
                         href="{% url 'booking_auditorium' st.id %}"
-                        class="p-3 rounded-xl bg-dark-900/90 border transition-all duration-200 flex flex-col justify-between space-y-2 group hover:scale-[1.03] {% if st.status == 'SOLD_OUT' %}border-red-900/40 opacity-50 pointer-events-none{% elif st.status == 'FILLING_FAST' %}border-amber-500/40 hover:border-amber-400 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)]{% else %}border-white/15 hover:border-neon hover:shadow-neon{% endif %}"
+                        class="p-2.5 sm:p-3 rounded-xl bg-dark-900/90 border transition-all duration-200 flex flex-col justify-between space-y-2 group hover:scale-[1.03] {% if st.status == 'SOLD_OUT' %}border-red-900/40 opacity-50 pointer-events-none{% elif st.status == 'FILLING_FAST' %}border-amber-500/40 hover:border-amber-400 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)]{% else %}border-white/15 hover:border-neon hover:shadow-neon{% endif %}"
                     >
                         <div class="flex items-center justify-between">
                             <span class="font-display font-black text-base text-white group-hover:text-neon transition-colors">

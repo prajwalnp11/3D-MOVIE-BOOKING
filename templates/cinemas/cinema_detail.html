@@ -5,7 +5,7 @@
 
 {% block content %}
 <!-- Hero Cinema Banner -->
-<div class="relative w-full h-80 overflow-hidden bg-black select-none">
+<div class="relative w-full h-56 sm:h-80 overflow-hidden bg-black select-none">
     <img 
         src="{{ cinema.get_image }}" 
         alt="{{ cinema.name }}" 
@@ -14,10 +14,10 @@
     <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/70 to-transparent"></div>
 </div>
 
-<div class="max-w-7xl mx-auto px-4 lg:px-8 -mt-44 relative z-20 pb-20">
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 -mt-28 sm:-mt-40 relative z-20 pb-16 sm:pb-20">
 
     <!-- Cinema Profile Card -->
-    <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-white/10 shadow-glass mb-10">
+    <div class="glass-panel rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-white/10 shadow-glass mb-8 sm:mb-10">
         <div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
             <div class="space-y-3">
                 <div class="flex items-center gap-3">
@@ -78,7 +78,7 @@
             </a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {% for show in shows %}
             <div class="p-4 rounded-2xl glass-panel border border-white/10 hover:border-neon transition-all flex flex-col justify-between space-y-4 group">
                 <div class="flex gap-4">
