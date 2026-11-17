@@ -27,4 +27,4 @@ RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python manage.py migrate && python manage.py loaddata movies/fixtures/all_movies_and_shows.json && gunicorn --config gunicorn.conf.py config.wsgi:application"]
+CMD ["sh", "-c", "python manage.py migrate && (python manage.py loaddata movies/fixtures/all_movies_and_shows.json || true) && exec gunicorn --config gunicorn.conf.py config.wsgi:application"]
