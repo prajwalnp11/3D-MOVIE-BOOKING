@@ -77,46 +77,58 @@
     <div id="webgl-container"></div>
 
     <!-- Top Navigation / Header -->
-    <header class="absolute top-0 left-0 w-full p-4 sm:p-6 flex flex-wrap justify-between items-start z-10 pointer-events-none gap-3">
+    <!-- Top Navigation / Header -->
+    <header class="absolute top-0 left-0 w-full p-2.5 sm:p-4 md:p-6 flex flex-wrap justify-between items-start z-20 pointer-events-none gap-2 sm:gap-3">
         
         <!-- Left: Back Button & Dynamic Movie / Theatre Meta -->
-        <div class="pointer-events-auto flex items-center gap-3">
-            <a href="{% url 'home' %}" class="w-10 h-10 rounded-full bg-black/50 hover:bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition shadow-lg shrink-0" title="Back to Home">
+        <div class="pointer-events-auto flex items-center gap-2.5 sm:gap-3">
+            <a href="{% url 'home' %}" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/50 hover:bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition shadow-lg shrink-0" title="Back to Home">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             </a>
 
             <div>
                 <div class="flex items-center gap-2">
-                    <h1 id="hud-movie-title" class="text-xl sm:text-2xl font-black tracking-wider uppercase text-white drop-shadow-lg">
+                    <h1 id="hud-movie-title" class="text-base sm:text-xl md:text-2xl font-black tracking-wider uppercase text-white drop-shadow-lg max-w-[140px] sm:max-w-xs md:max-w-none truncate">
                         {{ selected_movie.title|default:"Singham Again" }}
                     </h1>
-                    <span class="px-2 py-0.5 rounded-md bg-yellow-400/20 border border-yellow-400/50 text-yellow-400 text-[10px] font-mono font-bold uppercase">
+                    <span class="px-1.5 py-0.5 rounded-md bg-yellow-400/20 border border-yellow-400/50 text-yellow-400 text-[9px] sm:text-[10px] font-mono font-bold uppercase shrink-0">
                         NOW SHOWING
                     </span>
                     <span id="hud-cert" class="px-2 py-0.5 rounded-md bg-white/10 text-gray-300 text-[10px] font-mono hidden md:inline">
                         {{ selected_movie.certification|default:"UA 16+" }}
                     </span>
                 </div>
-                <p id="hud-theatre-meta" class="text-xs text-gray-400 mt-0.5 font-medium tracking-wide flex items-center gap-1.5 flex-wrap">
+                <p id="hud-theatre-meta" class="text-[11px] sm:text-xs text-gray-400 mt-0.5 font-medium tracking-wide flex items-center gap-1.5 flex-wrap">
                     <span class="text-white">Cinemax IMAX, Kolar</span>
                     <span>&bull;</span>
                     <span class="text-yellow-400 font-mono">Today • 11:40 AM</span>
-                    <span>&bull;</span>
-                    <span>IMAX 3D Laser ({{ selected_movie.language|default:"Hindi" }})</span>
+                    <span class="hidden sm:inline">&bull;</span>
+                    <span class="hidden sm:inline">IMAX 3D Laser ({{ selected_movie.language|default:"Hindi" }})</span>
                 </p>
             </div>
         </div>
         
         <!-- Right Action Controls: Movie Switcher, Trailer Sound, Camera Controls -->
-        <div class="pointer-events-auto flex items-center gap-2.5 mr-0 lg:mr-[345px] flex-wrap">
+        <div class="pointer-events-auto flex items-center gap-1.5 sm:gap-2.5 mr-0 lg:mr-[370px] flex-wrap justify-end">
             
+            <!-- Mobile Toggle Button for Seat Classes Drawer -->
+            <button 
+                type="button"
+                onclick="toggleMobileDrawer(true)"
+                class="lg:hidden bg-yellow-400 hover:bg-yellow-300 text-black font-extrabold rounded-full px-3 py-1.5 flex items-center gap-1.5 text-xs shadow-[0_0_15px_rgba(250,204,21,0.4)] transition active:scale-95"
+                title="View Seat Classes & Pricing"
+            >
+                <span>🎟️ Seats</span>
+                <span id="header-seat-badge" class="bg-black text-yellow-400 text-[10px] px-1.5 py-0.2 rounded-full font-mono hidden">0</span>
+            </button>
+
             <!-- Dynamic Movie Switcher Dropdown -->
-            <div class="flex items-center bg-black/60 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/10 shadow-lg">
-                <span class="text-[10px] font-mono text-gray-400 uppercase tracking-wider mr-2 hidden sm:inline">Movie:</span>
+            <div class="flex items-center bg-black/60 backdrop-blur-md rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 border border-white/10 shadow-lg max-w-[130px] sm:max-w-none">
+                <span class="text-[10px] font-mono text-gray-400 uppercase tracking-wider mr-1.5 hidden md:inline">Movie:</span>
                 <select 
                     id="movieDropdown"
                     onchange="if(this.value) window.location.href='?movie=' + this.value;"
-                    class="bg-transparent text-yellow-400 text-xs font-bold focus:outline-none cursor-pointer pr-1"
+                    class="bg-transparent text-yellow-400 text-xs font-bold focus:outline-none cursor-pointer pr-1 w-full truncate"
                 >
                     <optgroup label="⭐ Sandalwood (Kannada) Blockbusters" class="bg-neutral-900 text-yellow-400 font-bold">
                     {% for m in movies %}
@@ -143,18 +155,19 @@
             <button 
                 id="btn-real-trailer"
                 onclick="openAuditoriumTrailer()"
-                class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-black font-bold rounded-full px-3.5 py-1.5 flex items-center gap-1.5 text-xs shadow-[0_0_15px_rgba(250,204,21,0.4)] transition cursor-pointer"
+                class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-black font-bold rounded-full px-3 sm:px-3.5 py-1 sm:py-1.5 flex items-center gap-1 sm:gap-1.5 text-xs shadow-[0_0_15px_rgba(250,204,21,0.4)] transition cursor-pointer shrink-0"
                 title="Play Real Official Trailer on Theatre Screen"
             >
                 <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
-                <span class="tracking-wide uppercase text-[10px] font-mono font-black">Real Trailer</span>
+                <span class="tracking-wide uppercase text-[10px] font-mono font-black hidden sm:inline">Real Trailer</span>
+                <span class="tracking-wide uppercase text-[10px] font-mono font-black sm:hidden">Trailer</span>
             </button>
 
             <!-- Trailer Audio Unmute/Mute Toggle Button -->
             <button 
                 id="btn-trailer-audio"
                 onclick="toggleTrailerAudio()"
-                class="bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-full px-3 py-1.5 flex items-center gap-2 border border-yellow-400/30 text-white transition shadow-lg group"
+                class="bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 flex items-center gap-1.5 sm:gap-2 border border-yellow-400/30 text-white transition shadow-lg group shrink-0"
                 title="Toggle Trailer Sound"
             >
                 <div id="eq-bars-container" class="flex items-end gap-[2px] h-3.5 px-0.5 eq-muted">
@@ -163,7 +176,7 @@
                     <span class="eq-bar"></span>
                     <span class="eq-bar"></span>
                 </div>
-                <span id="audio-label" class="text-[11px] font-mono text-yellow-400 font-bold">Audio: Off</span>
+                <span id="audio-label" class="text-[11px] font-mono text-yellow-400 font-bold hidden sm:inline">Audio: Off</span>
                 <svg id="audio-icon-muted" class="w-3.5 h-3.5 text-gray-400 group-hover:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>
@@ -174,17 +187,32 @@
             </button>
 
             <!-- Camera View Controls -->
-            <div class="bg-black/60 backdrop-blur-md rounded-full px-2 py-1.5 flex items-center space-x-1 border border-white/10 shadow-lg">
-                <button id="btn-overview" onclick="moveCamera('overview', this)" class="px-3 sm:px-4 py-1 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-white">Overview</button>
-                <button id="btn-stage" onclick="moveCamera('stage', this)" class="px-3 sm:px-4 py-1 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300">From stage</button>
-                <button id="btn-balcony" onclick="moveCamera('balcony', this)" class="px-3 sm:px-4 py-1 rounded-full text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300">Balcony</button>
-                <button id="btn-birdsEye" onclick="moveCamera('birdsEye', this)" class="px-3 sm:px-4 py-1 rounded-full text-xs font-semibold bg-white text-black transition-colors">Bird's eye</button>
+            <div class="bg-black/60 backdrop-blur-md rounded-full px-1.5 sm:px-2 py-1 sm:py-1.5 flex items-center space-x-1 border border-white/10 shadow-lg overflow-x-auto no-scrollbar">
+                <button id="btn-overview" onclick="moveCamera('overview', this)" class="px-2.5 sm:px-4 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-semibold hover:bg-white/10 transition-colors text-white whitespace-nowrap">Overview</button>
+                <button id="btn-stage" onclick="moveCamera('stage', this)" class="px-2.5 sm:px-4 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300 whitespace-nowrap">From stage</button>
+                <button id="btn-balcony" onclick="moveCamera('balcony', this)" class="px-2.5 sm:px-4 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-semibold hover:bg-white/10 transition-colors text-gray-300 whitespace-nowrap">Balcony</button>
+                <button id="btn-birdsEye" onclick="moveCamera('birdsEye', this)" class="px-2.5 sm:px-4 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-white text-black transition-colors whitespace-nowrap">Bird's eye</button>
             </div>
         </div>
     </header>
 
-    <!-- UI Overlay Right Panel -->
-    <aside class="absolute top-0 right-0 h-full w-full sm:w-[340px] glass-panel z-10 flex flex-col pointer-events-auto shadow-2xl">
+    <!-- Mobile Drawer Backdrop Overlay -->
+    <div id="mobile-drawer-backdrop" onclick="toggleMobileDrawer(false)" class="fixed inset-0 bg-black/75 z-30 hidden backdrop-blur-sm transition-opacity lg:hidden"></div>
+
+    <!-- UI Overlay Right Panel / Mobile Bottom Sheet -->
+    <aside id="sidebar-panel" class="fixed lg:absolute bottom-0 right-0 h-[82vh] lg:h-full w-full lg:w-[360px] glass-panel z-40 lg:z-10 flex flex-col pointer-events-auto shadow-2xl transition-transform duration-300 ease-in-out translate-y-full lg:translate-y-0 rounded-t-3xl lg:rounded-none border-t lg:border-t-0 lg:border-l border-white/20">
+        
+        <!-- Mobile Drawer Drag Handle & Close Header -->
+        <div class="lg:hidden flex items-center justify-between px-5 pt-3 pb-2 border-b border-white/10 shrink-0 bg-white/5">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+                <span class="text-xs font-bold text-white uppercase tracking-wider">Seat Classes & Booking</span>
+            </div>
+            <button type="button" onclick="toggleMobileDrawer(false)" class="text-gray-400 hover:text-white px-2.5 py-1 text-xs font-bold uppercase tracking-wider flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded-full transition">
+                <span>✕ Close</span>
+            </button>
+        </div>
+
         <div class="flex-1 overflow-y-auto p-5 sm:p-6 pb-32 flex flex-col gap-6">
             
             <!-- Seat Classes -->
@@ -277,6 +305,28 @@
             </button>
         </div>
     </aside>
+
+    <!-- Mobile Bottom Quick Bar (always visible on mobile screens) -->
+    <div id="mobile-bottom-bar" class="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-[#0a0a0c]/90 backdrop-blur-xl border-t border-white/15 px-4 py-2.5 flex items-center justify-between gap-3 shadow-2xl">
+        <div onclick="toggleMobileDrawer(true)" class="cursor-pointer flex-1">
+            <div class="flex items-center gap-2">
+                <span id="mobile-seat-count" class="text-xs font-bold text-white bg-white/10 px-2.5 py-0.5 rounded-full">0 seats</span>
+                <span id="mobile-total-price" class="text-base font-black text-yellow-400">₹0</span>
+            </div>
+            <p class="text-[10px] text-gray-400 flex items-center gap-1 mt-0.5">
+                <span>Seat Info & Classes</span>
+                <span class="text-yellow-400 text-xs">▲</span>
+            </p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+            <button type="button" onclick="toggleMobileDrawer(true)" class="bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-3 py-2 rounded-xl border border-white/10 active:scale-95 transition">
+                🎟️ Details
+            </button>
+            <button type="button" id="mobile-btn-book" onclick="openCheckoutModal()" disabled class="bg-yellow-400 hover:bg-yellow-300 disabled:opacity-40 disabled:cursor-not-allowed text-black text-xs font-black px-4 py-2 rounded-xl transition shadow-[0_0_15px_rgba(250,204,21,0.3)] active:scale-95">
+                BOOK SEATS &rarr;
+            </button>
+        </div>
+    </div>
 
     <!-- Checkout Modal -->
     <div id="checkout-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
@@ -1000,12 +1050,19 @@
         const mouse = new THREE.Vector2();
         let hoveredSeat = null;
 
+        let pointerDownPos = { x: 0, y: 0, time: 0 };
+        window.addEventListener('pointerdown', (e) => {
+            pointerDownPos.x = e.clientX;
+            pointerDownPos.y = e.clientY;
+            pointerDownPos.time = Date.now();
+        }, { passive: true });
+
         window.addEventListener('mousemove', onMouseMove, false);
         window.addEventListener('click', onClick, false);
 
         function onMouseMove(event) {
-            if(event.clientX > window.innerWidth - 340 && window.innerWidth >= 640) return;
-            if(event.clientY < 80) return;
+            if(window.innerWidth >= 1024 && event.clientX > window.innerWidth - 360) return;
+            if(event.clientY < 70) return;
 
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -1042,8 +1099,21 @@
         }
 
         function onClick(event) {
-            if(event.clientX > window.innerWidth - 340 && window.innerWidth >= 640) return;
-            if(event.clientY < 80) return;
+            // Ignore clicks directly hitting UI elements, header, aside, bottom bar, or modal
+            if(event.target.closest('aside, header, #mobile-bottom-bar, #checkout-modal, button, select, input, a')) return;
+
+            // Prevent drag-to-rotate / orbit controls gesture from accidentally selecting seats
+            const dist = Math.hypot(event.clientX - pointerDownPos.x, event.clientY - pointerDownPos.y);
+            const duration = Date.now() - pointerDownPos.time;
+            if(dist > 12 || duration > 500) return;
+
+            // On desktop, ignore clicks within the right sidebar zone
+            if(window.innerWidth >= 1024 && event.clientX > window.innerWidth - 360) return;
+            if(event.clientY < 70) return;
+
+            // Accurately compute normalized device coordinates directly from tap event
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);
 
@@ -1151,6 +1221,22 @@
             else moveCamera('overview');
         }
 
+        // --- MOBILE DRAWER TOGGLE ---
+        function toggleMobileDrawer(forceState) {
+            const panel = document.getElementById('sidebar-panel');
+            const backdrop = document.getElementById('mobile-drawer-backdrop');
+            if (!panel) return;
+            const isClosed = panel.classList.contains('translate-y-full');
+            const shouldOpen = forceState !== undefined ? forceState : isClosed;
+            if (shouldOpen) {
+                panel.classList.remove('translate-y-full');
+                if (backdrop) backdrop.classList.remove('hidden');
+            } else {
+                panel.classList.add('translate-y-full');
+                if (backdrop) backdrop.classList.add('hidden');
+            }
+        }
+
         // --- UI UPDATES ---
         function updateUI() {
             const container = document.getElementById('selected-seats-container');
@@ -1160,6 +1246,11 @@
             const ticketsText = document.getElementById('tickets-text');
             const feesText = document.getElementById('fees-text');
             const btnContinue = document.getElementById('btn-continue');
+
+            const mobileCount = document.getElementById('mobile-seat-count');
+            const mobilePrice = document.getElementById('mobile-total-price');
+            const mobileBtn = document.getElementById('mobile-btn-book');
+            const headerBadge = document.getElementById('header-seat-badge');
 
             const chips = container.querySelectorAll('.chip-enter');
             chips.forEach(chip => chip.remove());
@@ -1173,6 +1264,11 @@
                 ticketsText.innerText = '0 tickets';
                 if (feesText) feesText.innerText = '+ fees ₹0';
                 btnContinue.disabled = true;
+
+                if (mobileCount) mobileCount.innerText = '0 seats';
+                if (mobilePrice) mobilePrice.innerText = '₹0';
+                if (mobileBtn) mobileBtn.disabled = true;
+                if (headerBadge) headerBadge.classList.add('hidden');
                 return;
             }
 
@@ -1218,7 +1314,16 @@
                 container.appendChild(chip);
             });
 
-            priceEl.innerText = (totalAmount + fees).toLocaleString('en-IN');
+            const grandTotal = totalAmount + fees;
+            priceEl.innerText = grandTotal.toLocaleString('en-IN');
+
+            if (mobileCount) mobileCount.innerText = `${selectedSeats.size} seat${selectedSeats.size > 1 ? 's' : ''}`;
+            if (mobilePrice) mobilePrice.innerText = `₹${grandTotal.toLocaleString('en-IN')}`;
+            if (mobileBtn) mobileBtn.disabled = false;
+            if (headerBadge) {
+                headerBadge.innerText = selectedSeats.size;
+                headerBadge.classList.remove('hidden');
+            }
         }
 
         // --- CHECKOUT MODAL ---
