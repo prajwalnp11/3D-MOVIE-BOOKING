@@ -1,0 +1,16 @@
+[Unit]
+Description=Gunicorn daemon for 3D Movie Booking Platform
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/3d-movie-booking
+ExecStart=/home/ubuntu/3d-movie-booking/venv/bin/gunicorn \
+          --config /home/ubuntu/3d-movie-booking/gunicorn.conf.py \
+          config.wsgi:application
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

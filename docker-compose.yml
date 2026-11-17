@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: cinema_3d_web
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - cinema_data:/app
+      - ./media:/app/media
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py loaddata movies/fixtures/all_movies_and_shows.json &&
+             gunicorn --config gunicorn.conf.py --bind 0.0.0.0:8000 config.wsgi:application"
+
+volumes:
+  cinema_data:
