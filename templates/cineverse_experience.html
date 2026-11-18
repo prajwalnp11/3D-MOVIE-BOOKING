@@ -983,7 +983,7 @@
         const seatBaseGeo = new THREE.BoxGeometry(0.8, 0.3, 0.7);
         const seatBackGeo = new THREE.BoxGeometry(0.8, 1.1, 0.2);
         const armRestGeo = new THREE.BoxGeometry(0.15, 0.5, 0.8);
-        const hitboxGeo = new THREE.BoxGeometry(1, 1.5, 1);
+        const hitboxGeo = new THREE.BoxGeometry(1.2, 1.8, 1.2);
         const hitboxMat = new THREE.MeshBasicMaterial({visible: false});
 
         const interactableSeats = [];
@@ -1091,22 +1091,33 @@
         const mouse = new THREE.Vector2();
         let hoveredSeat = null;
 
-        let pointerDownPos = { x: 0, y: 0, time: 0 };
-        window.addEventListener('pointerdown', (e) => {
-            pointerDownPos.x = e.clientX;
-            pointerDownPos.y = e.clientY;
+        let pointerDownPos = { x: 0, y: 0, time: 0, isTouch: false };
+        let lastTapHandledTime = 0;
+
+        function recordPointerDown(clientX, clientY, isTouch) {
+            pointerDownPos.x = clientX;
+            pointerDownPos.y = clientY;
             pointerDownPos.time = Date.now();
+            pointerDownPos.isTouch = isTouch;
+        }
+
+        renderer.domElement.addEventListener('pointerdown', (e) => {
+            recordPointerDown(e.clientX, e.clientY, e.pointerType === 'touch');
         }, { passive: true });
 
-        window.addEventListener('mousemove', onMouseMove, false);
-        window.addEventListener('click', onClick, false);
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches.length === 1) {
+                recordPointerDown(e.touches[0].clientX, e.touches[0].clientY, true);
+            }
+        }, { passive: true });
 
         function onMouseMove(event) {
             if(window.innerWidth >= 1024 && event.clientX > window.innerWidth - 360) return;
             if(event.clientY < 70) return;
 
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(interactableSeats);
@@ -1139,22 +1150,23 @@
             }
         }
 
-        function onClick(event) {
-            // Ignore clicks directly hitting UI elements, header, aside, bottom bar, or modal
-            if(event.target.closest('aside, header, #mobile-bottom-bar, #checkout-modal, button, select, input, a')) return;
+        function handleSeatSelectionAtPoint(clientX, clientY, sourceEvent) {
+            const now = Date.now();
+            if (now - lastTapHandledTime < 280) return;
+            lastTapHandledTime = now;
 
-            // Prevent drag-to-rotate / orbit controls gesture from accidentally selecting seats
-            const dist = Math.hypot(event.clientX - pointerDownPos.x, event.clientY - pointerDownPos.y);
-            const duration = Date.now() - pointerDownPos.time;
-            if(dist > 12 || duration > 500) return;
+            if (sourceEvent && sourceEvent.target && typeof sourceEvent.target.closest === 'function') {
+                if (sourceEvent.target.closest('aside, header, #mobile-bottom-bar, #checkout-modal, button, select, input, a, #mobile-drawer-backdrop')) return;
+            }
 
-            // On desktop, ignore clicks within the right sidebar zone
-            if(window.innerWidth >= 1024 && event.clientX > window.innerWidth - 360) return;
-            if(event.clientY < 70) return;
+            const elUnderPoint = document.elementFromPoint(clientX, clientY);
+            if (elUnderPoint && elUnderPoint.closest('aside, header, #mobile-bottom-bar, #checkout-modal, button, select, input, a, #mobile-drawer-backdrop')) return;
 
-            // Accurately compute normalized device coordinates directly from tap event
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            if (window.innerWidth >= 1024 && clientX > window.innerWidth - 360) return;
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);
 
@@ -1169,13 +1181,41 @@
 
             const intersects = raycaster.intersectObjects(interactableSeats);
 
-            if(intersects.length > 0) {
+            if (intersects.length > 0) {
                 const hit = intersects[0].object;
-                if(!hit.userData.isBooked) {
+                if (!hit.userData.isBooked) {
                     toggleSeatSelection(hit);
                 }
             }
         }
+
+        function onPointerUp(event) {
+            const clientX = event.clientX;
+            const clientY = event.clientY;
+            const dist = Math.hypot(clientX - pointerDownPos.x, clientY - pointerDownPos.y);
+            const duration = Date.now() - pointerDownPos.time;
+            const maxDist = pointerDownPos.isTouch ? 35 : 12;
+            const maxDuration = pointerDownPos.isTouch ? 750 : 500;
+
+            if (dist <= maxDist && duration <= maxDuration) {
+                handleSeatSelectionAtPoint(clientX, clientY, event);
+            }
+        }
+
+        renderer.domElement.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('click', onPointerUp);
+        window.addEventListener('mousemove', onMouseMove, false);
+
+        renderer.domElement.addEventListener('touchend', (e) => {
+            if (e.changedTouches && e.changedTouches.length === 1) {
+                const touch = e.changedTouches[0];
+                const dist = Math.hypot(touch.clientX - pointerDownPos.x, touch.clientY - pointerDownPos.y);
+                const duration = Date.now() - pointerDownPos.time;
+                if (dist <= 35 && duration <= 750) {
+                    handleSeatSelectionAtPoint(touch.clientX, touch.clientY, e);
+                }
+            }
+        }, { passive: true });
 
         function updateSeatColor(seatHitbox, hexColor) {
             seatHitbox.userData.materials.forEach(mat => {

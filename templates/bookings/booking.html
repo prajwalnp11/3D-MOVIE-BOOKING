@@ -995,7 +995,7 @@
         const seatBaseGeo = new THREE.BoxGeometry(0.8, 0.3, 0.7);
         const seatBackGeo = new THREE.BoxGeometry(0.8, 1.1, 0.2);
         const armRestGeo = new THREE.BoxGeometry(0.15, 0.5, 0.8);
-        const hitboxGeo = new THREE.BoxGeometry(1, 1.5, 1);
+        const hitboxGeo = new THREE.BoxGeometry(1.2, 1.8, 1.2);
         const hitboxMat = new THREE.MeshBasicMaterial({visible: false});
 
         const interactableSeats = [];
@@ -1144,29 +1144,47 @@
             }
         }
 
-        let pointerDownPos = { x: 0, y: 0, time: 0 };
-        window.addEventListener('pointerdown', (e) => {
-            pointerDownPos.x = e.clientX;
-            pointerDownPos.y = e.clientY;
+        let pointerDownPos = { x: 0, y: 0, time: 0, isTouch: false };
+        let lastTapHandledTime = 0;
+
+        function recordPointerDown(clientX, clientY, isTouch) {
+            pointerDownPos.x = clientX;
+            pointerDownPos.y = clientY;
             pointerDownPos.time = Date.now();
+            pointerDownPos.isTouch = isTouch;
+        }
+
+        renderer.domElement.addEventListener('pointerdown', (e) => {
+            recordPointerDown(e.clientX, e.clientY, e.pointerType === 'touch');
         }, { passive: true });
 
-        function onClick(event) {
-            // Ignore clicks directly hitting UI elements, header, aside, bottom bar, or modal
-            if(event.target.closest('aside, header, #mobile-bottom-bar, #booking-modal, button, select, input, a')) return;
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches.length === 1) {
+                recordPointerDown(e.touches[0].clientX, e.touches[0].clientY, true);
+            }
+        }, { passive: true });
 
-            // Prevent drag-to-rotate / orbit controls gesture from accidentally selecting seats
-            const dist = Math.hypot(event.clientX - pointerDownPos.x, event.clientY - pointerDownPos.y);
-            const duration = Date.now() - pointerDownPos.time;
-            if(dist > 12 || duration > 500) return;
+        function handleSeatSelectionAtPoint(clientX, clientY, sourceEvent) {
+            const now = Date.now();
+            // Debounce to prevent duplicate executions from pointerup + click + touchend
+            if (now - lastTapHandledTime < 280) return;
+            lastTapHandledTime = now;
+
+            // Ignore taps directly hitting UI elements
+            if (sourceEvent && sourceEvent.target && typeof sourceEvent.target.closest === 'function') {
+                if (sourceEvent.target.closest('aside, header, #mobile-bottom-bar, #booking-modal, button, select, input, a, #mobile-drawer-backdrop')) return;
+            }
+
+            const elUnderPoint = document.elementFromPoint(clientX, clientY);
+            if (elUnderPoint && elUnderPoint.closest('aside, header, #mobile-bottom-bar, #booking-modal, button, select, input, a, #mobile-drawer-backdrop')) return;
 
             // On desktop, ignore clicks within the right sidebar zone
-            if(window.innerWidth >= 1024 && event.clientX > window.innerWidth - 360) return;
-            if(event.clientY < 70) return;
+            if (window.innerWidth >= 1024 && clientX > window.innerWidth - 360) return;
 
-            // Accurately compute normalized device coordinates directly from tap event
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            // Accurately compute normalized device coordinates using canvas bounding rect
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);
 
@@ -1199,7 +1217,7 @@
                     exitSeatPov();
 
                 } else {
-                    if(selectedSeats.size >= 10) return;
+                    if (selectedSeats.size >= 10) return;
                     
                     // Select
                     selectedSeats.set(data.id, object);
@@ -1217,6 +1235,35 @@
             }
         }
 
+        function onPointerUp(event) {
+            const clientX = event.clientX;
+            const clientY = event.clientY;
+            const dist = Math.hypot(clientX - pointerDownPos.x, clientY - pointerDownPos.y);
+            const duration = Date.now() - pointerDownPos.time;
+            // On touch screens allow up to 35px finger movement; on desktop mouse allow 12px
+            const maxDist = pointerDownPos.isTouch ? 35 : 12;
+            const maxDuration = pointerDownPos.isTouch ? 750 : 500;
+
+            if (dist <= maxDist && duration <= maxDuration) {
+                handleSeatSelectionAtPoint(clientX, clientY, event);
+            }
+        }
+
+        renderer.domElement.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('click', onPointerUp);
+
+        // Also add direct touchend support on canvas for mobile WebKit / Android browsers
+        renderer.domElement.addEventListener('touchend', (e) => {
+            if (e.changedTouches && e.changedTouches.length === 1) {
+                const touch = e.changedTouches[0];
+                const dist = Math.hypot(touch.clientX - pointerDownPos.x, touch.clientY - pointerDownPos.y);
+                const duration = Date.now() - pointerDownPos.time;
+                if (dist <= 35 && duration <= 750) {
+                    handleSeatSelectionAtPoint(touch.clientX, touch.clientY, e);
+                }
+            }
+        }, { passive: true });
+
         function updateSeatColor(hitboxObject, hexColor) {
             hitboxObject.userData.materials.forEach(mat => {
                 mat.color.setHex(hexColor);
@@ -1230,7 +1277,6 @@
         }
 
         window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('click', onClick);
 
         // --- QUICK PICK FUNCTIONALITY ---
         function changeQuickPick(delta) {

@@ -17,11 +17,13 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+        transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
         user-select: none;
         -webkit-user-select: none;
         -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
         position: relative;
+        cursor: pointer;
     }
     @media (max-width: 480px) {
         .seat-btn {
@@ -32,7 +34,7 @@
         }
     }
     .seat-btn:not(.seat-booked):active {
-        transform: scale(0.92);
+        opacity: 0.8;
     }
 
     /* Green: Available */
@@ -55,7 +57,6 @@
         color: #000000 !important;
         font-weight: 800 !important;
         box-shadow: 0 0 14px rgba(250, 204, 21, 0.6) !important;
-        transform: scale(1.08) !important;
     }
 
     /* Red / Grey: Booked */
@@ -65,6 +66,7 @@
         color: #ef4444 !important;
         cursor: not-allowed !important;
         opacity: 0.45;
+        pointer-events: none;
     }
 
     /* Screen Curved Projection Effect */
@@ -78,10 +80,8 @@
     /* Smooth panning container */
     .seat-map-scroll {
         overflow-x: auto;
-        overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
         overscroll-behavior-x: contain;
-        touch-action: pan-x pan-y;
     }
 
     /* Safe Area Padding for Mobile Bottom Bar */
@@ -485,8 +485,14 @@
     let quickPickCount = 2;
     let currentMapZoom = 1.0;
 
+    let lastToggleTime = 0;
+
     function toggleSeat(btn) {
-        if (btn.classList.contains('seat-booked')) return;
+        if (!btn || btn.classList.contains('seat-booked')) return;
+
+        const now = Date.now();
+        if (now - lastToggleTime < 180) return; // Prevent double-trigger from touchend + click
+        lastToggleTime = now;
 
         const seatId = btn.dataset.seatId;
         const seatLabel = btn.dataset.seatLabel;
@@ -713,5 +719,39 @@
             container.firstElementChild.style.transform = 'scale(1.0)';
         }
     }
+
+    // Dedicated Mobile Touch Listener for 100% Instant Seat Tapping
+    document.addEventListener('DOMContentLoaded', () => {
+        const seatMap = document.getElementById('seatMapContainer');
+        if (!seatMap) return;
+
+        let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+
+        seatMap.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches.length === 1) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                touchStartTime = Date.now();
+            }
+        }, { passive: true });
+
+        seatMap.addEventListener('touchend', (e) => {
+            if (e.changedTouches && e.changedTouches.length === 1) {
+                const touch = e.changedTouches[0];
+                const dx = Math.abs(touch.clientX - touchStartX);
+                const dy = Math.abs(touch.clientY - touchStartY);
+                const dt = Date.now() - touchStartTime;
+
+                // Tap gesture: small movement (< 18px) and short duration (< 500ms)
+                if (dx < 18 && dy < 18 && dt < 500) {
+                    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+                    const seatBtn = target ? target.closest('.seat-btn') : null;
+                    if (seatBtn && !seatBtn.classList.contains('seat-booked')) {
+                        toggleSeat(seatBtn);
+                    }
+                }
+            }
+        }, { passive: true });
+    });
 </script>
 {% endblock %}
